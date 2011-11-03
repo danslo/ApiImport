@@ -1,0 +1,17 @@
+Magento introduced many performance and stability fixes between 1.4 and 1.6 to their Mage_ImportExport module. 
+Unfortunately, the current catalog API still uses original Magento models which means product imports may take up to 5 seconds per product. 
+This (modman) module is an attempt to provide an API interface to the ImportExport module so that you can do fast XMLRPC/SOAP based imports.
+You can simply provide your (array-based) import data in the exact same way as you would provide CSV files to ImportExport.
+
+The following is a very simple benchmark run done with 10,000 simple products on a Virtual Machine running Debian, with 1GB RAM and without any MySQL optimizations. Your experiences may vary.
+
+Dropping old entities...
+Generating 10000 testproducts...
+Generated 25 bunches of 400 products each!
+Importing products... Using the external API!
+
+========== Import statistics ==========
+Total duration:		99.130189s
+Average per product:	0.009913s
+Products per second:	100.877443s
+Products per hour:	363158.795360s
