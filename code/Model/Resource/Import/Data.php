@@ -48,7 +48,7 @@ class Danslo_ApiImport_Model_Resource_Import_Data implements IteratorAggregate {
     
     public function getBehavior() {
         if($this->_behavior === null) {
-            Mage::throwException('Import resource model was not provided any entity type.');
+            Mage::throwException('Import resource model was not provided any import behavior.');
         }
         return $this->_behavior;
     }

@@ -18,7 +18,7 @@
 class Danslo_ApiImport_Model_Import_Entity_Product extends Mage_ImportExport_Model_Import_Entity_Product {
     
     public function __construct() {
-        $entityType = Mage::getSingleton('eav/config')->getEntityType($this->getEntityTypeCode());
+        $entityType             = Mage::getSingleton('eav/config')->getEntityType($this->getEntityTypeCode());
         $this->_entityTypeId    = $entityType->getEntityTypeId();
         $this->_connection      = Mage::getSingleton('core/resource')->getConnection('write');
         $this->_dataSourceModel = Danslo_ApiImport_Model_Import::getDataSourceModel();
