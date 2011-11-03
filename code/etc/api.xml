@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config>
+    <api>
+        <resources>
+            <import translate="title" module="api_import">
+                <model>api_import/import_api</model>
+                <title>Import API</title>
+                <methods>
+                    <setBehavior translate="title" module="api_import">
+                        <title>Sets the import behavior</title>
+                    </setBehavior>
+                    <setEntityTypeCode translate="title" module="api_import">
+                        <title>Sets the type for imported entities</title>
+                    </setEntityTypeCode>
+                    <importEntities translate="title" module="api_import">
+                        <title>Import entities</title>
+                    </importEntities>
+                </methods>
+                <faults module="api_import">
+                    <invalid_entity_type>
+                        <code>100</code>
+                        <message>Entity type is not valid.</message>
+                    </invalid_entity_type>
+                    <invalid_behavior>
+                        <code>101</code>
+                        <message>Import behavior is not valid.</message>
+                    </invalid_behavior>
+                    <import_failed>
+                        <code>102</code>
+                        <message>Import failed. Please see message for more information.</message>
+                    </import_failed>
+                </faults>
+            </import>
+        </resources>
+    </api>
+</config>

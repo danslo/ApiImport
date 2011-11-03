@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config>
+    <global>
+        <models>
+            <api_import>
+                <class>Danslo_ApiImport_Model</class>
+                <resourceModel>api_import_resource</resourceModel>
+            </api_import>
+            <api_import_resource>
+                <class>Danslo_ApiImport_Model_Resource</class>
+            </api_import_resource>
+        </models>
+        <api_import>
+            <import_entities>
+                <catalog_product>
+                    <model_token>api_import/import_entity_product</model_token>
+                    <label>XMLRPC Products</label>
+                </catalog_product>
+            </import_entities>
+        </api_import>
+    </global>
+</config>
