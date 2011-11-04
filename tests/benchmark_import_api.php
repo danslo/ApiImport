@@ -54,13 +54,7 @@ foreach(array('simple', 'configurable') as $productType) {
     printf('Starting import...' . PHP_EOL);
     $totalTime = microtime(true);
     try {
-        $client->call('multiCall', array($session,
-            array(
-                array('import.setBehavior',       Mage_ImportExport_Model_Import::BEHAVIOR_APPEND),
-                array('import.setEntityTypeCode', Mage_Catalog_Model_Product::ENTITY),
-                array('import.importEntities',    array($products))
-            )
-        ));
+        $client->call('call', array($session, 'import.importEntities', array($products)));
     } 
     catch(Exception $e) {
         printf('Import failed: '     . PHP_EOL, $e->getMessage());

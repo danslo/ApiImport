@@ -23,9 +23,11 @@ class Danslo_ApiImport_Model_Import_Api extends Mage_Api_Model_Resource_Abstract
         $this->_api = Mage::getSingleton('api_import/import');
     }
 
-    public function importEntities($entities) {
-        $this->_api->getDataSourceModel()->setEntities($entities);
+    public function importEntities($entities, $entityType = null, $behavior = null) {
+        $this->_setEntityTypeCode($entityType ? $entityType : Mage_Catalog_Model_Product::ENTITY);
+        $this->_setBehavior($behavior ? $behavior : Mage_ImportExport_Model_Import::BEHAVIOR_APPEND);
         
+        $this->_api->getDataSourceModel()->setEntities($entities);
         try {
             $result = $this->_api->importSource();
         } catch(Mage_Core_Exception $e) {
@@ -35,7 +37,7 @@ class Danslo_ApiImport_Model_Import_Api extends Mage_Api_Model_Resource_Abstract
         return array($result);
     }
     
-    public function setEntityTypeCode($entityType) {
+    protected function _setEntityTypeCode($entityType) {
         try {
             $this->_api->getDataSourceModel()->setEntityTypeCode($entityType);
         } catch(Mage_Core_Exception $e) {
@@ -43,7 +45,7 @@ class Danslo_ApiImport_Model_Import_Api extends Mage_Api_Model_Resource_Abstract
         }
     }
     
-    public function setBehavior($behavior) {
+    protected function _setBehavior($behavior) {
         try {
             $this->_api->getDataSourceModel()->setBehavior($behavior);
         } catch(Mage_Core_Exception $e) {

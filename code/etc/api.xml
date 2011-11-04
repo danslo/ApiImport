@@ -6,12 +6,6 @@
                 <model>api_import/import_api</model>
                 <title>Import API</title>
                 <methods>
-                    <setBehavior translate="title" module="api_import">
-                        <title>Sets the import behavior</title>
-                    </setBehavior>
-                    <setEntityTypeCode translate="title" module="api_import">
-                        <title>Sets the type for imported entities</title>
-                    </setEntityTypeCode>
                     <importEntities translate="title" module="api_import">
                         <title>Import entities</title>
                     </importEntities>
