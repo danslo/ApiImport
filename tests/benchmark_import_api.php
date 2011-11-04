@@ -19,75 +19,70 @@ require_once 'app/Mage.php';
 
 Mage::init();
 
-define('BENCHMARK',     true);
-define('NUM_PRODUCTS',  10000);
+define('NUM_PRODUCTS',  2000);
 define('BUNCH_NUM',     400);
-define('USE_API',       true);
 define('API_USER',      'apiUser');
 define('API_KEY',       'someApiKey123');
 
-if(BENCHMARK) {
-    printf('Dropping old entities...' . PHP_EOL);
-    Mage::getSingleton('core/resource')->getConnection('core_write')->query('TRUNCATE TABLE catalog_product_entity');
-    
-    printf('Generating %d testproducts...' . PHP_EOL, NUM_PRODUCTS);
-    $bunches  = array();
-    $products = array();
-    for($i = 1; $i <= NUM_PRODUCTS; $i++) {
-        $products[$i] = array(
-           'sku'                => 'some_sku_' . $i,
-           '_type'              => Mage_Catalog_Model_Product_Type::TYPE_SIMPLE,
-           '_attribute_set'     => 'Default',
-            'name'              => 'Some product ( ' . $i . ' )',
-            'price'             => rand(1, 1000),
-            'description'       => 'Some description',
-            'short_description' => 'Some short description',
-            'weight'            => rand(1, 1000),
-            'status'            => Mage_Catalog_Model_Product_Status::STATUS_ENABLED,
-            'visibility'        => Mage_Catalog_Model_Product_Visibility::VISIBILITY_BOTH,
-            'tax_class_id'      => 0
-        );
-        
-        if(($i && $i % BUNCH_NUM == 0) || $i == NUM_PRODUCTS) {
-            $bunches[] = $products;
-            $products = array();
-        }
-    }
-    printf('Generated %d bunches of %d products each!' . PHP_EOL, count($bunches), BUNCH_NUM);
-    
-    printf('Importing products... Using %s!' . PHP_EOL, USE_API ? 'the external API' : 'Magento models');
+$helper = Mage::helper('api_import/test');
+
+/*
+ * Create an API connection.
+ * Standard timeout for Zend_Http_Client is 10 seconds, so we must lengthen it.
+ */
+$client = new Zend_XmlRpc_Client(Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_WEB) . 'api/xmlrpc/');
+$client->getHttpClient()->setConfig(array(
+    'timeout' => -1
+));
+$session = $client->call('login', array(API_USER, API_KEY));
+
+/*
+ * Careful! Drops all product entities from database.
+ */
+$helper->removeAllProducts();
+
+foreach(array('simple', 'configurable') as $productType) {
+    /*
+     * Generation method depends on product type.
+     */
+    printf('Generating %d %s products...' . PHP_EOL, NUM_PRODUCTS, $productType);
+    $products = $helper->{sprintf('generateRandom%sProducts', $productType)}(NUM_PRODUCTS, BUNCH_NUM);
+
+    /*
+     * Attempt to import generated products.
+     */
+    printf('Starting import...' . PHP_EOL);
     $totalTime = microtime(true);
-    if(USE_API) {
-        $client = new Zend_XmlRpc_Client(Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_WEB) . 'api/xmlrpc/');
-        $client->getHttpClient()->setConfig(array(
-            'timeout' => -1
-        ));
-        $session = $client->call('login', array(API_USER, API_KEY));
-        
+    try {
         $client->call('multiCall', array($session,
             array(
                 array('import.setBehavior',       Mage_ImportExport_Model_Import::BEHAVIOR_APPEND),
                 array('import.setEntityTypeCode', Mage_Catalog_Model_Product::ENTITY),
-                array('import.importEntities',    array($bunches))
+                array('import.importEntities',    array($products))
             )
         ));
-        
-        $client->call('endSession', array($session));
     } 
-    else {
-        $import = Mage::getModel('api_import/import');
-        $import->getDataSourceModel()
-            ->setBehavior(Mage_ImportExport_Model_Import::BEHAVIOR_APPEND)
-            ->setEntityTypeCode(Mage_Catalog_Model_Product::ENTITY)
-            ->setEntities($bunches);
-
-        $import->importSource();
+    catch(Exception $e) {
+        printf('Import failed: '     . PHP_EOL, $e->getMessage());
+        printf('Server returned: %s' . PHP_EOL, $client->getHttpClient()->getLastResponse()->getBody());
+        exit;
     }
     $totalTime = microtime(true) - $totalTime;
-
-    printf(PHP_EOL . '========== Import statistics ==========' . PHP_EOL);
+    printf('Done! Magento reports %d products in catalog.' . PHP_EOL, Mage::getModel('catalog/product')->getCollection()->count());
+    
+    /*
+     * Generate some rough statistics.
+     */
+    printf('========== Import statistics ==========' . PHP_EOL);
     printf("Total duration:\t\t%fs"    . PHP_EOL, $totalTime);
     printf("Average per product:\t%fs" . PHP_EOL, $totalTime / NUM_PRODUCTS);
     printf("Products per second:\t%fs" . PHP_EOL, 1 / ($totalTime / NUM_PRODUCTS));
     printf("Products per hour:\t%fs"   . PHP_EOL, (60 * 60) / ($totalTime / NUM_PRODUCTS));
+    printf('=======================================' . PHP_EOL . PHP_EOL);
 }
+
+/*
+ * Cleanup.
+ */
+$helper->removeAllProducts();
+$client->call('endSession', array($session));

@@ -10,6 +10,11 @@
                 <class>Danslo_ApiImport_Model_Resource</class>
             </api_import_resource>
         </models>
+        <helpers>
+            <api_import>
+                <class>Danslo_ApiImport_Helper</class>
+            </api_import>
+        </helpers>
         <api_import>
             <import_entities>
                 <catalog_product>
