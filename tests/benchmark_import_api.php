@@ -20,9 +20,9 @@ require_once 'app/Mage.php';
 Mage::init();
 
 define('NUM_PRODUCTS',  2000);
-define('BUNCH_NUM',     400);
 define('API_USER',      'apiUser');
 define('API_KEY',       'someApiKey123');
+define('USE_API',       false);
 
 $helper = Mage::helper('api_import/test');
 
@@ -41,25 +41,34 @@ $session = $client->call('login', array(API_USER, API_KEY));
  */
 $helper->removeAllProducts();
 
-foreach(array('simple', 'configurable') as $productType) {
+foreach(array(/*'simple', */ 'configurable') as $productType) {
     /*
      * Generation method depends on product type.
      */
     printf('Generating %d %s products...' . PHP_EOL, NUM_PRODUCTS, $productType);
-    $products = $helper->{sprintf('generateRandom%sProducts', $productType)}(NUM_PRODUCTS, BUNCH_NUM);
-
+    $products = $helper->{sprintf('generateRandom%sProducts', $productType)}(NUM_PRODUCTS);
+    
     /*
      * Attempt to import generated products.
      */
     printf('Starting import...' . PHP_EOL);
     $totalTime = microtime(true);
-    try {
-        $client->call('call', array($session, 'import.importEntities', array($products)));
-    } 
-    catch(Exception $e) {
-        printf('Import failed: '     . PHP_EOL, $e->getMessage());
-        printf('Server returned: %s' . PHP_EOL, $client->getHttpClient()->getLastResponse()->getBody());
-        exit;
+    
+    if(USE_API) {
+        try {
+            $client->call('call', array($session, 'import.importEntities', array($products)));
+        } 
+        catch(Exception $e) {
+            printf('Import failed: '     . PHP_EOL, $e->getMessage());
+            printf('Server returned: %s' . PHP_EOL, $client->getHttpClient()->getLastResponse()->getBody());
+            exit;
+        }
+    }
+    else {
+        /*
+         * For debugging purposes only.
+         */
+        Mage::getModel('api_import/import_api')->importEntities($products);
     }
     $totalTime = microtime(true) - $totalTime;
     printf('Done! Magento reports %d products in catalog.' . PHP_EOL, Mage::getModel('catalog/product')->getCollection()->count());

@@ -24,4 +24,9 @@
             </import_entities>
         </api_import>
     </global>
+    <default>
+        <api_import>
+            <bunch_num>500</bunch_num>
+        </api_import>
+    </default>
 </config>

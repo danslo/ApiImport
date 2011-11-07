@@ -15,9 +15,9 @@ class Danslo_ApiImport_Helper_Test {
         Mage::getSingleton('core/resource')->getConnection('core_write')->query('TRUNCATE TABLE catalog_product_entity');
     }
     
-    public function generateRandomSimpleProducts($numProducts, $bunchNum) {
-        $bunches  = array();
+    public function generateRandomSimpleProducts($numProducts) {
         $products = array();
+        
         for($i = 1; $i <= $numProducts; $i++) {
             $products[$i] = array_merge($this->_defaultAttributes, array(
                'sku'                => 'some_sku_' . $i,
@@ -26,34 +26,29 @@ class Danslo_ApiImport_Helper_Test {
                 'price'             => rand(1, 1000),
                 'weight'            => rand(1, 1000)
             ));
-
-            if(($i && $i % $bunchNum == 0) || $i == $numProducts) {
-                $bunches[] = $products;
-                $products = array();
-            }
         }
-        return $bunches;
+        
+        return $products;
     }
     
-    public function generateRandomConfigurableProducts($numProducts, $bunchNum) {
-        $bunches  = array();
+    public function generateRandomConfigurableProducts($numProducts) {
         $products = array();
         
         /*
          * Create a bunch of simples that we can associate.
          * Obviously in a 'real' import, most of these will be unique simples.
+         * This could be a lot cleaner...
          */
-        $simples = current($this->generateRandomSimpleProducts(3, 3));
+        $simples = $this->generateRandomSimpleProducts(3, 3);
         foreach(array('red', 'yellow', 'green') as $key => $color) {
             $simples[$key + 1]['color'] = $color;
-            $counter++;
         }
-        $bunches[] = $simples;
+        Mage::getModel('api_import/import_api')->importEntities($simples);
 
-        for($i = 1, $counter = 4; $i <= $numProducts; $i++) {
-            /*
-             * Create a configurable.
-             */
+        /*
+         * Create our configurables.
+         */
+        for($i = 1, $counter = 1; $i <= $numProducts; $i++) {
             $configurable = array_merge($this->_defaultAttributes, array(
                'sku'                    => 'some_configurable_' . $i,
                 '_type'                 => Mage_Catalog_Model_Product_Type::TYPE_CONFIGURABLE,
@@ -72,14 +67,9 @@ class Danslo_ApiImport_Helper_Test {
                 $products[$counter]['_super_attribute_option'] = $simple['color'];
                 $counter++;
             }
-            
-            if(($i && $i % $bunchNum == 0) || $i == $numProducts) {
-                $bunches[] = $products;
-                $products = array();
-            }
         }
 
-        return $bunches;
+        return $products;
     }
     
 }

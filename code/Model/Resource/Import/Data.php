@@ -17,7 +17,7 @@
 
 class Danslo_ApiImport_Model_Resource_Import_Data implements IteratorAggregate {
 
-    protected $_entities         = null;
+    protected $_entities         = array();
     protected $_entityTypeCode   = null;
     protected $_behavior         = null;
     protected $_iterator         = null;
@@ -34,7 +34,22 @@ class Danslo_ApiImport_Model_Resource_Import_Data implements IteratorAggregate {
     
     public function setEntities($entities) {
         if(count($entities)) {
-            $this->_entities = $entities;
+            $this->_entities = array();
+            
+            /*
+             * Split up entities by bunches.
+             */
+            $products = array();
+            $bunchNum = Mage::getStoreConfig('api_import/bunch_num');
+            $i = 1;
+            foreach($entities as $product) {
+                $products[$i] = $product;
+                if(($i && $i % $bunchNum == 0) || $i == count($entities)) {
+                    $this->_entities[] = $products;
+                    $products = array();
+                }
+                $i++;
+            }
             $this->_iterator = null;
         }
     }
