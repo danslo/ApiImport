@@ -1,0 +1,7 @@
+<% 
+	EXTRACT(__SCHEMA__);
+	EXTRACT(__SCHEMA_TARGET__);
+%>
+INSERT INTO <%=__TABLE_NAME_TARGET__%> (<%= StringUtils.list(__SCHEMA_TARGET_NAME__, ",") %>) 
+SELECT <%= StringUtils.list(__SCHEMA_NAME__, ",") %> FROM <%= __TABLE_NAME__ %> 
+WHERE <%=__WHERE_CLAUSE__%>;

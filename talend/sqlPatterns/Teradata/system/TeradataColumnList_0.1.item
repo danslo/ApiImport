@@ -1,0 +1,6 @@
+-- This template is just an example for the RC release, and will be modified in future version.
+
+-- ColumnList
+SELECT ColumnName from DBC.COLUMNS
+Where databasename ='<%= __DATABASE_NAME__ %>'
+and tablename = '<%= __TABLE_NAME__ %>';

@@ -1,0 +1,23 @@
+<% 
+	EXTRACT(__GROUPBY__);
+	EXTRACT(__OPERATION__);
+	String operation = "";
+	boolean flag=false;
+	for(int i=0; i < __OPERATION_INPUT_COLUMN__.length; i++){
+	 if(flag){
+	  operation += ",";
+	 }else{
+	  flag=true;
+	 }
+	if (__OPERATION_FUNCTION__[i]!= null && __OPERATION_FUNCTION__[i].indexOf("@COLUMN") != -1) {
+		operation += __OPERATION_FUNCTION__[i].replaceAll("@COLUMN", __OPERATION_INPUT_COLUMN__[i]);
+	} else {
+	 	operation += (__OPERATION_FUNCTION__[i] + "(" + __OPERATION_INPUT_COLUMN__[i] + ")");
+	}
+	}
+	
+%>
+
+INSERT INTO <%=__TABLE_NAME_TARGET__%> (<%=StringUtils.list(__OPERATION_OUTPUT_COLUMN__, ",")%> , <%= StringUtils.list(__GROUPBY_OUTPUT_COLUMN__, ",") %> )
+SELECT <%= operation %>, <%= StringUtils.list(__GROUPBY_INPUT_COLUMN__, ",") %> FROM <%= __TABLE_NAME__ %>
+GROUP BY <%=StringUtils.list(__GROUPBY_INPUT_COLUMN__, ",", "", "") %>;

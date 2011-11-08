@@ -1,0 +1,42 @@
+<%
+	EXTRACT(__SCHEMA_TARGET__);
+	String fieldsTarget = "";
+	boolean flagTarget =false;
+	for(int i=0; i < __SCHEMA_TARGET__.length; i++){
+	 if(flagTarget){
+		 fieldsTarget += ",";
+	 }else{
+		 flagTarget=true;
+	 }
+	 	if(__SCHEMA_TARGET_DBTYPE__[i].equals("DECIMAL") || __SCHEMA_TARGET_DBTYPE__[i].equals("VARCHAR") || __SCHEMA_TARGET_DBTYPE__[i].equals("CHAR") || __SCHEMA_TARGET_DBTYPE__[i].equals("BYTE") || __SCHEMA_TARGET_DBTYPE__[i].equals("VARBYTE")){
+	 		 fieldsTarget  += (__SCHEMA_TARGET_NAME__[i] + " " + __SCHEMA_TARGET_DBTYPE__[i] +" ("+ __SCHEMA_TARGET_LENGTH__[i] +") ");	
+	 	} else if(__SCHEMA_TARGET_DBTYPE__[i].equals("DECIMAL")){
+	 		 fieldsTarget  += (__SCHEMA_TARGET_NAME__[i] + " " + __SCHEMA_TARGET_DBTYPE__[i] +" ("+ __SCHEMA_TARGET_LENGTH__[i] +","+ __SCHEMA_TARGET_PRECISION__[i] +") ");	
+	 	} else {
+	 		 fieldsTarget  += (__SCHEMA_TARGET_NAME__[i] + " " + __SCHEMA_TARGET_DBTYPE__[i]);
+	    }
+	 	if(__SCHEMA_TARGET_NULLABLE__[i].equals("false")){
+	 		 fieldsTarget  += " NOT NULL";
+	 	}
+	}
+	String primary = "";
+	for(int j=0; j < __SCHEMA_TARGET__.length; j++){
+		if(__SCHEMA_TARGET_ISKEY__[j].equals("true") && __SCHEMA_TARGET_NULLABLE__[j].equals("false")){
+			if(primary.startsWith(" , PRIMARY KEY")) {
+				primary += ","+__SCHEMA_TARGET_NAME__[j];
+			} else {
+				primary += " , PRIMARY KEY ("+__SCHEMA_TARGET_NAME__[j];	
+			}
+		}
+	}
+	if(!primary.equals("")){
+		 fieldsTarget  += primary+")";
+	}
+%>
+
+CREATE MULTISET TABLE <%= __DATABASE_NAME__ %>.<%= __TABLE_NAME_TARGET__ %> ,NO FALLBACK ,
+NO BEFORE JOURNAL,
+NO AFTER JOURNAL,
+CHECKSUM = DEFAULT
+(
+ <%=  fieldsTarget %>); 
