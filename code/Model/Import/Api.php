@@ -25,7 +25,7 @@ class Danslo_ApiImport_Model_Import_Api extends Mage_Api_Model_Resource_Abstract
 
     public function importEntities($entities, $entityType = null, $behavior = null) {
         $this->_setEntityTypeCode($entityType ? $entityType : Mage_Catalog_Model_Product::ENTITY);
-        $this->_setBehavior($behavior ? $behavior : Mage_ImportExport_Model_Import::BEHAVIOR_APPEND);
+        $this->_setBehavior($behavior ? $behavior : Mage_ImportExport_Model_Import::BEHAVIOR_REPLACE);
         
         $this->_api->getDataSourceModel()->setEntities($entities);
         try {
