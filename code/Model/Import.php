@@ -31,7 +31,13 @@ class Danslo_ApiImport_Model_Import extends Mage_ImportExport_Model_Import {
             'behavior' => self::getDataSourceModel()->getBehavior()
         ));
         $this->addLogComment(Mage::helper('importexport')->__('Begin import of "%s" with "%s" behavior', $this->getEntity(), $this->getBehavior()));
+        
+        /*
+         * Import entities.
+         */
         $result = $this->_getEntityAdapter()->importData();
+        
+        
         $this->addLogComment(array(
             Mage::helper('importexport')->__('Checked rows: %d, checked entities: %d, invalid rows: %d, total errors: %d',
                 $this->getProcessedRowsCount(), $this->getProcessedEntitiesCount(),
@@ -39,6 +45,16 @@ class Danslo_ApiImport_Model_Import extends Mage_ImportExport_Model_Import {
             ),
             Mage::helper('importexport')->__('Import has been done successfuly.')
         ));
+        
+        /*
+         * We circumvent validateSource, so we output the errors (if any) ourselves here.
+         */
+        foreach ($this->getErrors() as $errorCode => $rows) {
+            $error = $errorCode . ' '
+                . Mage::helper('importexport')->__('in rows') . ': '
+                . implode(', ', $rows);
+            $this->addLogComment($error);
+        }
         return $result;
     }
     
