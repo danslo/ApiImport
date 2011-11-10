@@ -47,7 +47,8 @@ class Danslo_ApiImport_Model_Import_Entity_Product extends Mage_ImportExport_Mod
         $transport = Mage::getModel('index/event');
         $transport->setNewData(array(
             'product_ids'               => $entities,   // for category_indexer_product
-            'reindex_price_product_ids' => $entities    // for product_indexer_price
+            'reindex_price_product_ids' => $entities,   // for product_indexer_price
+            'reindex_stock_product_ids' => $entities    // 
         ));
 
         /*
@@ -55,6 +56,7 @@ class Danslo_ApiImport_Model_Import_Entity_Product extends Mage_ImportExport_Mod
          */
         Mage::getResourceSingleton('catalog/category_indexer_product')->catalogProductMassAction($transport);
         Mage::getResourceSingleton('catalog/product_indexer_price')->catalogProductMassAction($transport);
+        Mage::getResourceSingleton('cataloginventory/indexer_stock')->catalogProductMassAction($transport);
 
         return $this;
     }
