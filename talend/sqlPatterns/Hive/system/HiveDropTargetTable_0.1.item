@@ -1,4 +1,0 @@
--- This template is just an example for the RC release, and will be modified in future version.
-
--- DROP TARGET TABLE
-DROP TABLE <%=__TABLE_NAME_TARGET__%>;

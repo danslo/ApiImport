@@ -1,7 +1,0 @@
-<% 
-	EXTRACT(__SCHEMA__);
-	EXTRACT(__SCHEMA_TARGET__);
-%>
-INSERT OVERWRITE TABLE <%=__TABLE_NAME_TARGET__%> 
-SELECT <%= StringUtils.list(__SCHEMA_NAME__, ",") %> FROM <%= __TABLE_NAME__ %> 
-WHERE <%=__WHERE_CLAUSE__%>;

@@ -1,6 +1,0 @@
--- This template is just an example for the RC release, and will be modified in future version.
-
--- TableList
-SELECT TableName from DBC.TABLES
-WHERE databasename = '<%= __DATABASE_NAME__ %>'
-AND tablekind = 'T';

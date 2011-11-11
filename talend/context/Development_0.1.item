@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<talendfile:ContextType xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:talendfile="platform:/resource/org.talend.model/model/TalendFile.xsd" confirmationNeeded="false" name="Default">
-  <contextParameter comment="" name="apiUser" prompt="apiUser?" promptNeeded="false" type="id_String" value="&quot;apiUser&quot;"/>
-  <contextParameter comment="" name="apiKey" prompt="apiKey?" promptNeeded="false" type="id_String" value="&quot;someApiKey123&quot;"/>
-  <contextParameter comment="" name="apiUrl" prompt="apiUrl?" promptNeeded="false" type="id_String" value="&quot;http://latest.local/api/xmlrpc/&quot;"/>
-</talendfile:ContextType>
