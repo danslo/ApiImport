@@ -26,7 +26,36 @@
     </global>
     <default>
         <api_import>
-            <bunch_num>500</bunch_num>
+            <import_settings>
+                <bunch_num>1000</bunch_num>
+                <enable_stock_index>1</enable_stock_index>
+                <enable_price_index>1</enable_price_index>
+                <enable_category_relation_index>1</enable_category_relation_index>
+                <enable_attribute_index>1</enable_attribute_index>
+                <enable_search_index>1</enable_search_index>
+                <enable_rewrite_index>1</enable_rewrite_index>
+            </import_settings>
         </api_import>
     </default>
+    <adminhtml>
+        <acl>
+            <resources>
+                <admin>
+                    <children>
+                        <system>
+                            <children>
+                                <config>
+                                    <children>
+                                        <api_import>
+                                            <title>API Import Settings</title>
+                                        </api_import>
+                                    </children>
+                                </config>
+                            </children>
+                        </system>
+                    </children>
+                </admin>
+            </resources>
+        </acl>
+    </adminhtml>
 </config>

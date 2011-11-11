@@ -42,13 +42,21 @@ class Danslo_ApiImport_Model_Import_Entity_Product extends Mage_ImportExport_Mod
         return Mage::getResourceSingleton('catalogsearch/fulltext')->rebuildIndex(null, $productIds);
     }
     
+    protected function _indexRewrites(&$productIds) {
+        $indexer = Mage::getResourceSingleton('ecomdev_urlrewrite/indexer');
+        if($indexer) {
+            return Mage::getResourceSingleton('ecomdev_urlrewrite/indexer')->updateProductRewrites($productIds);
+        }
+        return true;
+    }
+    
     protected function _indexEntities() {
         /*
          * Run some of the indexers for newly imported entities.
          */
-        $entities = array();
+        $entityIds = array();
         foreach($this->_newSku as $sku) {
-            $entities[] = $sku['entity_id'];
+            $entityIds[] = $sku['entity_id'];
         }
         
         /*
@@ -56,21 +64,34 @@ class Danslo_ApiImport_Model_Import_Entity_Product extends Mage_ImportExport_Mod
          */
         $event = Mage::getModel('index/event');
         $event->setNewData(array(
-            'product_ids'               => &$entities, // for category_indexer_product
-            'reindex_price_product_ids' => &$entities, // for product_indexer_price
-            'reindex_stock_product_ids' => &$entities, // for indexer_stock
-            'reindex_eav_product_ids'   => &$entities  // for product_indexer_eav
+            'product_ids'               => &$entityIds, // for category_indexer_product
+            'reindex_price_product_ids' => &$entityIds, // for product_indexer_price
+            'reindex_stock_product_ids' => &$entityIds, // for indexer_stock
+            'reindex_eav_product_ids'   => &$entityIds  // for product_indexer_eav
         ));
 
         /*
          * Rebuild indexes that are essential to basic functionality.
          */
         try {
-            $this->_indexStock($event);
-            $this->_indexPrice($event);
-            $this->_indexCategoryRelation($event);
-            $this->_indexEav($event);
-            $this->_indexSearch($entities);
+            if(Mage::getStoreConfig('api_import/import_settings/enable_stock_index')) {
+                $this->_indexStock($event);
+            }
+            if(Mage::getStoreConfig('api_import/import_settings/enable_price_index')) {
+                $this->_indexPrice($event);
+            }
+            if(Mage::getStoreConfig('api_import/import_settings/enable_category_relation_index')) {
+                $this->_indexCategoryRelation($event);
+            }
+            if(Mage::getStoreConfig('api_import/import_settings/enable_attribute_index')) {
+                $this->_indexEav($event);
+            }
+            if(Mage::getStoreConfig('api_import/import_settings/enable_search_index')) {
+                $this->_indexSearch($entityIds);
+            }
+            if(Mage::getStoreConfig('api_import/import_settings/enable_rewrite_index')) {
+                $this->_indexRewrites($entityIds);
+            }
         } 
         catch(Exception $e) {
             return false;

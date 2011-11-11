@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config>
+    <sections>
+        <api_import>
+            <label>API Import</label>
+            <sort_order>10000</sort_order>
+            <show_in_default>1</show_in_default>
+            <show_in_website>0</show_in_website>
+            <show_in_store>0</show_in_store>
+            <tab>service</tab>
+            <groups>
+                <import_settings>
+                    <label>Import Settings</label>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>0</show_in_website>
+                    <show_in_store>0</show_in_store>
+                    <fields>
+                        <bunch_num>
+                            <label>Import bunch size</label>
+                            <frontend_type>text</frontend_type>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </bunch_num>
+                        <enable_stock_index>
+                            <label>Index stock for imported products</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </enable_stock_index>
+                        <enable_price_index>
+                            <label>Index prices for imported products</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </enable_price_index>
+                        <enable_category_relation_index>
+                            <label>Index category/product relation for imported products</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </enable_category_relation_index>
+                        <enable_attribute_index>
+                            <label>Index attributes (layered navigation) for imported products</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </enable_attribute_index>
+                        <enable_search_index>
+                            <label>Index fulltext search for imported products</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </enable_search_index>
+                        <enable_rewrite_index>
+                            <label>Index URL rewrites for imported products</label>
+                            <comment>
+                                <![CDATA[Please note that <a target="_blank" href="http://www.ecomdev.org/2011/10/08/ecomdev-breaks-magento-speed-limits.html">EcomDev_UrlRewrite</a> must be installed for this indexer to work.<br />
+                                         Magento's default indexer is too slow to be implemented here.<br />
+                                         If you still wish to use the original indexer, please do so nightly via cron.]]>
+                            </comment>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </enable_rewrite_index>
+                    </fields>
+                </import_settings>
+            </groups>
+        </api_import>
+    </sections>
+</config>
