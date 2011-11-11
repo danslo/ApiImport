@@ -40,7 +40,7 @@ class Danslo_ApiImport_Model_Resource_Import_Data implements IteratorAggregate {
              * Split up entities by bunches.
              */
             $products = array();
-            $bunchNum = Mage::getStoreConfig('api_import/bunch_num');
+            $bunchNum = Mage::getStoreConfig('api_import/import_settings/bunch_num');
             $i = 1;
             foreach($entities as $product) {
                 $products[$i] = $product;
