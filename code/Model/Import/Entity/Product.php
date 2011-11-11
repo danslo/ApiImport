@@ -18,18 +18,28 @@
 class Danslo_ApiImport_Model_Import_Entity_Product extends Mage_ImportExport_Model_Import_Entity_Product {
     
     public function __construct() {
-        $entityType             = Mage::getSingleton('eav/config')->getEntityType($this->getEntityTypeCode());
-        $this->_entityTypeId    = $entityType->getEntityTypeId();
-        $this->_connection      = Mage::getSingleton('core/resource')->getConnection('write');
+        parent::__construct();
         $this->_dataSourceModel = Danslo_ApiImport_Model_Import::getDataSourceModel();
-
-        $this->_initWebsites()
-            ->_initStores()
-            ->_initAttributeSets()
-            ->_initTypeModels()
-            ->_initCategories()
-            ->_initSkus()
-            ->_initCustomerGroups();
+    }
+    
+    protected function _indexStock(&$event) {
+        return Mage::getResourceSingleton('cataloginventory/indexer_stock')->catalogProductMassAction($event);
+    }
+    
+    protected function _indexPrice(&$event) {
+        return Mage::getResourceSingleton('catalog/product_indexer_price')->catalogProductMassAction($event);
+    }
+    
+    protected function _indexCategoryRelation(&$event) {
+        return Mage::getResourceSingleton('catalog/category_indexer_product')->catalogProductMassAction($event);
+    }
+    
+    protected function _indexEav(&$event) {
+        return Mage::getResourceSingleton('catalog/product_indexer_eav')->catalogProductMassAction($event);
+    }
+    
+    protected function _indexSearch(&$productIds) {
+        return Mage::getResourceSingleton('catalogsearch/fulltext')->rebuildIndex(null, $productIds);
     }
     
     protected function _indexEntities() {
@@ -42,29 +52,37 @@ class Danslo_ApiImport_Model_Import_Entity_Product extends Mage_ImportExport_Mod
         }
         
         /*
-         * Set up transport object containing entities.
+         * Set up event object for transporting our product ids.
          */
-        $transport = Mage::getModel('index/event');
-        $transport->setNewData(array(
+        $event = Mage::getModel('index/event');
+        $event->setNewData(array(
             'product_ids'               => &$entities, // for category_indexer_product
             'reindex_price_product_ids' => &$entities, // for product_indexer_price
-            'reindex_stock_product_ids' => &$entities  // for indexer_stock 
+            'reindex_stock_product_ids' => &$entities, // for indexer_stock
+            'reindex_eav_product_ids'   => &$entities  // for product_indexer_eav
         ));
 
         /*
-         * TODO: Some error handling.
+         * Rebuild indexes that are essential to basic functionality.
          */
-        Mage::getResourceSingleton('catalog/category_indexer_product')->catalogProductMassAction($transport);
-        Mage::getResourceSingleton('catalog/product_indexer_price')->catalogProductMassAction($transport);
-        Mage::getResourceSingleton('cataloginventory/indexer_stock')->catalogProductMassAction($transport);
+        try {
+            $this->_indexStock($event);
+            $this->_indexPrice($event);
+            $this->_indexCategoryRelation($event);
+            $this->_indexEav($event);
+            $this->_indexSearch($entities);
+        } 
+        catch(Exception $e) {
+            return false;
+        }
 
-        return $this;
+        return true;
     }
     
     public function _importData() {
         $result = parent::_importData();
         if($result) {
-            $this->_indexEntities();
+            $result = $this->_indexEntities();
         }
         return $result;
     }
