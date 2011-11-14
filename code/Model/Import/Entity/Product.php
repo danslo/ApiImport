@@ -45,7 +45,7 @@ class Danslo_ApiImport_Model_Import_Entity_Product extends Mage_ImportExport_Mod
     protected function _indexRewrites(&$productIds) {
         $indexer = Mage::getResourceSingleton('ecomdev_urlrewrite/indexer');
         if($indexer) {
-            return Mage::getResourceSingleton('ecomdev_urlrewrite/indexer')->updateProductRewrites($productIds);
+            return $indexer->updateProductRewrites($productIds);
         }
         return true;
     }
