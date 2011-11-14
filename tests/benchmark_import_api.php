@@ -22,7 +22,7 @@ Mage::init();
 define('NUM_PRODUCTS',  2000);
 define('API_USER',      'apiUser');
 define('API_KEY',       'someApiKey123');
-define('USE_API',       false);
+define('USE_API',       true);
 
 $helper = Mage::helper('api_import/test');
 
@@ -41,7 +41,7 @@ $session = $client->call('login', array(API_USER, API_KEY));
  */
 $helper->removeAllProducts();
 
-foreach(array(/*'simple', */ 'configurable') as $productType) {
+foreach(array('simple', 'configurable') as $productType) {
     /*
      * Generation method depends on product type.
      */
