@@ -17,9 +17,28 @@
 
 class Danslo_ApiImport_Model_Import_Entity_Product extends Mage_ImportExport_Model_Import_Entity_Product {
     
+    protected $_attributes = null;
+    
     public function __construct() {
-        parent::__construct();
+        /*
+         * Setup from the abstract model.
+         */
+        $entityType = Mage::getSingleton('eav/config')->getEntityType($this->getEntityTypeCode());
+        $this->_entityTypeId    = $entityType->getEntityTypeId();
         $this->_dataSourceModel = Danslo_ApiImport_Model_Import::getDataSourceModel();
+        $this->_connection      = Mage::getSingleton('core/resource')->getConnection('write');
+        
+        /*
+         * Setup for product entities.
+         */
+        $this->_importAttributes() // Import non-existent attribute values.
+            ->_initWebsites()
+            ->_initStores()
+            ->_initAttributeSets()
+            ->_initTypeModels()
+            ->_initCategories()
+            ->_initSkus()
+            ->_initCustomerGroups();
     }
     
     protected function _indexStock(&$event) {
@@ -47,7 +66,7 @@ class Danslo_ApiImport_Model_Import_Entity_Product extends Mage_ImportExport_Mod
         if($indexer) {
             return $indexer->updateProductRewrites($productIds);
         }
-        return true;
+        return $this;
     }
     
     protected function _indexEntities() {
@@ -96,10 +115,66 @@ class Danslo_ApiImport_Model_Import_Entity_Product extends Mage_ImportExport_Mod
         catch(Exception $e) {
             return false;
         }
-
-        return true;
+        
+        return $this;
     }
     
+    protected function _initAttributes() {
+        if($this->_attributes === null) {
+            $productEntityType = Mage::getModel('eav/entity_type')->loadByCode($this->getEntityTypeCode());
+            $productAttributes = $productEntityType->getAttributeCollection()
+                    ->setFrontendInputTypeFilter('select')
+                    ->addFieldToFilter('is_user_defined', true);
+
+            /*
+             * Group attributes by code for easier lookup.
+             */
+            foreach($productAttributes as $attribute) {
+                $this->_attributes[$attribute->getAttributeCode()] = $attribute;
+            }
+        }
+        
+        return $this;
+    }
+    
+    protected function _importAttributes() {
+        /*
+         * TODO: Support for multiple storeviews.
+         */
+        $this->_initAttributes();
+        foreach($this->_attributes as $code => $attribute) {
+            /*
+             * Optionally add non-existent attributes.
+             */
+            $sourceOptions = $attribute->getSource()->getAllOptions(false);
+            while($bunch = $this->_dataSourceModel->getNextBunch()) {
+                foreach($bunch as $rowNum => $rowData) {
+                    if(isset($rowData[$code])) {
+                        $optionExists = false;
+                        foreach($sourceOptions as $sourceOption) {
+                            if($rowData[$code] == $sourceOption['label']) {
+                                $optionExists = true;
+                                break;
+                            }
+                        }
+                        if(!$optionExists) {
+                            $options['value'][$rowData[$code]][0] = $rowData[$code];
+                        }
+                    }
+                }
+            }
+            /*
+             * Save all attributes.
+             */
+            if(!empty($options)) {
+                $attribute->setOption($options)->save();
+            }
+        }
+        $this->_dataSourceModel->getIterator()->rewind();
+        
+        return $this;
+    }
+
     public function _importData() {
         $result = parent::_importData();
         if($result) {
