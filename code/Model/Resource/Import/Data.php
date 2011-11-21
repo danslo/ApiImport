@@ -81,7 +81,7 @@ class Danslo_ApiImport_Model_Resource_Import_Data implements IteratorAggregate {
     }
     
     public function setEntityTypeCode($entityTypeCode) {
-        $allowedEntities = array_keys(Mage_ImportExport_Model_Config::getModels(Mage_ImportExport_Model_Import::CONFIG_KEY_ENTITIES));
+        $allowedEntities = array_keys(Mage_ImportExport_Model_Config::getModels(Danslo_ApiImport_Model_Import::CONFIG_KEY_ENTITIES));
         if(!in_array($entityTypeCode, $allowedEntities)) {
             Mage::throwException('Specified entity type (%s) is not in allowed entity types: %s', $entityTypeCode, implode(', ', $allowedEntities));
         }
