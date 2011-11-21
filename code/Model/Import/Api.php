@@ -16,9 +16,9 @@
 */
 
 class Danslo_ApiImport_Model_Import_Api extends Mage_Api_Model_Resource_Abstract {
-    
+
     protected $_api;
-    
+
     public function __construct() {
         $this->_api = Mage::getSingleton('api_import/import');
     }
@@ -26,7 +26,7 @@ class Danslo_ApiImport_Model_Import_Api extends Mage_Api_Model_Resource_Abstract
     public function importEntities($entities, $entityType = null, $behavior = null) {
         $this->_setEntityTypeCode($entityType ? $entityType : Mage_Catalog_Model_Product::ENTITY);
         $this->_setBehavior($behavior ? $behavior : Mage_ImportExport_Model_Import::BEHAVIOR_REPLACE);
-        
+
         $this->_api->getDataSourceModel()->setEntities($entities);
         try {
             $result = $this->_api->importSource();
@@ -36,7 +36,7 @@ class Danslo_ApiImport_Model_Import_Api extends Mage_Api_Model_Resource_Abstract
 
         return array($result);
     }
-    
+
     protected function _setEntityTypeCode($entityType) {
         try {
             $this->_api->getDataSourceModel()->setEntityTypeCode($entityType);
@@ -44,7 +44,7 @@ class Danslo_ApiImport_Model_Import_Api extends Mage_Api_Model_Resource_Abstract
             $this->_fault('invalid_entity_type', $e->getMessage());
         }
     }
-    
+
     protected function _setBehavior($behavior) {
         try {
             $this->_api->getDataSourceModel()->setBehavior($behavior);
@@ -52,5 +52,5 @@ class Danslo_ApiImport_Model_Import_Api extends Mage_Api_Model_Resource_Abstract
             $this->_fault('invalid_behavior', $e->getMessage());
         }
     }
-    
+
 }

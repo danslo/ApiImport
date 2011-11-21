@@ -32,27 +32,27 @@ class Danslo_ApiImport_Model_Import_Entity_Product extends Mage_ImportExport_Mod
             ->_initSkus()
             ->_initCustomerGroups();
     }
-    
+
     protected function _indexStock(&$event) {
         return Mage::getResourceSingleton('cataloginventory/indexer_stock')->catalogProductMassAction($event);
     }
-    
+
     protected function _indexPrice(&$event) {
         return Mage::getResourceSingleton('catalog/product_indexer_price')->catalogProductMassAction($event);
     }
-    
+
     protected function _indexCategoryRelation(&$event) {
         return Mage::getResourceSingleton('catalog/category_indexer_product')->catalogProductMassAction($event);
     }
-    
+
     protected function _indexEav(&$event) {
         return Mage::getResourceSingleton('catalog/product_indexer_eav')->catalogProductMassAction($event);
     }
-    
+
     protected function _indexSearch(&$productIds) {
         return Mage::getResourceSingleton('catalogsearch/fulltext')->rebuildIndex(null, $productIds);
     }
-    
+
     protected function _indexRewrites(&$productIds) {
         $indexer = Mage::getResourceSingleton('ecomdev_urlrewrite/indexer');
         if($indexer) {
@@ -60,13 +60,13 @@ class Danslo_ApiImport_Model_Import_Entity_Product extends Mage_ImportExport_Mod
         }
         return $this;
     }
-    
+
     protected function _indexEntities() {
         $entityIds = array();
         foreach($this->_newSku as $sku) {
             $entityIds[] = $sku['entity_id'];
         }
-        
+
         $event = Mage::getModel('index/event');
         $event->setNewData(array(
             'product_ids'               => &$entityIds, // for category_indexer_product
@@ -94,20 +94,20 @@ class Danslo_ApiImport_Model_Import_Entity_Product extends Mage_ImportExport_Mod
             if(Mage::getStoreConfig('api_import/import_settings/enable_rewrite_index')) {
                 $this->_indexRewrites($entityIds);
             }
-        } 
+        }
         catch(Exception $e) {
             return false;
         }
-        
+
         return true;
     }
-    
+
     protected function _importAttributes() {
         $productAttributes = Mage::getModel('eav/entity_type')->loadByCode($this->getEntityTypeCode())
                 ->getAttributeCollection()
                 ->setFrontendInputTypeFilter('select')
                 ->addFieldToFilter('is_user_defined', true);
-        
+
         foreach($productAttributes as $attribute) {
             $attributeCode = $attribute->getAttributeCode();
             $sourceOptions = $attribute->getSource()->getAllOptions(false);
@@ -132,7 +132,7 @@ class Danslo_ApiImport_Model_Import_Entity_Product extends Mage_ImportExport_Mod
             }
         }
         $this->_dataSourceModel->getIterator()->rewind();
-        
+
         return $this;
     }
 
@@ -143,5 +143,5 @@ class Danslo_ApiImport_Model_Import_Entity_Product extends Mage_ImportExport_Mod
         }
         return $result;
     }
-    
+
 }

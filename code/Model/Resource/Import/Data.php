@@ -21,7 +21,7 @@ class Danslo_ApiImport_Model_Resource_Import_Data implements IteratorAggregate {
     protected $_entityTypeCode   = null;
     protected $_behavior         = null;
     protected $_iterator         = null;
-    
+
     public function getIterator() {
         if($this->_iterator === null) {
             if($this->_entities === null) {
@@ -31,11 +31,11 @@ class Danslo_ApiImport_Model_Resource_Import_Data implements IteratorAggregate {
         }
         return $this->_iterator;
     }
-    
+
     public function setEntities($entities) {
         if(count($entities)) {
             $this->_entities = array();
-            
+
             /*
              * Split up entities by bunches.
              */
@@ -53,21 +53,21 @@ class Danslo_ApiImport_Model_Resource_Import_Data implements IteratorAggregate {
             $this->_iterator = null;
         }
     }
-    
+
     public function getEntityTypeCode() {
         if($this->_entityTypeCode === null) {
             Mage::throwException('Import resource model was not provided any entity type.');
         }
         return $this->_entityTypeCode;
     }
-    
+
     public function getBehavior() {
         if($this->_behavior === null) {
             Mage::throwException('Import resource model was not provided any import behavior.');
         }
         return $this->_behavior;
     }
-    
+
     public function setBehavior($behavior) {
         $allowedBehaviors = array(
             Mage_ImportExport_Model_Import::BEHAVIOR_APPEND,
@@ -79,7 +79,7 @@ class Danslo_ApiImport_Model_Resource_Import_Data implements IteratorAggregate {
         $this->_behavior = $behavior;
         return $this;
     }
-    
+
     public function setEntityTypeCode($entityTypeCode) {
         $allowedEntities = array_keys(Mage_ImportExport_Model_Config::getModels(Danslo_ApiImport_Model_Import::CONFIG_KEY_ENTITIES));
         if(!in_array($entityTypeCode, $allowedEntities)) {
@@ -88,7 +88,7 @@ class Danslo_ApiImport_Model_Resource_Import_Data implements IteratorAggregate {
         $this->_entityTypeCode = $entityTypeCode;
         return $this;
     }
-    
+
     public function getNextBunch() {
         if ($this->_iterator === null) {
             $this->_iterator = $this->getIterator();
@@ -103,5 +103,5 @@ class Danslo_ApiImport_Model_Resource_Import_Data implements IteratorAggregate {
         }
         return $dataRow;
     }
-    
+
 }
