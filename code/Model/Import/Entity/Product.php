@@ -16,22 +16,14 @@
 */
 
 class Danslo_ApiImport_Model_Import_Entity_Product extends Mage_ImportExport_Model_Import_Entity_Product {
-    
-    protected $_attributes = null;
-    
+
     public function __construct() {
-        /*
-         * Setup from the abstract model.
-         */
         $entityType = Mage::getSingleton('eav/config')->getEntityType($this->getEntityTypeCode());
         $this->_entityTypeId    = $entityType->getEntityTypeId();
         $this->_dataSourceModel = Danslo_ApiImport_Model_Import::getDataSourceModel();
         $this->_connection      = Mage::getSingleton('core/resource')->getConnection('write');
-        
-        /*
-         * Setup for product entities.
-         */
-        $this->_importAttributes() // Import non-existent attribute values.
+
+        $this->_importAttributes()
             ->_initWebsites()
             ->_initStores()
             ->_initAttributeSets()
@@ -70,17 +62,11 @@ class Danslo_ApiImport_Model_Import_Entity_Product extends Mage_ImportExport_Mod
     }
     
     protected function _indexEntities() {
-        /*
-         * Run some of the indexers for newly imported entities.
-         */
         $entityIds = array();
         foreach($this->_newSku as $sku) {
             $entityIds[] = $sku['entity_id'];
         }
         
-        /*
-         * Set up event object for transporting our product ids.
-         */
         $event = Mage::getModel('index/event');
         $event->setNewData(array(
             'product_ids'               => &$entityIds, // for category_indexer_product
@@ -89,9 +75,6 @@ class Danslo_ApiImport_Model_Import_Entity_Product extends Mage_ImportExport_Mod
             'reindex_eav_product_ids'   => &$entityIds  // for product_indexer_eav
         ));
 
-        /*
-         * Rebuild indexes that are essential to basic functionality.
-         */
         try {
             if(Mage::getStoreConfig('api_import/import_settings/enable_stock_index')) {
                 $this->_indexStock($event);
@@ -116,56 +99,34 @@ class Danslo_ApiImport_Model_Import_Entity_Product extends Mage_ImportExport_Mod
             return false;
         }
         
-        return $this;
-    }
-    
-    protected function _initAttributes() {
-        if($this->_attributes === null) {
-            $productEntityType = Mage::getModel('eav/entity_type')->loadByCode($this->getEntityTypeCode());
-            $productAttributes = $productEntityType->getAttributeCollection()
-                    ->setFrontendInputTypeFilter('select')
-                    ->addFieldToFilter('is_user_defined', true);
-
-            /*
-             * Group attributes by code for easier lookup.
-             */
-            foreach($productAttributes as $attribute) {
-                $this->_attributes[$attribute->getAttributeCode()] = $attribute;
-            }
-        }
-        
-        return $this;
+        return true;
     }
     
     protected function _importAttributes() {
-        /*
-         * TODO: Support for multiple storeviews.
-         */
-        $this->_initAttributes();
-        foreach($this->_attributes as $code => $attribute) {
-            /*
-             * Optionally add non-existent attributes.
-             */
+        $productAttributes = Mage::getModel('eav/entity_type')->loadByCode($this->getEntityTypeCode())
+                ->getAttributeCollection()
+                ->setFrontendInputTypeFilter('select')
+                ->addFieldToFilter('is_user_defined', true);
+        
+        foreach($productAttributes as $attribute) {
+            $attributeCode = $attribute->getAttributeCode();
             $sourceOptions = $attribute->getSource()->getAllOptions(false);
             while($bunch = $this->_dataSourceModel->getNextBunch()) {
                 foreach($bunch as $rowNum => $rowData) {
-                    if(isset($rowData[$code])) {
+                    if(isset($rowData[$attributeCode])) {
                         $optionExists = false;
                         foreach($sourceOptions as $sourceOption) {
-                            if($rowData[$code] == $sourceOption['label']) {
+                            if($rowData[$attributeCode] == $sourceOption['label']) {
                                 $optionExists = true;
                                 break;
                             }
                         }
                         if(!$optionExists) {
-                            $options['value'][$rowData[$code]][0] = $rowData[$code];
+                            $options['value'][$rowData[$attributeCode]][0] = $rowData[$attributeCode];
                         }
                     }
                 }
             }
-            /*
-             * Save all attributes.
-             */
             if(!empty($options)) {
                 $attribute->setOption($options)->save();
             }
