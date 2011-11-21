@@ -21,6 +21,10 @@
                     <model_token>api_import/import_entity_product</model_token>
                     <label>XMLRPC Products</label>
                 </catalog_product>
+                <catalog_category>
+                    <model_token>api_import/import_entity_category</model_token>
+                    <label>XMLRPC Categories</label>
+                </catalog_category>
             </import_entities>
         </api_import>
     </global>

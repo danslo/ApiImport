@@ -1,3 +1,3 @@
-bootstrap.xml	app/etc/modules/Danslo_ApiImport.xml
-code			app/code/local/Danslo/ApiImport/
-tests/*			.
+bootstrap.xml   app/etc/modules/Danslo_ApiImport.xml
+code            app/code/local/Danslo/ApiImport/
+tests/*         .
