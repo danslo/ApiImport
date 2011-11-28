@@ -139,7 +139,7 @@ class Danslo_ApiImport_Model_Import_Entity_Product extends Mage_ImportExport_Mod
     }
 
     public function _importData() {
-        Mage::dispatchEvent($this->_eventPrefix . '_after_import', array('data_source_model' => $this->_dataSourceModel));
+        Mage::dispatchEvent($this->_eventPrefix . '_before_import', array('data_source_model' => $this->_dataSourceModel));
         $result = parent::_importData();
         if($result) {
             $result = $this->_indexEntities();

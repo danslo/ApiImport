@@ -21,6 +21,11 @@ class Danslo_ApiImport_Model_Import_Api extends Mage_Api_Model_Resource_Abstract
 
     public function __construct() {
         $this->_api = Mage::getSingleton('api_import/import');
+
+        /*
+         * Event part is not loaded by default for API.
+         */
+        Mage::app()->loadAreaPart(Mage_Core_Model_App_Area::AREA_GLOBAL, Mage_Core_Model_App_Area::PART_EVENTS);
     }
 
     public function importEntities($entities, $entityType = null, $behavior = null) {
