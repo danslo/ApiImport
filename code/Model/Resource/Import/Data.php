@@ -54,6 +54,10 @@ class Danslo_ApiImport_Model_Resource_Import_Data implements IteratorAggregate {
         }
     }
 
+    public function getEntities() {
+        return $this->_entities;
+    }
+
     public function getEntityTypeCode() {
         if($this->_entityTypeCode === null) {
             Mage::throwException('Import resource model was not provided any entity type.');
