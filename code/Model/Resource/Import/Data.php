@@ -18,40 +18,45 @@
 class Danslo_ApiImport_Model_Resource_Import_Data implements IteratorAggregate {
 
     protected $_entities         = array();
+    protected $_bunches          = array();
     protected $_entityTypeCode   = null;
     protected $_behavior         = null;
     protected $_iterator         = null;
 
     public function getIterator() {
         if($this->_iterator === null) {
-            if($this->_entities === null) {
+            $this->_generateBunches();
+            if(empty($this->_bunches)) {
                 Mage::throwException('Import resource model was not provided any entities.');
             }
-            $this->_iterator = new ArrayIterator($this->_entities);
+            $this->_iterator = new ArrayIterator($this->_bunches);
         }
         return $this->_iterator;
     }
 
+    public function _generateBunches() {
+        /*
+         * Split up entities by bunches.
+         */
+        $products = array();
+        $bunchNum = Mage::getStoreConfig('api_import/import_settings/bunch_num');
+        $i = 1;
+        foreach($this->_entities as $product) {
+            $products[$i] = $product;
+            if(($i && $i % $bunchNum == 0) || $i == count($entities)) {
+                $this->_bunches[] = $products;
+                $products = array();
+            }
+            $i++;
+        }
+        $this->_iterator = null;
+    }
+
     public function setEntities($entities) {
         if(count($entities)) {
-            $this->_entities = array();
-
-            /*
-             * Split up entities by bunches.
-             */
-            $products = array();
-            $bunchNum = Mage::getStoreConfig('api_import/import_settings/bunch_num');
-            $i = 1;
-            foreach($entities as $product) {
-                $products[$i] = $product;
-                if(($i && $i % $bunchNum == 0) || $i == count($entities)) {
-                    $this->_entities[] = $products;
-                    $products = array();
-                }
-                $i++;
-            }
-            $this->_iterator = null;
+            $this->_entities = $entities;
         }
+        return $this;
     }
 
     public function getEntities() {

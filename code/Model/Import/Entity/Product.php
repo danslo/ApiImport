@@ -113,19 +113,18 @@ class Danslo_ApiImport_Model_Import_Entity_Product extends Mage_ImportExport_Mod
         foreach($productAttributes as $attribute) {
             $attributeCode = $attribute->getAttributeCode();
             $sourceOptions = $attribute->getSource()->getAllOptions(false);
-            while($bunch = $this->_dataSourceModel->getNextBunch()) {
-                foreach($bunch as $rowNum => $rowData) {
-                    if(isset($rowData[$attributeCode])) {
-                        $optionExists = false;
-                        foreach($sourceOptions as $sourceOption) {
-                            if($rowData[$attributeCode] == $sourceOption['label']) {
-                                $optionExists = true;
-                                break;
-                            }
+
+            foreach($this->_dataSourceModel->getEntities() as $rowNum => $rowData) {
+                if(isset($rowData[$attributeCode])) {
+                    $optionExists = false;
+                    foreach($sourceOptions as $sourceOption) {
+                        if($rowData[$attributeCode] == $sourceOption['label']) {
+                            $optionExists = true;
+                            break;
                         }
-                        if(!$optionExists) {
-                            $options['value'][$rowData[$attributeCode]][0] = $rowData[$attributeCode];
-                        }
+                    }
+                    if(!$optionExists) {
+                        $options['value'][$rowData[$attributeCode]][0] = $rowData[$attributeCode];
                     }
                 }
             }
