@@ -49,12 +49,12 @@ class Danslo_ApiImport_Model_Resource_Import_Data implements IteratorAggregate {
             }
             $i++;
         }
-        $this->_iterator = null;
     }
 
     public function setEntities($entities) {
         if(count($entities)) {
             $this->_entities = $entities;
+            $this->_iterator = null;
         }
         return $this;
     }
