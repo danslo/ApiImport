@@ -17,6 +17,8 @@
 
 class Danslo_ApiImport_Model_Import_Entity_Product extends Mage_ImportExport_Model_Import_Entity_Product {
 
+    protected $_eventPrefix = 'api_import_entity_product';
+
     public function __construct() {
         $entityType = Mage::getSingleton('eav/config')->getEntityType($this->getEntityTypeCode());
         $this->_entityTypeId    = $entityType->getEntityTypeId();
@@ -137,10 +139,12 @@ class Danslo_ApiImport_Model_Import_Entity_Product extends Mage_ImportExport_Mod
     }
 
     public function _importData() {
+        Mage::dispatchEvent($this->_eventPrefix . '_after_import', array('data_source_model' => $this->_dataSourceModel));
         $result = parent::_importData();
         if($result) {
             $result = $this->_indexEntities();
         }
+        Mage::dispatchEvent($this->_eventPrefix . '_after_import', array('entities' => $this->_newSku));
         return $result;
     }
 
