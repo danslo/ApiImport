@@ -43,7 +43,7 @@ class Danslo_ApiImport_Model_Resource_Import_Data implements IteratorAggregate {
         $i = 1;
         foreach($this->_entities as $product) {
             $products[$i] = $product;
-            if(($i && $i % $bunchNum == 0) || $i == count($entities)) {
+            if(($i && $i % $bunchNum == 0) || $i == count($this->_entities)) {
                 $this->_bunches[] = $products;
                 $products = array();
             }
