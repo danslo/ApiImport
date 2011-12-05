@@ -27,6 +27,11 @@
                 </catalog_category>
             </import_entities>
         </api_import>
+        <importexport>
+            <import_product_types>
+                <bundle>api_import/import_entity_product_type_bundle</bundle>
+            </import_product_types>
+        </importexport>
     </global>
     <default>
         <api_import>
