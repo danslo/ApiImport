@@ -4,6 +4,9 @@
         <Danslo_ApiImport>
             <active>true</active>
             <codePool>local</codePool>
+            <depends>
+                <Mage_ImportExport />
+            </depends>
         </Danslo_ApiImport>
     </modules>
 </config>
