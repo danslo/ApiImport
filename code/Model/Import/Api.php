@@ -20,7 +20,7 @@ class Danslo_ApiImport_Model_Import_Api extends Mage_Api_Model_Resource_Abstract
     protected $_api;
 
     public function __construct() {
-        $this->_api = Mage::getSingleton('api_import/import');
+        $this->_api = Mage::getModel('api_import/import');
 
         /*
          * Event part is not loaded by default for API.
