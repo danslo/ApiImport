@@ -17,6 +17,8 @@
 
 class Danslo_ApiImport_Helper_Test {
 
+    protected $_linkedProducts = null;
+
     protected $_defaultAttributes = array(
         'description'       => 'Some description',
         '_attribute_set'    => 'Default',
@@ -28,6 +30,24 @@ class Danslo_ApiImport_Helper_Test {
 
     public function removeAllProducts() {
         Mage::getSingleton('core/resource')->getConnection('core_write')->query('TRUNCATE TABLE catalog_product_entity');
+    }
+
+    protected function _getLinkedProducts() {
+        /*
+         * We create 3 simple products so we can test configurable/bundle links.
+         */
+        if($this->_linkedProducts === null) {
+            $this->_linkedProducts = $this->generateRandomSimpleProducts(3);
+            /*
+             * Use the color option for configurables. Note that this attribute
+             * must be added to the specified attribute set!
+             */
+            foreach(array('red', 'yellow', 'green') as $key => $color) {
+                $this->_linkedProducts[$key + 1]['color'] = $color;
+            }
+            Mage::getModel('api_import/import_api')->importEntities($this->_linkedProducts);
+        }
+        return $this->_linkedProducts;
     }
 
     public function generateRandomSimpleProducts($numProducts) {
@@ -50,17 +70,6 @@ class Danslo_ApiImport_Helper_Test {
         $products = array();
 
         /*
-         * Create a bunch of simples that we can associate.
-         * Obviously in a 'real' import, most of these will be unique simples.
-         * This could be a lot cleaner...
-         */
-        $simples = $this->generateRandomSimpleProducts(3, 3);
-        foreach(array('red', 'yellow', 'green') as $key => $color) {
-            $simples[$key + 1]['color'] = $color;
-        }
-        Mage::getModel('api_import/import_api')->importEntities($simples);
-
-        /*
          * Create our configurables.
          */
         for($i = 1, $counter = 1; $i <= $numProducts; $i++) {
@@ -76,10 +85,48 @@ class Danslo_ApiImport_Helper_Test {
             /*
              * Now associate all the simple products.
              */
-            foreach($simples as $simple) {
-                $products[$counter]['_super_products_sku']     = $simple['sku'];
+            foreach($this->_getLinkedProducts() as $linkedProduct) {
+                $products[$counter]['_super_products_sku']     = $linkedProduct['sku'];
                 $products[$counter]['_super_attribute_code']   = 'color';
-                $products[$counter]['_super_attribute_option'] = $simple['color'];
+                $products[$counter]['_super_attribute_option'] = $linkedProduct['color'];
+                $counter++;
+            }
+        }
+
+        return $products;
+    }
+
+    public function generateRandomBundleProducts($numProducts) {
+        /*
+         * Bundles are very similar to simple products, just deviating with price view.
+         */
+        $products = array();
+
+        for($i = 1, $counter = 1; $i <= $numProducts; $i++) {
+            $bundle = array_merge($this->_defaultAttributes, array(
+               'sku'                => 'some_bundle_' . $i,
+               '_type'              => Mage_Catalog_Model_Product_Type::TYPE_BUNDLE,
+                'name'              => 'Some bundle ( ' . $i . ' )',
+                'price'             => rand(1, 1000),
+                'weight'            => rand(1, 1000),
+                'price_view'        => 'price range'
+            ));
+            $products[$counter] = $bundle;
+
+            $optionTitle = 'Select a bundle item!';
+            /*
+             * Create an option, for more options check the following class:
+             * Danslo_ApiImport_Model_Import_Entity_Product_Type_Bundle
+             */
+            $products[$counter]['_bundle_option_title'] = $optionTitle;
+            $products[$counter]['_bundle_option_type']  = Danslo_ApiImport_Model_Import_Entity_Product_Type_Bundle::DEFAULT_OPTION_TYPE;
+
+            /*
+             * Now associate option selections.
+             */
+            foreach($this->_getLinkedProducts() as $linkedProduct) {
+                $products[$counter]['_bundle_option_title'] = $optionTitle;
+                $products[$counter]['_bundle_product_sku']  = $linkedProduct['sku'];
                 $counter++;
             }
         }

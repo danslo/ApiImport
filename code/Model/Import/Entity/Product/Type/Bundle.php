@@ -38,6 +38,9 @@ class Danslo_ApiImport_Model_Import_Entity_Product_Type_Bundle
      */
     protected $_bundleOptionTypes = array('select', 'radio', 'checkbox', 'multi');
 
+    /*
+     * If no type is selected, fall back to a default dropdown.
+     */
     const DEFAULT_OPTION_TYPE = 'select';
 
     public function saveData() {
@@ -102,7 +105,7 @@ class Danslo_ApiImport_Model_Import_Entity_Product_Type_Bundle
                     }
 
                     if($selectionEntityId) {
-                        $bundleSelections[$rowData['_bundle_option_title']][] = array(
+                        $bundleSelections[$productId][$rowData['_bundle_option_title']][] = array(
                             'parent_product_id'         => $productId,
                             'product_id'                => $selectionEntityId,
                             'position'                  => !empty($rowData['_bundle_product_position'])       ? $rowData['_bundle_product_position']        : '0',
@@ -139,8 +142,8 @@ class Danslo_ApiImport_Model_Import_Entity_Product_Type_Bundle
                                 'store_id'  => '0',
                                 'title'     => $title
                             ));
-                            if(isset($bundleSelections[$title])) {
-                                foreach($bundleSelections[$title] as $selection) {
+                            if(isset($bundleSelections[$productId][$title])) {
+                                foreach($bundleSelections[$productId][$title] as $selection) {
                                     $selection['option_id'] = $optionId;
                                     $connection->insertOnDuplicate($selectionTable, $selection);
                                 }
