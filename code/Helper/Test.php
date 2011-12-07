@@ -113,7 +113,7 @@ class Danslo_ApiImport_Helper_Test {
                 'weight'            => rand(1, 1000),
                 'price_view'        => 'price range'
             ));
-            $products[$counter] = $bundle;
+            $products[$counter++] = $bundle;
 
             $optionTitle = 'Select a bundle item!';
             /*
