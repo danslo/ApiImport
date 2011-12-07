@@ -25,7 +25,8 @@ class Danslo_ApiImport_Helper_Test {
         'short_description' => 'Some short description',
         'status'            => Mage_Catalog_Model_Product_Status::STATUS_ENABLED,
         'visibility'        => Mage_Catalog_Model_Product_Visibility::VISIBILITY_BOTH,
-        'tax_class_id'      => 0
+        'tax_class_id'      => 0,
+        'is_in_stock'       => 1
     );
 
     public function removeAllProducts() {
@@ -59,7 +60,8 @@ class Danslo_ApiImport_Helper_Test {
                '_type'              => Mage_Catalog_Model_Product_Type::TYPE_SIMPLE,
                 'name'              => 'Some product ( ' . $i . ' )',
                 'price'             => rand(1, 1000),
-                'weight'            => rand(1, 1000)
+                'weight'            => rand(1, 1000),
+                'qty'               => rand(1, 30)
             ));
         }
 
@@ -125,8 +127,9 @@ class Danslo_ApiImport_Helper_Test {
              * Now associate option selections.
              */
             foreach($this->_getLinkedProducts() as $linkedProduct) {
-                $products[$counter]['_bundle_option_title'] = $optionTitle;
-                $products[$counter]['_bundle_product_sku']  = $linkedProduct['sku'];
+                $products[$counter]['_bundle_option_title']         = $optionTitle;
+                $products[$counter]['_bundle_product_sku']          = $linkedProduct['sku'];
+                $products[$counter]['_bundle_product_price_value']  = rand(1, 1000);
                 $counter++;
             }
         }
