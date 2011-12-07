@@ -56,6 +56,7 @@ class Danslo_ApiImport_Model_Import_Entity_Product_Type_Bundle
         while ($bunch = $this->_entityModel->getNextBunch()) {
             $bundleOptions    = array();
             $bundleSelections = array();
+
             foreach ($bunch as $rowNum => $rowData) {
                 if (!$this->_entityModel->isRowAllowedToImport($rowData, $rowNum)) {
                     continue;
@@ -73,21 +74,14 @@ class Danslo_ApiImport_Model_Import_Entity_Product_Type_Bundle
                     continue;
                 }
 
-                /*
-                 * TODO: Preferably we don't want title to be the key for options and option selections.
-                 */
                 if(empty($rowData['_bundle_option_title'])) {
                     continue;
                 }
-
                 if(isset($rowData['_bundle_option_type']) && strlen($rowData['_bundle_option_type'])) {
                     if(!in_array($rowData['_bundle_option_type'], $this->_bundleOptionTypes)) {
                         continue;
                     }
 
-                    /*
-                     * TODO: Support for different labels per storeview.
-                     */
                     $bundleOptions[$productId][$rowData['_bundle_option_title']] = array(
                         'parent_id' => $productId,
                         'required'  => !empty($rowData['_bundle_option_required']) ? $rowData['_bundle_option_required'] : '0',
@@ -95,7 +89,6 @@ class Danslo_ApiImport_Model_Import_Entity_Product_Type_Bundle
                         'type'      => !empty($rowData['_bundle_option_type'])     ? $rowData['_bundle_option_type']     : self::DEFAULT_OPTION_TYPE
                     );
                 }
-
                 if(isset($rowData['_bundle_product_sku']) && strlen($rowData['_bundle_product_sku'])) {
                     $selectionEntityId = false;
                     if (isset($newSku[$rowData['_bundle_product_sku']])) {
@@ -119,37 +112,56 @@ class Danslo_ApiImport_Model_Import_Entity_Product_Type_Bundle
                 }
             }
 
-            /*
-             * We are not appending, remove options and selections.
-             */
-            if($this->_entityModel->getBehavior() != Mage_ImportExport_Model_Import::BEHAVIOR_APPEND
-               && count($bundleOptions)) {
-                $quoted = $connection->quoteInto('IN (?)', array_keys($bundleOptions));
-                $connection->delete($optionTable, "parent_id {$quoted}");
-                $connection->delete($selectionTable, "parent_product_id {$quoted}");
-            }
-
-            /*
-             * TODO: Support for inserting selections on pre-existing options.
-             */
             if(count($bundleOptions)) {
+                if($this->_entityModel->getBehavior() != Mage_ImportExport_Model_Import::BEHAVIOR_APPEND) {
+                    $quoted = $connection->quoteInto('IN (?)', array_keys($bundleOptions));
+                    $connection->delete($optionTable, "parent_id {$quoted}");
+                    $connection->delete($selectionTable, "parent_product_id {$quoted}");
+                }
+
+                /*
+                 * Insert options.
+                 */
+                $optionData = array();
                 foreach($bundleOptions as $productId => $options) {
                     foreach($options as $title => $option) {
-                        if($connection->insertOnDuplicate($optionTable, $option)) {
-                            $optionId = $connection->lastInsertId();
-                            $connection->insertOnDuplicate($optionValueTable, array(
-                                'option_id' => $optionId,
-                                'store_id'  => '0',
-                                'title'     => $title
-                            ));
-                            if(isset($bundleSelections[$productId][$title])) {
-                                foreach($bundleSelections[$productId][$title] as $selection) {
-                                    $selection['option_id'] = $optionId;
-                                    $connection->insertOnDuplicate($selectionTable, $selection);
-                                }
+                        $optionData[] = $option;
+                    }
+                }
+                $connection->insertOnDuplicate($optionTable, $optionData);
+
+                /*
+                 * Insert option titles.
+                 */
+                $optionId = $connection->lastInsertId();
+                $optionValues = array();
+                foreach($bundleOptions as $productId => $options) {
+                    foreach($options as $title => $option) {
+                        $optionValues[] = array(
+                            'option_id' => $optionId++,
+                            'store_id'  => '0',
+                            'title'     => $title
+                        );
+                    }
+                }
+                $connection->insertOnDuplicate($optionValueTable, $optionValues);
+                $optionId -= count($optionData);
+
+                if(count($bundleSelections)) {
+                    /*
+                     * Insert option selections.
+                     */
+                    $optionSelections = array();
+                    foreach($bundleSelections as $productId => $selections) {
+                        foreach($selections as $title => $selection) {
+                            foreach($selection as &$sel) {
+                                $sel['option_id'] = $optionId;
                             }
+                            $optionId++;
+                            $optionSelections = array_merge($optionSelections, $selection);
                         }
                     }
+                    $connection->insertOnDuplicate($selectionTable, $optionSelections);
                 }
             }
         }
