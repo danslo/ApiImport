@@ -115,7 +115,7 @@ class Danslo_ApiImport_Model_Import_Entity_Product extends Mage_ImportExport_Mod
             $sourceOptions = $attribute->getSource()->getAllOptions(false);
 
             foreach($this->_dataSourceModel->getEntities() as $rowNum => $rowData) {
-                if(isset($rowData[$attributeCode])) {
+                if(isset($rowData[$attributeCode]) && strlen(trim($rowData[$attributeCode]))) {
                     $optionExists = false;
                     foreach($sourceOptions as $sourceOption) {
                         if($rowData[$attributeCode] == $sourceOption['label']) {
