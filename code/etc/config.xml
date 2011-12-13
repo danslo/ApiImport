@@ -10,6 +10,17 @@
                 <class>Danslo_ApiImport_Model_Resource</class>
             </api_import_resource>
         </models>
+        <events>
+            <api_import_entity_product_after_import>
+                <observers>
+                    <api_import_observer>
+                        <class>api_import/observer</class>
+                        <method>indexProducts</method>
+                        <type>singleton</type>
+                    </api_import_observer>
+                </observers>
+            </api_import_entity_product_after_import>
+        </events>
         <helpers>
             <api_import>
                 <class>Danslo_ApiImport_Helper</class>

@@ -15,7 +15,9 @@
  * limitations under the License.
 */
 
-class Danslo_ApiImport_Model_Import_Entity_Product extends Mage_ImportExport_Model_Import_Entity_Product {
+class Danslo_ApiImport_Model_Import_Entity_Product
+    extends Mage_ImportExport_Model_Import_Entity_Product
+{
 
     protected $_eventPrefix = 'api_import_entity_product';
 
@@ -26,82 +28,13 @@ class Danslo_ApiImport_Model_Import_Entity_Product extends Mage_ImportExport_Mod
         $this->_connection      = Mage::getSingleton('core/resource')->getConnection('write');
 
         $this->_importAttributes()
-            ->_initWebsites()
-            ->_initStores()
-            ->_initAttributeSets()
-            ->_initTypeModels()
-            ->_initCategories()
-            ->_initSkus()
-            ->_initCustomerGroups();
-    }
-
-    protected function _indexStock(&$event) {
-        return Mage::getResourceSingleton('cataloginventory/indexer_stock')->catalogProductMassAction($event);
-    }
-
-    protected function _indexPrice(&$event) {
-        return Mage::getResourceSingleton('catalog/product_indexer_price')->catalogProductMassAction($event);
-    }
-
-    protected function _indexCategoryRelation(&$event) {
-        return Mage::getResourceSingleton('catalog/category_indexer_product')->catalogProductMassAction($event);
-    }
-
-    protected function _indexEav(&$event) {
-        return Mage::getResourceSingleton('catalog/product_indexer_eav')->catalogProductMassAction($event);
-    }
-
-    protected function _indexSearch(&$productIds) {
-        return Mage::getResourceSingleton('catalogsearch/fulltext')->rebuildIndex(null, $productIds);
-    }
-
-    protected function _indexRewrites(&$productIds) {
-        $indexer = Mage::getResourceSingleton('ecomdev_urlrewrite/indexer');
-        if($indexer) {
-            return $indexer->updateProductRewrites($productIds);
-        }
-        return $this;
-    }
-
-    protected function _indexEntities() {
-        $entityIds = array();
-        foreach($this->_newSku as $sku) {
-            $entityIds[] = $sku['entity_id'];
-        }
-
-        $event = Mage::getModel('index/event');
-        $event->setNewData(array(
-            'product_ids'               => &$entityIds, // for category_indexer_product
-            'reindex_price_product_ids' => &$entityIds, // for product_indexer_price
-            'reindex_stock_product_ids' => &$entityIds, // for indexer_stock
-            'reindex_eav_product_ids'   => &$entityIds  // for product_indexer_eav
-        ));
-
-        try {
-            if(Mage::getStoreConfig('api_import/import_settings/enable_stock_index')) {
-                $this->_indexStock($event);
-            }
-            if(Mage::getStoreConfig('api_import/import_settings/enable_price_index')) {
-                $this->_indexPrice($event);
-            }
-            if(Mage::getStoreConfig('api_import/import_settings/enable_category_relation_index')) {
-                $this->_indexCategoryRelation($event);
-            }
-            if(Mage::getStoreConfig('api_import/import_settings/enable_attribute_index')) {
-                $this->_indexEav($event);
-            }
-            if(Mage::getStoreConfig('api_import/import_settings/enable_search_index')) {
-                $this->_indexSearch($entityIds);
-            }
-            if(Mage::getStoreConfig('api_import/import_settings/enable_rewrite_index')) {
-                $this->_indexRewrites($entityIds);
-            }
-        }
-        catch(Exception $e) {
-            return false;
-        }
-
-        return true;
+             ->_initWebsites()
+             ->_initStores()
+             ->_initAttributeSets()
+             ->_initTypeModels()
+             ->_initCategories()
+             ->_initSkus()
+             ->_initCustomerGroups();
     }
 
     protected function _importAttributes() {
@@ -140,9 +73,6 @@ class Danslo_ApiImport_Model_Import_Entity_Product extends Mage_ImportExport_Mod
     public function _importData() {
         Mage::dispatchEvent($this->_eventPrefix . '_before_import', array('data_source_model' => $this->_dataSourceModel));
         $result = parent::_importData();
-        if($result) {
-            $result = $this->_indexEntities();
-        }
         Mage::dispatchEvent($this->_eventPrefix . '_after_import', array('entities' => $this->_newSku));
         return $result;
     }
