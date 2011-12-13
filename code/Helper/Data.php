@@ -15,4 +15,5 @@
  * limitations under the License.
 */
 
-class Danslo_ApiImport_Helper_Data extends Mage_Core_Helper_Abstract {}
+class Danslo_ApiImport_Helper_Data
+    extends Mage_Core_Helper_Abstract {}

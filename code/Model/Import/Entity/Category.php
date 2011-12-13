@@ -15,7 +15,9 @@
  * limitations under the License.
 */
 
-class Danslo_ApiImport_Model_Import_Entity_Category extends Mage_ImportExport_Model_Import_Entity_Abstract {
+class Danslo_ApiImport_Model_Import_Entity_Category
+    extends Mage_ImportExport_Model_Import_Entity_Abstract
+{
 
     protected $_oldCategories = array();
 

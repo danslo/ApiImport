@@ -15,7 +15,9 @@
  * limitations under the License.
 */
 
-class Danslo_ApiImport_Model_Import extends Mage_ImportExport_Model_Import {
+class Danslo_ApiImport_Model_Import
+    extends Mage_ImportExport_Model_Import
+{
 
     const CONFIG_KEY_ENTITIES  = 'global/api_import/import_entities';
 

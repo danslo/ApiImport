@@ -15,7 +15,9 @@
  * limitations under the License.
 */
 
-class Danslo_ApiImport_Model_Resource_Import_Data implements IteratorAggregate {
+class Danslo_ApiImport_Model_Resource_Import_Data
+    implements IteratorAggregate
+{
 
     protected $_entities         = array();
     protected $_bunches          = array();

@@ -15,7 +15,9 @@
  * limitations under the License.
 */
 
-class Danslo_ApiImport_Model_Import_Api extends Mage_Api_Model_Resource_Abstract {
+class Danslo_ApiImport_Model_Import_Api
+    extends Mage_Api_Model_Resource_Abstract
+{
 
     protected $_api;
 
