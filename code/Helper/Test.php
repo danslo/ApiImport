@@ -23,6 +23,7 @@ class Danslo_ApiImport_Helper_Test {
         'description'       => 'Some description',
         '_attribute_set'    => 'Default',
         'short_description' => 'Some short description',
+        '_product_websites' => 'base',
         'status'            => Mage_Catalog_Model_Product_Status::STATUS_ENABLED,
         'visibility'        => Mage_Catalog_Model_Product_Visibility::VISIBILITY_BOTH,
         'tax_class_id'      => 0,
@@ -111,7 +112,8 @@ class Danslo_ApiImport_Helper_Test {
                 'name'              => 'Some bundle ( ' . $i . ' )',
                 'price'             => rand(1, 1000),
                 'weight'            => rand(1, 1000),
-                'price_view'        => 'price range'
+                'price_view'        => 'price range',
+                'price_type'        => Mage_Bundle_Model_Product_Price::PRICE_TYPE_FIXED
             ));
             $products[$counter++] = $bundle;
 
