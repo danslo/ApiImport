@@ -16,7 +16,8 @@
 */
 
 class Danslo_ApiImport_Model_Import_Entity_Product_Type_Bundle
-    extends Mage_ImportExport_Model_Import_Entity_Product_Type_Abstract {
+    extends Mage_ImportExport_Model_Import_Entity_Product_Type_Abstract
+{
 
     /**
      * Column names that hold values with particular meaning.
@@ -43,6 +44,36 @@ class Danslo_ApiImport_Model_Import_Entity_Product_Type_Bundle
      */
     const DEFAULT_OPTION_TYPE = 'select';
 
+    public function _initAttributes() {
+        parent::_initAttributes();
+
+        /*
+         * Price type does not live in an attribute set, so it is not picked up
+         * by abstract _initAttributes method. We add it here manually.
+         */
+        $attribute = Mage::getResourceModel('catalog/eav_attribute')->load('price_type', 'attribute_code');
+        foreach($this->_attributes as $attrSetName => $attributes) {
+            $this->_addAttributeParams($attrSetName, array(
+                'id'               => $attribute->getId(),
+                'code'             => $attribute->getAttributeCode(),
+                'for_configurable' => $attribute->getIsConfigurable(),
+                'is_global'        => $attribute->getIsGlobal(),
+                'is_required'      => $attribute->getIsRequired(),
+                'is_unique'        => $attribute->getIsUnique(),
+                'frontend_label'   => $attribute->getFrontendLabel(),
+                'is_static'        => $attribute->isStatic(),
+                'apply_to'         => $attribute->getApplyTo(),
+                'type'             => Mage_ImportExport_Model_Import::getAttributeType($attribute),
+                'default_value'    => strlen($attribute->getDefaultValue())
+                                      ? $attribute->getDefaultValue() : null,
+                'options'          => $this->_entityModel
+                                          ->getAttributeOptions($attribute, $this->_indexValueAttributes)
+            ));
+        }
+
+        return $this;
+    }
+
     public function saveData() {
         $connection         = $this->_entityModel->getConnection();
         $newSku             = $this->_entityModel->getNewSku();
@@ -50,6 +81,7 @@ class Danslo_ApiImport_Model_Import_Entity_Product_Type_Bundle
         $optionTable        = Mage::getSingleton('core/resource')->getTableName('bundle/option');
         $optionValueTable   = Mage::getSingleton('core/resource')->getTableName('bundle/option_value');
         $selectionTable     = Mage::getSingleton('core/resource')->getTableName('bundle/selection');
+        $relationTable      = Mage::getSingleton('core/resource')->getTableName('catalog/product_relation');
         $productData        = null;
         $productId          = null;
 
@@ -117,6 +149,7 @@ class Danslo_ApiImport_Model_Import_Entity_Product_Type_Bundle
                     $quoted = $connection->quoteInto('IN (?)', array_keys($bundleOptions));
                     $connection->delete($optionTable, "parent_id {$quoted}");
                     $connection->delete($selectionTable, "parent_product_id {$quoted}");
+                    $connection->delete($relationTable, "parent_id {$quotes}");
                 }
 
                 /*
@@ -148,20 +181,32 @@ class Danslo_ApiImport_Model_Import_Entity_Product_Type_Bundle
                 $optionId -= count($optionData);
 
                 if(count($bundleSelections)) {
-                    /*
-                     * Insert option selections.
-                     */
                     $optionSelections = array();
+                    $productRelations = array();
+
                     foreach($bundleSelections as $productId => $selections) {
                         foreach($selections as $title => $selection) {
                             foreach($selection as &$sel) {
-                                $sel['option_id'] = $optionId;
+                                $productRelations[] = array(
+                                    'parent_id' => $sel['parent_product_id'],
+                                    'child_id'  => $sel['product_id']
+                                );
+                                $sel['option_id']   = $optionId;
                             }
                             $optionId++;
                             $optionSelections = array_merge($optionSelections, $selection);
                         }
                     }
+
+                    /*
+                     * Insert option selections.
+                     */
                     $connection->insertOnDuplicate($selectionTable, $optionSelections);
+
+                    /*
+                     * Insert product relations.
+                     */
+                    $connection->insertOnDuplicate($relationTable, $productRelations);
                 }
             }
         }
