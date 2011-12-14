@@ -19,11 +19,6 @@ class Danslo_ApiImport_Model_Import_Entity_Product_Type_Bundle
     extends Mage_ImportExport_Model_Import_Entity_Product_Type_Abstract
 {
 
-    /**
-     * Column names that hold values with particular meaning.
-     *
-     * @var array
-     */
     protected $_particularAttributes = array(
         '_bundle_option_required', '_bundle_option_position',
         '_bundle_option_type', '_bundle_option_title', '_bundle_option_store',
@@ -32,16 +27,8 @@ class Danslo_ApiImport_Model_Import_Entity_Product_Type_Bundle
         '_bundle_product_can_change_qty'
     );
 
-    /**
-     * Allowed types for bundle options.
-     *
-     * @var array
-     */
     protected $_bundleOptionTypes = array('select', 'radio', 'checkbox', 'multi');
 
-    /*
-     * If no type is selected, fall back to a default dropdown.
-     */
     const DEFAULT_OPTION_TYPE = 'select';
 
     public function _initAttributes() {
@@ -75,15 +62,15 @@ class Danslo_ApiImport_Model_Import_Entity_Product_Type_Bundle
     }
 
     public function saveData() {
-        $connection         = $this->_entityModel->getConnection();
-        $newSku             = $this->_entityModel->getNewSku();
-        $oldSku             = $this->_entityModel->getOldSku();
-        $optionTable        = Mage::getSingleton('core/resource')->getTableName('bundle/option');
-        $optionValueTable   = Mage::getSingleton('core/resource')->getTableName('bundle/option_value');
-        $selectionTable     = Mage::getSingleton('core/resource')->getTableName('bundle/selection');
-        $relationTable      = Mage::getSingleton('core/resource')->getTableName('catalog/product_relation');
-        $productData        = null;
-        $productId          = null;
+        $connection       = $this->_entityModel->getConnection();
+        $newSku           = $this->_entityModel->getNewSku();
+        $oldSku           = $this->_entityModel->getOldSku();
+        $optionTable      = Mage::getSingleton('core/resource')->getTableName('bundle/option');
+        $optionValueTable = Mage::getSingleton('core/resource')->getTableName('bundle/option_value');
+        $selectionTable   = Mage::getSingleton('core/resource')->getTableName('bundle/selection');
+        $relationTable    = Mage::getSingleton('core/resource')->getTableName('catalog/product_relation');
+        $productData      = null;
+        $productId        = null;
 
         while ($bunch = $this->_entityModel->getNextBunch()) {
             $bundleOptions    = array();
@@ -109,7 +96,7 @@ class Danslo_ApiImport_Model_Import_Entity_Product_Type_Bundle
                 if(empty($rowData['_bundle_option_title'])) {
                     continue;
                 }
-                if(isset($rowData['_bundle_option_type']) && strlen($rowData['_bundle_option_type'])) {
+                if(isset($rowData['_bundle_option_type']) && !empty($rowData['_bundle_option_type'])) {
                     if(!in_array($rowData['_bundle_option_type'], $this->_bundleOptionTypes)) {
                         continue;
                     }
@@ -121,11 +108,11 @@ class Danslo_ApiImport_Model_Import_Entity_Product_Type_Bundle
                         'type'      => !empty($rowData['_bundle_option_type'])     ? $rowData['_bundle_option_type']     : self::DEFAULT_OPTION_TYPE
                     );
                 }
-                if(isset($rowData['_bundle_product_sku']) && strlen($rowData['_bundle_product_sku'])) {
+                if(isset($rowData['_bundle_product_sku']) && !empty($rowData['_bundle_product_sku'])) {
                     $selectionEntityId = false;
-                    if (isset($newSku[$rowData['_bundle_product_sku']])) {
+                    if(isset($newSku[$rowData['_bundle_product_sku']])) {
                         $selectionEntityId = $newSku[$rowData['_bundle_product_sku']]['entity_id'];
-                    } elseif (isset($oldSku[$rowData['_bundle_product_sku']])) {
+                    } elseif(isset($oldSku[$rowData['_bundle_product_sku']])) {
                         $selectionEntityId = $oldSku[$rowData['_bundle_product_sku']]['entity_id'];
                     }
 
@@ -191,7 +178,7 @@ class Danslo_ApiImport_Model_Import_Entity_Product_Type_Bundle
                                     'parent_id' => $sel['parent_product_id'],
                                     'child_id'  => $sel['product_id']
                                 );
-                                $sel['option_id']   = $optionId;
+                                $sel['option_id'] = $optionId;
                             }
                             $optionId++;
                             $optionSelections = array_merge($optionSelections, $selection);
