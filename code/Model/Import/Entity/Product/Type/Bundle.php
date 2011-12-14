@@ -30,6 +30,7 @@ class Danslo_ApiImport_Model_Import_Entity_Product_Type_Bundle
     protected $_bundleOptionTypes = array('select', 'radio', 'checkbox', 'multi');
 
     const DEFAULT_OPTION_TYPE = 'select';
+    const ERROR_INVALID_BUNDLE_PRODUCT_SKU = 'invalidBundleProductSku';
 
     public function _initAttributes() {
         parent::_initAttributes();
@@ -112,8 +113,16 @@ class Danslo_ApiImport_Model_Import_Entity_Product_Type_Bundle
                     $selectionEntityId = false;
                     if(isset($newSku[$rowData['_bundle_product_sku']])) {
                         $selectionEntityId = $newSku[$rowData['_bundle_product_sku']]['entity_id'];
-                    } elseif(isset($oldSku[$rowData['_bundle_product_sku']])) {
+                    }
+                    elseif(isset($oldSku[$rowData['_bundle_product_sku']])) {
                         $selectionEntityId = $oldSku[$rowData['_bundle_product_sku']]['entity_id'];
+                    }
+                    else {
+                        /*
+                         * TODO: We should move this to _isParticularAttributeValid, but
+                         * entity model is not filled with newSku / oldSku there.
+                         */
+                        $this->_entityModel->addRowError(self::ERROR_INVALID_BUNDLE_PRODUCT_SKU, $rowNum);
                     }
 
                     if($selectionEntityId) {
