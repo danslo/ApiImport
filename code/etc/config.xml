@@ -41,6 +41,7 @@
         <importexport>
             <import_product_types>
                 <bundle>api_import/import_entity_product_type_bundle</bundle>
+                <grouped>api_import/import_entity_product_type_grouped</grouped>
             </import_product_types>
         </importexport>
     </global>
