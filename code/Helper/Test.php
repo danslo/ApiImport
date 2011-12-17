@@ -28,8 +28,7 @@ class Danslo_ApiImport_Helper_Test
         'status'            => Mage_Catalog_Model_Product_Status::STATUS_ENABLED,
         'visibility'        => Mage_Catalog_Model_Product_Visibility::VISIBILITY_BOTH,
         'tax_class_id'      => 0,
-        'is_in_stock'       => 1,
-        '_category'         => 'Yep'
+        'is_in_stock'       => 1
     );
 
     public function removeAllProducts() {

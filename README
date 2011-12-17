@@ -2,24 +2,50 @@ Magento introduced many performance and stability fixes between 1.4 and 1.6 to t
 
 This (modman) module is an attempt to provide an API interface to the ImportExport module so that you can do fast XMLRPC/SOAP based imports. You can simply provide your (array-based) import data in the exact same way as you would provide CSV files to ImportExport.
 
-The following is a very simple benchmark run done on a Virtual Machine running Debian, with 1GB RAM and without any MySQL optimizations. Your experience may vary.
+Additionally, it provides support for:
+- Importing bundled products (absent in ImportExport)
+- Reindex imported product entities
+- Automatic creation of non-existent (dropdown) attribute values. 
+- Useful events for enriching product entities from other Magento modules. 
 
-Generating 2000 simple products...
+The following is a very simple benchmark run done on a Virtual Machine running Debian, with 1GB RAM and without any MySQL optimizations. Your experience may vary. These are fully indexed results, mind you.
+
+Generating 5000 simple products...
 Starting import...
-Done! Magento reports 2000 products in catalog.
+Done! Magento reports 5000 products in catalog.
 ========== Import statistics ==========
-Total duration:         12.014141s
-Average per product:    0.006007s
-Products per second:    166.470497s
-Products per hour:      599293.789983s
+Total duration:		37.475983s
+Average per product:	0.007495s
+Products per second:	133.418781s
+Products per hour:	480307.612782s
 =======================================
 
-Generating 2000 configurable products...
+Generating 5000 configurable products...
 Starting import...
-Done! Magento reports 4000 products in catalog.
+Done! Magento reports 10000 products in catalog.
 ========== Import statistics ==========
-Total duration:         17.978612s
-Average per product:    0.008989s
-Products per second:    111.243293s
-Products per hour:      400475.855510s
+Total duration:		68.099526s
+Average per product:	0.013620s
+Products per second:	73.421950s
+Products per hour:	264319.020648s
+=======================================
+
+Generating 5000 bundle products...
+Starting import...
+Done! Magento reports 15000 products in catalog.
+========== Import statistics ==========
+Total duration:		113.453821s
+Average per product:	0.022691s
+Products per second:	44.070794s
+Products per hour:	158654.859310s
+=======================================
+
+Generating 5000 grouped products...
+Starting import...
+Done! Magento reports 20000 products in catalog.
+========== Import statistics ==========
+Total duration:		62.553724s
+Average per product:	0.012511s
+Products per second:	79.931292s
+Products per hour:	287752.652192s
 =======================================
