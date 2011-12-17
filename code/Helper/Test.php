@@ -15,7 +15,8 @@
  * limitations under the License.
 */
 
-class Danslo_ApiImport_Helper_Test {
+class Danslo_ApiImport_Helper_Test 
+{
 
     protected $_linkedProducts = null;
 
@@ -27,7 +28,8 @@ class Danslo_ApiImport_Helper_Test {
         'status'            => Mage_Catalog_Model_Product_Status::STATUS_ENABLED,
         'visibility'        => Mage_Catalog_Model_Product_Visibility::VISIBILITY_BOTH,
         'tax_class_id'      => 0,
-        'is_in_stock'       => 1
+        'is_in_stock'       => 1,
+        '_category'         => 'Yep'
     );
 
     public function removeAllProducts() {
@@ -89,9 +91,11 @@ class Danslo_ApiImport_Helper_Test {
              * Now associate all the simple products.
              */
             foreach($this->_getLinkedProducts() as $linkedProduct) {
-                $products[$counter]['_super_products_sku']     = $linkedProduct['sku'];
-                $products[$counter]['_super_attribute_code']   = 'color';
-                $products[$counter]['_super_attribute_option'] = $linkedProduct['color'];
+                $products[$counter] = array_merge((isset($products[$counter]) ? $products[$counter] : array()), array(
+                    '_super_products_sku'       => $linkedProduct['sku'],
+                    '_super_attribute_code'     => 'color',
+                    '_super_attribute_option'   => $linkedProduct['color']
+                ));
                 $counter++;
             }
         }
@@ -129,13 +133,47 @@ class Danslo_ApiImport_Helper_Test {
              * Now associate option selections.
              */
             foreach($this->_getLinkedProducts() as $linkedProduct) {
-                $products[$counter]['_bundle_option_title']         = $optionTitle;
-                $products[$counter]['_bundle_product_sku']          = $linkedProduct['sku'];
-                $products[$counter]['_bundle_product_price_value']  = rand(1, 1000);
+                $products[$counter] = array_merge((isset($products[$counter]) ? $products[$counter] : array()), array(
+                    '_bundle_option_title'          => $optionTitle,
+                    '_bundle_product_sku'           => $linkedProduct['sku'],
+                    '_bundle_product_price_value'   => rand(1, 1000)
+                ));
                 $counter++;
             }
         }
 
+        return $products;
+    }
+    
+    public function generateRandomGroupedProducts($numProducts) {
+        $products = array();
+        
+        for($i = 1, $counter = 1; $i <= $numProducts; $i++) {
+            $grouped = array_merge($this->_defaultAttributes, array(
+               'sku'        => 'some_grouped_' . $i,
+                '_type'     => Mage_Catalog_Model_Product_Type::TYPE_BUNDLE,
+                'name'      => 'Some grouped ( ' . $i . ' )'
+            ));
+            $products[$counter] = $grouped;
+            
+            /*
+             * The first associated bundle SKU -must- be on the same row as the grouped
+             * row. Compared to other product types this might be a bug.
+             */
+            foreach($this->_getLinkedProducts() as $linkedProduct) {
+                $products[$counter] = array_merge((isset($products[$counter]) ? $products[$counter] : array()), array(
+                    /*
+                     * Type -must- be specified here. Another bug.
+                     */
+                    '_type'                     => 'grouped',
+                    '_associated_sku'           => $linkedProduct['sku'],
+                    '_associated_default_qty'   => '1', // optional
+                    '_associated_position'      => '0'  // optional
+                ));
+                $counter++;
+            }
+        }
+        
         return $products;
     }
 

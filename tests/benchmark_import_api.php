@@ -43,7 +43,7 @@ if(USE_API) {
  */
 $helper->removeAllProducts();
 
-foreach(array('simple', 'configurable', 'bundle') as $productType) {
+foreach(array('simple', 'configurable', 'bundle', 'grouped') as $productType) {
     /*
      * Generation method depends on product type.
      */
