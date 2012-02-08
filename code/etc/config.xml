@@ -36,6 +36,10 @@
                     <model_token>api_import/import_entity_category</model_token>
                     <label>XMLRPC Categories</label>
                 </catalog_category>
+                <customer>
+                    <model_token>importexport/import_entity_customer</model_token>
+                    <label>Customers</label>
+                </customer>
             </import_entities>
         </api_import>
         <importexport>
