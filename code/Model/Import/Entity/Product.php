@@ -57,7 +57,7 @@ class Danslo_ApiImport_Model_Import_Entity_Product
                         }
                     }
                     if(!$optionExists) {
-                        $options['value'][$rowData[$attributeCode]][0] = $rowData[$attributeCode];
+                        $options['value']['option_' . $rowData[$attributeCode]][0] = $rowData[$attributeCode];
                     }
                 }
             }
