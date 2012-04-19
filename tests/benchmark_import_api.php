@@ -38,11 +38,6 @@ if(USE_API) {
     $session = $client->call('login', array(API_USER, API_KEY));
 }
 
-/*
- * Careful! Drops all product entities from database.
- */
-$helper->removeAllProducts();
-
 foreach(array('simple', 'configurable', 'bundle', 'grouped') as $productType) {
     /*
      * Generation method depends on product type.
