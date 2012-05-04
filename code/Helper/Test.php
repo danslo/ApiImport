@@ -150,21 +150,13 @@ class Danslo_ApiImport_Helper_Test
         for($i = 1, $counter = 1; $i <= $numProducts; $i++) {
             $grouped = array_merge($this->_defaultAttributes, array(
                'sku'        => 'some_grouped_' . $i,
-                '_type'     => Mage_Catalog_Model_Product_Type::TYPE_BUNDLE,
+                '_type'     => Mage_Catalog_Model_Product_Type::TYPE_GROUPED,
                 'name'      => 'Some grouped ( ' . $i . ' )'
             ));
-            $products[$counter] = $grouped;
+            $products[$counter++] = $grouped;
             
-            /*
-             * The first associated bundle SKU -must- be on the same row as the grouped
-             * row. Compared to other product types this might be a bug.
-             */
             foreach($this->_getLinkedProducts() as $linkedProduct) {
                 $products[$counter] = array_merge((isset($products[$counter]) ? $products[$counter] : array()), array(
-                    /*
-                     * Type -must- be specified here. Another bug.
-                     */
-                    '_type'                     => 'grouped',
                     '_associated_sku'           => $linkedProduct['sku'],
                     '_associated_default_qty'   => '1', // optional
                     '_associated_position'      => '0'  // optional
