@@ -153,7 +153,10 @@ class Danslo_ApiImport_Helper_Test
                 '_type'     => Mage_Catalog_Model_Product_Type::TYPE_GROUPED,
                 'name'      => 'Some grouped ( ' . $i . ' )'
             ));
-            $products[$counter++] = $grouped;
+            /*
+             * Compared to other super products, the first associated child product must be on the same line as its parent.
+             */
+            $products[$counter] = $grouped;
             
             foreach($this->_getLinkedProducts() as $linkedProduct) {
                 $products[$counter] = array_merge((isset($products[$counter]) ? $products[$counter] : array()), array(
