@@ -19,26 +19,24 @@ require_once 'app/Mage.php';
 
 Mage::init();
 
-define('NUM_PRODUCTS',  100);
-define('API_USER',      'apiUser');
-define('API_KEY',       'someApiKey123');
-define('USE_API',       true);
+define('NUM_PRODUCTS', 100);
+define('API_USER', 'apiUser');
+define('API_KEY', 'someApiKey123');
+define('USE_API', true);
 
 $helper = Mage::helper('api_import/test');
 
-if(USE_API) {
+if (USE_API) {
     /*
      * Create an API connection.
      * Standard timeout for Zend_Http_Client is 10 seconds, so we must lengthen it.
      */
     $client = new Zend_XmlRpc_Client(Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_WEB) . 'api/xmlrpc/');
-    $client->getHttpClient()->setConfig(array(
-        'timeout' => -1
-    ));
+    $client->getHttpClient()->setConfig(array('timeout' => -1));
     $session = $client->call('login', array(API_USER, API_KEY));
 }
 
-foreach(array('simple', 'configurable', 'bundle', 'grouped') as $productType) {
+foreach (array('simple', 'configurable', 'bundle', 'grouped') as $productType) {
     /*
      * Generation method depends on product type.
      */
@@ -51,17 +49,16 @@ foreach(array('simple', 'configurable', 'bundle', 'grouped') as $productType) {
     printf('Starting import...' . PHP_EOL);
     $totalTime = microtime(true);
 
-    if(USE_API) {
+    if (USE_API) {
         try {
             $client->call('call', array($session, 'import.importEntities', array($products)));
         }
         catch(Exception $e) {
-            printf('Import failed: '     . PHP_EOL, $e->getMessage());
+            printf('Import failed: ' . PHP_EOL, $e->getMessage());
             printf('Server returned: %s' . PHP_EOL, $client->getHttpClient()->getLastResponse()->getBody());
             exit;
         }
-    }
-    else {
+    } else {
         /*
          * For debugging purposes only.
          */
@@ -84,6 +81,6 @@ foreach(array('simple', 'configurable', 'bundle', 'grouped') as $productType) {
 /*
  * Cleanup.
  */
-if(USE_API) {
+if (USE_API) {
     $client->call('endSession', array($session));
 }

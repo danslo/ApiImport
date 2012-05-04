@@ -27,7 +27,8 @@ class Danslo_ApiImport_Model_Import_Entity_Product_Type_Grouped
      * Unfortunately this does break importing grouped products when not done through
      * ApiImport. But there is no other way.
      */
-    public function getBehavior() {
+    public function getBehavior()
+    {
         return $this->_entityModel->getBehavior();
     }
 

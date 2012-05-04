@@ -20,7 +20,7 @@ class Danslo_ApiImport_Model_Import_Entity_Customer
     extends Mage_ImportExport_Model_Import_Entity_Customer
 {
 
-    public function __construct() 
+    public function __construct()
     {
         parent::__construct();
         $this->_dataSourceModel = Danslo_ApiImport_Model_Import::getDataSourceModel();
@@ -28,4 +28,3 @@ class Danslo_ApiImport_Model_Import_Entity_Customer
     }
 
 }
-

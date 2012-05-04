@@ -19,20 +19,33 @@ class Danslo_ApiImport_Model_Import_Entity_Product_Type_Bundle
     extends Mage_ImportExport_Model_Import_Entity_Product_Type_Abstract
 {
 
-    protected $_particularAttributes = array(
-        '_bundle_option_required', '_bundle_option_position',
-        '_bundle_option_type', '_bundle_option_title', '_bundle_option_store',
-        '_bundle_product_sku', '_bundle_product_position', '_bundle_product_is_default',
-        '_bundle_product_price_type', '_bundle_product_price_value', '_bundle_product_qty',
-        '_bundle_product_can_change_qty'
-    );
-
-    protected $_bundleOptionTypes = array('select', 'radio', 'checkbox', 'multi');
-
     const DEFAULT_OPTION_TYPE = 'select';
     const ERROR_INVALID_BUNDLE_PRODUCT_SKU = 'invalidBundleProductSku';
 
-    public function _initAttributes() {
+    protected $_particularAttributes = array(
+        '_bundle_option_required',
+        '_bundle_option_position',
+        '_bundle_option_type',
+        '_bundle_option_title',
+        '_bundle_option_store',
+        '_bundle_product_sku',
+        '_bundle_product_position',
+        '_bundle_product_is_default',
+        '_bundle_product_price_type',
+        '_bundle_product_price_value',
+        '_bundle_product_qty',
+        '_bundle_product_can_change_qty'
+    );
+
+    protected $_bundleOptionTypes = array(
+        'select',
+        'radio',
+        'checkbox',
+        'multi'
+    );
+
+    public function _initAttributes()
+    {
         parent::_initAttributes();
 
         /*
@@ -40,29 +53,31 @@ class Danslo_ApiImport_Model_Import_Entity_Product_Type_Bundle
          * by abstract _initAttributes method. We add it here manually.
          */
         $attribute = Mage::getResourceModel('catalog/eav_attribute')->load('price_type', 'attribute_code');
-        foreach($this->_attributes as $attrSetName => $attributes) {
-            $this->_addAttributeParams($attrSetName, array(
-                'id'               => $attribute->getId(),
-                'code'             => $attribute->getAttributeCode(),
-                'for_configurable' => $attribute->getIsConfigurable(),
-                'is_global'        => $attribute->getIsGlobal(),
-                'is_required'      => $attribute->getIsRequired(),
-                'is_unique'        => $attribute->getIsUnique(),
-                'frontend_label'   => $attribute->getFrontendLabel(),
-                'is_static'        => $attribute->isStatic(),
-                'apply_to'         => $attribute->getApplyTo(),
-                'type'             => Mage_ImportExport_Model_Import::getAttributeType($attribute),
-                'default_value'    => strlen($attribute->getDefaultValue())
-                                      ? $attribute->getDefaultValue() : null,
-                'options'          => $this->_entityModel
-                                          ->getAttributeOptions($attribute, $this->_indexValueAttributes)
-            ));
+        foreach ($this->_attributes as $attrSetName => $attributes) {
+            $this->_addAttributeParams(
+                $attrSetName,
+                array(
+                    'id'               => $attribute->getId(),
+                    'code'             => $attribute->getAttributeCode(),
+                    'for_configurable' => $attribute->getIsConfigurable(),
+                    'is_global'        => $attribute->getIsGlobal(),
+                    'is_required'      => $attribute->getIsRequired(),
+                    'is_unique'        => $attribute->getIsUnique(),
+                    'frontend_label'   => $attribute->getFrontendLabel(),
+                    'is_static'        => $attribute->isStatic(),
+                    'apply_to'         => $attribute->getApplyTo(),
+                    'type'             => Mage_ImportExport_Model_Import::getAttributeType($attribute),
+                    'default_value'    => strlen($attribute->getDefaultValue()) ? $attribute->getDefaultValue() : null,
+                    'options'          => $this->_entityModel->getAttributeOptions($attribute, $this->_indexValueAttributes)
+                )
+            );
         }
 
         return $this;
     }
 
-    public function saveData() {
+    public function saveData()
+    {
         $connection       = $this->_entityModel->getConnection();
         $newSku           = $this->_entityModel->getNewSku();
         $oldSku           = $this->_entityModel->getOldSku();
@@ -94,11 +109,11 @@ class Danslo_ApiImport_Model_Import_Entity_Product_Type_Bundle
                     continue;
                 }
 
-                if(empty($rowData['_bundle_option_title'])) {
+                if (empty($rowData['_bundle_option_title'])) {
                     continue;
                 }
-                if(isset($rowData['_bundle_option_type']) && !empty($rowData['_bundle_option_type'])) {
-                    if(!in_array($rowData['_bundle_option_type'], $this->_bundleOptionTypes)) {
+                if (isset($rowData['_bundle_option_type']) && !empty($rowData['_bundle_option_type'])) {
+                    if (!in_array($rowData['_bundle_option_type'], $this->_bundleOptionTypes)) {
                         continue;
                     }
 
@@ -109,15 +124,13 @@ class Danslo_ApiImport_Model_Import_Entity_Product_Type_Bundle
                         'type'      => !empty($rowData['_bundle_option_type'])     ? $rowData['_bundle_option_type']     : self::DEFAULT_OPTION_TYPE
                     );
                 }
-                if(isset($rowData['_bundle_product_sku']) && !empty($rowData['_bundle_product_sku'])) {
+                if (isset($rowData['_bundle_product_sku']) && !empty($rowData['_bundle_product_sku'])) {
                     $selectionEntityId = false;
-                    if(isset($newSku[$rowData['_bundle_product_sku']])) {
+                    if (isset($newSku[$rowData['_bundle_product_sku']])) {
                         $selectionEntityId = $newSku[$rowData['_bundle_product_sku']]['entity_id'];
-                    }
-                    elseif(isset($oldSku[$rowData['_bundle_product_sku']])) {
+                    } elseif (isset($oldSku[$rowData['_bundle_product_sku']])) {
                         $selectionEntityId = $oldSku[$rowData['_bundle_product_sku']]['entity_id'];
-                    }
-                    else {
+                    } else {
                         /*
                          * TODO: We should move this to _isParticularAttributeValid, but
                          * entity model is not filled with newSku / oldSku there.
@@ -125,7 +138,7 @@ class Danslo_ApiImport_Model_Import_Entity_Product_Type_Bundle
                         $this->_entityModel->addRowError(self::ERROR_INVALID_BUNDLE_PRODUCT_SKU, $rowNum);
                     }
 
-                    if($selectionEntityId) {
+                    if ($selectionEntityId) {
                         $bundleSelections[$productId][$rowData['_bundle_option_title']][] = array(
                             'parent_product_id'         => $productId,
                             'product_id'                => $selectionEntityId,
@@ -140,8 +153,8 @@ class Danslo_ApiImport_Model_Import_Entity_Product_Type_Bundle
                 }
             }
 
-            if(count($bundleOptions)) {
-                if($this->_entityModel->getBehavior() != Mage_ImportExport_Model_Import::BEHAVIOR_APPEND) {
+            if (count($bundleOptions)) {
+                if ($this->_entityModel->getBehavior() != Mage_ImportExport_Model_Import::BEHAVIOR_APPEND) {
                     $quoted = $connection->quoteInto('IN (?)', array_keys($bundleOptions));
                     $connection->delete($optionTable, "parent_id {$quoted}");
                     $connection->delete($selectionTable, "parent_product_id {$quoted}");
@@ -152,8 +165,8 @@ class Danslo_ApiImport_Model_Import_Entity_Product_Type_Bundle
                  * Insert options.
                  */
                 $optionData = array();
-                foreach($bundleOptions as $productId => $options) {
-                    foreach($options as $title => $option) {
+                foreach ($bundleOptions as $productId => $options) {
+                    foreach ($options as $title => $option) {
                         $optionData[] = $option;
                     }
                 }
@@ -164,8 +177,8 @@ class Danslo_ApiImport_Model_Import_Entity_Product_Type_Bundle
                  */
                 $optionId = $connection->lastInsertId();
                 $optionValues = array();
-                foreach($bundleOptions as $productId => $options) {
-                    foreach($options as $title => $option) {
+                foreach ($bundleOptions as $productId => $options) {
+                    foreach ($options as $title => $option) {
                         $optionValues[] = array(
                             'option_id' => $optionId++,
                             'store_id'  => '0',
@@ -176,13 +189,13 @@ class Danslo_ApiImport_Model_Import_Entity_Product_Type_Bundle
                 $connection->insertOnDuplicate($optionValueTable, $optionValues);
                 $optionId -= count($optionData);
 
-                if(count($bundleSelections)) {
+                if (count($bundleSelections)) {
                     $optionSelections = array();
                     $productRelations = array();
 
-                    foreach($bundleSelections as $productId => $selections) {
-                        foreach($selections as $title => $selection) {
-                            foreach($selection as &$sel) {
+                    foreach ($bundleSelections as $productId => $selections) {
+                        foreach ($selections as $title => $selection) {
+                            foreach ($selection as &$sel) {
                                 $productRelations[] = array(
                                     'parent_id' => $sel['parent_product_id'],
                                     'child_id'  => $sel['product_id']

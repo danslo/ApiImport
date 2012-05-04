@@ -25,10 +25,11 @@ class Danslo_ApiImport_Model_Resource_Import_Data
     protected $_behavior         = null;
     protected $_iterator         = null;
 
-    public function getIterator() {
-        if($this->_iterator === null) {
+    public function getIterator()
+    {
+        if ($this->_iterator === null) {
             $this->_generateBunches();
-            if(empty($this->_bunches)) {
+            if (empty($this->_bunches)) {
                 Mage::throwException('Import resource model was not provided any entities.');
             }
             $this->_iterator = new ArrayIterator($this->_bunches);
@@ -36,7 +37,8 @@ class Danslo_ApiImport_Model_Resource_Import_Data
         return $this->_iterator;
     }
 
-    public function _generateBunches() {
+    public function _generateBunches()
+    {
         /*
          * Split up entities by bunches.
          */
@@ -44,9 +46,9 @@ class Danslo_ApiImport_Model_Resource_Import_Data
         $products = array();
         $bunchNum = Mage::getStoreConfig('api_import/import_settings/bunch_num');
         $i = 1;
-        foreach($this->_entities as $product) {
+        foreach ($this->_entities as $product) {
             $products[$i] = $product;
-            if(($i && $i % $bunchNum == 0) || $i == count($this->_entities)) {
+            if (($i && $i % $bunchNum == 0) || $i == count($this->_entities)) {
                 $this->_bunches[] = $products;
                 $products = array();
             }
@@ -54,54 +56,62 @@ class Danslo_ApiImport_Model_Resource_Import_Data
         }
     }
 
-    public function setEntities($entities) {
-        if(count($entities)) {
+    public function setEntities($entities)
+    {
+        if (count($entities)) {
             $this->_entities = $entities;
             $this->_iterator = null;
         }
         return $this;
     }
 
-    public function getEntities() {
+    public function getEntities()
+    {
         return $this->_entities;
     }
 
-    public function getEntityTypeCode() {
-        if($this->_entityTypeCode === null) {
+    public function getEntityTypeCode()
+    {
+        if ($this->_entityTypeCode === null) {
             Mage::throwException('Import resource model was not provided any entity type.');
         }
         return $this->_entityTypeCode;
     }
 
-    public function getBehavior() {
-        if($this->_behavior === null) {
+    public function getBehavior()
+    {
+        if ($this->_behavior === null) {
             Mage::throwException('Import resource model was not provided any import behavior.');
         }
         return $this->_behavior;
     }
 
-    public function setBehavior($behavior) {
+    public function setBehavior($behavior)
+    {
         $allowedBehaviors = array(
             Mage_ImportExport_Model_Import::BEHAVIOR_APPEND,
             Mage_ImportExport_Model_Import::BEHAVIOR_REPLACE,
-            Mage_ImportExport_Model_Import::BEHAVIOR_DELETE);
-        if(!in_array($behavior, $allowedBehaviors)) {
+            Mage_ImportExport_Model_Import::BEHAVIOR_DELETE
+        );
+        if (!in_array($behavior, $allowedBehaviors)) {
             Mage::throwException('Specified import behavior (%s) is not in allowed behaviors: %s', $behavior, implode(', ', $allowedBehaviors));
         }
         $this->_behavior = $behavior;
         return $this;
     }
 
-    public function setEntityTypeCode($entityTypeCode) {
+    public function setEntityTypeCode($entityTypeCode)
+    {
         $allowedEntities = array_keys(Mage_ImportExport_Model_Config::getModels(Danslo_ApiImport_Model_Import::CONFIG_KEY_ENTITIES));
-        if(!in_array($entityTypeCode, $allowedEntities)) {
+        if (!in_array($entityTypeCode, $allowedEntities)) {
             Mage::throwException('Specified entity type (%s) is not in allowed entity types: %s', $entityTypeCode, implode(', ', $allowedEntities));
         }
         $this->_entityTypeCode = $entityTypeCode;
         return $this;
     }
 
-    public function getNextBunch() {
+    public function getNextBunch()
+    {
         if ($this->_iterator === null) {
             $this->_iterator = $this->getIterator();
             $this->_iterator->rewind();

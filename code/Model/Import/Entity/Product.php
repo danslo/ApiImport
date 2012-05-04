@@ -21,7 +21,8 @@ class Danslo_ApiImport_Model_Import_Entity_Product
 
     protected $_eventPrefix = 'api_import_entity_product';
 
-    public function __construct() {
+    public function __construct()
+    {
         $entityType = Mage::getSingleton('eav/config')->getEntityType($this->getEntityTypeCode());
         $this->_entityTypeId    = $entityType->getEntityTypeId();
         $this->_dataSourceModel = Danslo_ApiImport_Model_Import::getDataSourceModel();
@@ -37,31 +38,32 @@ class Danslo_ApiImport_Model_Import_Entity_Product
              ->_initCustomerGroups();
     }
 
-    protected function _importAttributes() {
+    protected function _importAttributes()
+    {
         $productAttributes = Mage::getModel('eav/entity_type')->loadByCode($this->getEntityTypeCode())
-                ->getAttributeCollection()
-                ->setFrontendInputTypeFilter('select')
-                ->addFieldToFilter('is_user_defined', true);
+            ->getAttributeCollection()
+            ->setFrontendInputTypeFilter('select')
+            ->addFieldToFilter('is_user_defined', true);
 
-        foreach($productAttributes as $attribute) {
+        foreach ($productAttributes as $attribute) {
             $attributeCode = $attribute->getAttributeCode();
             $sourceOptions = $attribute->getSource()->getAllOptions(false);
 
-            foreach($this->_dataSourceModel->getEntities() as $rowNum => $rowData) {
-                if(isset($rowData[$attributeCode]) && strlen(trim($rowData[$attributeCode]))) {
+            foreach ($this->_dataSourceModel->getEntities() as $rowNum => $rowData) {
+                if (isset($rowData[$attributeCode]) && strlen(trim($rowData[$attributeCode]))) {
                     $optionExists = false;
-                    foreach($sourceOptions as $sourceOption) {
-                        if($rowData[$attributeCode] == $sourceOption['label']) {
+                    foreach ($sourceOptions as $sourceOption) {
+                        if ($rowData[$attributeCode] == $sourceOption['label']) {
                             $optionExists = true;
                             break;
                         }
                     }
-                    if(!$optionExists) {
+                    if (!$optionExists) {
                         $options['value']['option_' . $rowData[$attributeCode]][0] = $rowData[$attributeCode];
                     }
                 }
             }
-            if(!empty($options)) {
+            if (!empty($options)) {
                 $attribute->setOption($options)->save();
             }
         }
@@ -70,7 +72,8 @@ class Danslo_ApiImport_Model_Import_Entity_Product
         return $this;
     }
 
-    public function _importData() {
+    public function _importData()
+    {
         Mage::dispatchEvent($this->_eventPrefix . '_before_import', array('data_source_model' => $this->_dataSourceModel));
         $result = parent::_importData();
         Mage::dispatchEvent($this->_eventPrefix . '_after_import', array('entities' => $this->_newSku));
