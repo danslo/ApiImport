@@ -27,4 +27,12 @@ class Danslo_ApiImport_Model_Import_Entity_Customer
         $this->_addressEntity   = Mage::getModel('api_import/import_entity_customer_address', $this);
     }
 
+    public function _importData()
+    {
+        Mage::dispatchEvent($this->_eventPrefix . '_before_import', array('data_source_model' => $this->_dataSourceModel));
+        $result = parent::_importData();
+        Mage::dispatchEvent($this->_eventPrefix . '_after_import', array('entities' => $this->_newCustomers));
+        return $result;
+    }
+
 }

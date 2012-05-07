@@ -20,7 +20,7 @@ class Danslo_ApiImport_Helper_Test
 
     protected $_linkedProducts = null;
 
-    protected $_defaultAttributes = array(
+    protected $_defaultProductAttributes = array(
         'description'       => 'Some description',
         '_attribute_set'    => 'Default',
         'short_description' => 'Some short description',
@@ -29,6 +29,12 @@ class Danslo_ApiImport_Helper_Test
         'visibility'        => Mage_Catalog_Model_Product_Visibility::VISIBILITY_BOTH,
         'tax_class_id'      => 0,
         'is_in_stock'       => 1
+    );
+
+    protected $_defaultCustomerAttributes = array(
+        '_website'          => 'base',
+        '_store'            => 'default',
+        'group_id'          => 1
     );
 
     public function removeAllProducts()
@@ -62,7 +68,7 @@ class Danslo_ApiImport_Helper_Test
 
         for ($i = 1; $i <= $numProducts; $i++) {
             $products[$i] = array_merge(
-                $this->_defaultAttributes,
+                $this->_defaultProductAttributes,
                 array(
                     'sku'    => 'some_sku_' . $i,
                     '_type'  => Mage_Catalog_Model_Product_Type::TYPE_SIMPLE,
@@ -86,7 +92,7 @@ class Danslo_ApiImport_Helper_Test
              * Generate configurable product.
              */
             $products[$counter] = array_merge(
-                $this->_defaultAttributes,
+                $this->_defaultProductAttributes,
                 array(
                     'sku'    => 'some_configurable_' . $i,
                     '_type'  => Mage_Catalog_Model_Product_Type::TYPE_CONFIGURABLE,
@@ -124,7 +130,7 @@ class Danslo_ApiImport_Helper_Test
              * Generate bundle product.
              */
             $products[$counter] = array_merge(
-                $this->_defaultAttributes, array(
+                $this->_defaultProductAttributes, array(
                     'sku'        => 'some_bundle_' . $i,
                     '_type'      => Mage_Catalog_Model_Product_Type::TYPE_BUNDLE,
                     'name'       => 'Some bundle ( ' . $i . ' )',
@@ -170,7 +176,7 @@ class Danslo_ApiImport_Helper_Test
          */
         for ($i = 1, $counter = 1; $i <= $numProducts; $i++) {
             $products[$counter] = array_merge(
-                $this->_defaultAttributes,
+                $this->_defaultProductAttributes,
                 array(
                     'sku'   => 'some_grouped_' . $i,
                     '_type' => Mage_Catalog_Model_Product_Type::TYPE_GROUPED,
@@ -195,6 +201,24 @@ class Danslo_ApiImport_Helper_Test
         }
 
         return $products;
+    }
+
+    public function generateRandomStandardCustomers($numCustomers)
+    {
+        $customers = array();
+
+        for ($i = 0; $i < $numCustomers; $i++) {
+            $customers[$i] = array_merge(
+                $this->_defaultCustomerAttributes,
+                array(
+                    'email'     => sprintf('%s@%s.com', uniqid(), uniqid()),
+                    'firstname' => uniqid(),
+                    'lastname'  => uniqid()
+                )
+            );
+        }
+
+        return $customers;
     }
 
 }

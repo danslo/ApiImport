@@ -19,7 +19,7 @@ require_once 'app/Mage.php';
 
 Mage::init();
 
-define('NUM_PRODUCTS', 100);
+define('NUM_ENTITIES', 100);
 define('API_USER', 'apiUser');
 define('API_KEY', 'someApiKey123');
 define('USE_API', true);
@@ -36,46 +36,65 @@ if (USE_API) {
     $session = $client->call('login', array(API_USER, API_KEY));
 }
 
-foreach (array('simple', 'configurable', 'bundle', 'grouped') as $productType) {
-    /*
-     * Generation method depends on product type.
-     */
-    printf('Generating %d %s products...' . PHP_EOL, NUM_PRODUCTS, $productType);
-    $products = $helper->{sprintf('generateRandom%sProducts', $productType)}(NUM_PRODUCTS);
+$entityTypes = array(
+    'product' => array(
+        'entity' => Mage_ImportExport_Model_Export_Entity_Product::getEntityTypeCode(),
+        'types'  => array(
+            'simple',
+            'configurable',
+            'bundle',
+            'grouped'
+        )
+    ),
+    'customer' => array(
+        'entity' => Mage_ImportExport_Model_Export_Entity_Customer::getEntityTypeCode(),
+        'types'  => array(
+            'standard'
+        )
+    )
+);
 
-    /*
-     * Attempt to import generated products.
-     */
-    printf('Starting import...' . PHP_EOL);
-    $totalTime = microtime(true);
-
-    if (USE_API) {
-        try {
-            $client->call('call', array($session, 'import.importEntities', array($products)));
-        }
-        catch(Exception $e) {
-            printf('Import failed: ' . PHP_EOL, $e->getMessage());
-            printf('Server returned: %s' . PHP_EOL, $client->getHttpClient()->getLastResponse()->getBody());
-            exit;
-        }
-    } else {
+foreach ($entityTypes as $typeName => $entityType) {
+    foreach ($entityType['types'] as $subType) {
         /*
-         * For debugging purposes only.
-         */
-        Mage::getModel('api_import/import_api')->importEntities($products);
-    }
-    $totalTime = microtime(true) - $totalTime;
-    printf('Done! Magento reports %d products in catalog.' . PHP_EOL, Mage::getModel('catalog/product')->getCollection()->count());
+        * Generation method depends on product type.
+        */
+        printf('Generating %d %s %ss...' . PHP_EOL, NUM_ENTITIES, $subType, $typeName);
+        $entities = $helper->{sprintf('generateRandom%s%ss', ucfirst($subType), ucfirst($typeName))}(NUM_ENTITIES);
 
-    /*
-     * Generate some rough statistics.
-     */
-    printf('========== Import statistics ==========' . PHP_EOL);
-    printf("Total duration:\t\t%fs"    . PHP_EOL, $totalTime);
-    printf("Average per product:\t%fs" . PHP_EOL, $totalTime / NUM_PRODUCTS);
-    printf("Products per second:\t%fs" . PHP_EOL, 1 / ($totalTime / NUM_PRODUCTS));
-    printf("Products per hour:\t%fs"   . PHP_EOL, (60 * 60) / ($totalTime / NUM_PRODUCTS));
-    printf('=======================================' . PHP_EOL . PHP_EOL);
+        /*
+         * Attempt to import generated products.
+        */
+        printf('Starting import...' . PHP_EOL);
+        $totalTime = microtime(true);
+
+        if (USE_API) {
+            try {
+                $client->call('call', array($session, 'import.importEntities', array($entities, $entityType['entity'])));
+            }
+            catch(Exception $e) {
+                printf('Import failed: ' . PHP_EOL, $e->getMessage());
+                printf('Server returned: %s' . PHP_EOL, $client->getHttpClient()->getLastResponse()->getBody());
+                exit;
+            }
+        } else {
+            /*
+            * For debugging purposes only.
+            */
+            Mage::getModel('api_import/import_api')->importEntities($entities, $entityType['entity']);
+        }
+        $totalTime = microtime(true) - $totalTime;
+
+        /*
+        * Generate some rough statistics.
+        */
+        printf('========== Import statistics ==========' . PHP_EOL);
+        printf("Total duration:\t\t%fs"    . PHP_EOL, $totalTime);
+        printf("Average per %s:\t%fs" . PHP_EOL, $typeName, $totalTime / NUM_ENTITIES);
+        printf("%ss per second:\t%fs" . PHP_EOL, ucfirst($typeName), 1 / ($totalTime / NUM_ENTITIES));
+        printf("%ss per hour:\t%fs"   . PHP_EOL, ucfirst($typeName), (60 * 60) / ($totalTime / NUM_ENTITIES));
+        printf('=======================================' . PHP_EOL . PHP_EOL);
+    }
 }
 
 /*
