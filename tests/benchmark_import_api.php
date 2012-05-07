@@ -19,7 +19,7 @@ require_once 'app/Mage.php';
 
 Mage::init();
 
-define('NUM_ENTITIES', 100);
+define('NUM_ENTITIES', 5000);
 define('API_USER', 'apiUser');
 define('API_KEY', 'someApiKey123');
 define('USE_API', true);
@@ -39,6 +39,7 @@ if (USE_API) {
 $entityTypes = array(
     'product' => array(
         'entity' => Mage_ImportExport_Model_Export_Entity_Product::getEntityTypeCode(),
+        'model'  => 'catalog/product',
         'types'  => array(
             'simple',
             'configurable',
@@ -48,6 +49,7 @@ $entityTypes = array(
     ),
     'customer' => array(
         'entity' => Mage_ImportExport_Model_Export_Entity_Customer::getEntityTypeCode(),
+        'model'  => 'customer/customer',
         'types'  => array(
             'standard'
         )
@@ -83,6 +85,7 @@ foreach ($entityTypes as $typeName => $entityType) {
             */
             Mage::getModel('api_import/import_api')->importEntities($entities, $entityType['entity']);
         }
+        printf('Done! Magento reports %d %ss.' . PHP_EOL, Mage::getModel($entityType['model'])->getCollection()->count(), $typeName);
         $totalTime = microtime(true) - $totalTime;
 
         /*
