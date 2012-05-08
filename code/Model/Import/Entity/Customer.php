@@ -20,6 +20,8 @@ class Danslo_ApiImport_Model_Import_Entity_Customer
     extends Mage_ImportExport_Model_Import_Entity_Customer
 {
 
+    protected $_eventPrefix = 'api_import_entity_customer';
+
     public function __construct()
     {
         parent::__construct();
