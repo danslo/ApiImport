@@ -42,14 +42,15 @@ class Danslo_ApiImport_Model_Import_Entity_Product
     {
         $productAttributes = Mage::getModel('eav/entity_type')->loadByCode($this->getEntityTypeCode())
             ->getAttributeCollection()
-            ->setFrontendInputTypeFilter('select')
+            ->addFieldToFilter('frontend_input', array('select', 'multiselect'))
             ->addFieldToFilter('is_user_defined', true);
 
         foreach ($productAttributes as $attribute) {
             $attributeCode = $attribute->getAttributeCode();
             $sourceOptions = $attribute->getSource()->getAllOptions(false);
 
-            foreach ($this->_dataSourceModel->getEntities() as $rowNum => $rowData) {
+            $options = array();
+            foreach ($this->_dataSourceModel->getEntities() as $rowData) {
                 if (isset($rowData[$attributeCode]) && strlen(trim($rowData[$attributeCode]))) {
                     $optionExists = false;
                     foreach ($sourceOptions as $sourceOption) {
