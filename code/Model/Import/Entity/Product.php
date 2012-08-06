@@ -109,12 +109,18 @@ class Danslo_ApiImport_Model_Import_Entity_Product
             'use_config_qty_increments'     => 1,
             'is_in_stock'                   => 0,
             'low_stock_date'                => null,
-            'stock_status_changed_auto'     => 0,
-            'is_decimal_divided'            => 0
+            'stock_status_changed_auto'     => 0
         );
 
         $entityTable = Mage::getResourceModel('cataloginventory/stock_item')->getMainTable();
         $helper      = Mage::helper('catalogInventory');
+
+        /**
+         * This column was added in migration 1.6.0.0.1-1.6.0.0.2, preserve backwards compatibility.
+         */
+        if ($this->_connection->tableColumnExists($entityTable, 'is_decimal_divided')) {
+            $defaultStockData['is_decimal_divided'] = 0;
+        }
 
         while ($bunch = $this->_dataSourceModel->getNextBunch()) {
             $stockData = array();
