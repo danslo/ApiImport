@@ -30,8 +30,12 @@
             <import_entities>
                 <catalog_product>
                     <model_token>api_import/import_entity_product</model_token>
-                    <label>XMLRPC Products</label>
+                    <label>Products</label>
                 </catalog_product>
+                <catalog_category>
+                    <model_token>api_import/import_entity_category</model_token>
+                    <label>Categories</label>
+                </catalog_category>
                 <customer>
                     <model_token>api_import/import_entity_customer</model_token>
                     <label>Customers</label>
