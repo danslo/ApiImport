@@ -80,7 +80,7 @@ The second parameter to importEntities specifies what kind of entity is imported
 
 1. ``Mage_ImportExport_Model_Export_Entity_Product::getEntityTypeCode()``
 2. ``Mage_ImportExport_Model_Export_Entity_Customer::getEntityTypeCode()``
-3. ... in the future, a category entity type.
+3. ``Danslo_ApiImport_Model_Export_Entity_Customer::getEntityTypeCode()``
 
 ## Where can I see the results?
 
