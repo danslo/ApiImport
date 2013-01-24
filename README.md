@@ -78,9 +78,9 @@ Another useful trick to figure out what to give to ApiImport is to simply use Ma
 
 The second parameter to importEntities specifies what kind of entity is imported. By default it will assume you are importing products. If you want to import a different kind of entity, use the return value of any of these methods:
 
-1. ``Mage_ImportExport_Model_Export_Entity_Product::getEntityTypeCode()``
-2. ``Mage_ImportExport_Model_Export_Entity_Customer::getEntityTypeCode()``
-3. ``Danslo_ApiImport_Model_Export_Entity_Customer::getEntityTypeCode()``
+1. ``Mage_ImportExport_Model_Import_Entity_Product::getEntityTypeCode()``
+2. ``Mage_ImportExport_Model_Import_Entity_Customer::getEntityTypeCode()``
+3. ``Danslo_ApiImport_Model_Import_Entity_Category::getEntityTypeCode()``
 
 ## Where can I see the results?
 
