@@ -13,7 +13,7 @@ Additionally, ApiImport is 100% free from rewrites - making it upgrade-proof and
 
 ApiImport is a [modman](https://github.com/colinmollenhour/modman) module. Simply install modman and execute the following command:
 
-``./modman clone ApiImport ``
+``./modman clone ApiImport https://github.com/danslo/ApiImport.git``
 
 ## How do I use ApiImport?
 
