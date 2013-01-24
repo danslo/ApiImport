@@ -19,9 +19,22 @@ class Danslo_ApiImport_Model_Import_Entity_Product_Type_Bundle
     extends Mage_ImportExport_Model_Import_Entity_Product_Type_Abstract
 {
 
+    /**
+     * Default values.
+     */
     const DEFAULT_OPTION_TYPE = 'select';
+
+    /**
+     * Import errors.
+     */
     const ERROR_INVALID_BUNDLE_PRODUCT_SKU = 'invalidBundleProductSku';
 
+    /**
+     * Columns with a specific meaning. Unused for now.
+     * Can be used for validation through _isParticularAttributesValid.
+     *
+     * @var array
+     */
     protected $_particularAttributes = array(
         '_bundle_option_required',
         '_bundle_option_position',
@@ -37,6 +50,11 @@ class Danslo_ApiImport_Model_Import_Entity_Product_Type_Bundle
         '_bundle_product_can_change_qty'
     );
 
+    /**
+     * Bundle option types.
+     *
+     * @var array
+     */
     protected $_bundleOptionTypes = array(
         'select',
         'radio',
@@ -44,6 +62,11 @@ class Danslo_ApiImport_Model_Import_Entity_Product_Type_Bundle
         'multi'
     );
 
+    /**
+     * Adds bundle price type to internet attributes.
+     *
+     * @return Danslo_ApiImport_Model_Import_Entity_Product_Type_Bundle
+     */
     public function _initAttributes()
     {
         parent::_initAttributes();
@@ -76,6 +99,11 @@ class Danslo_ApiImport_Model_Import_Entity_Product_Type_Bundle
         return $this;
     }
 
+    /**
+     * Saves data specific to bundle products.
+     *
+     * @return Danslo_ApiImport_Model_Import_Entity_Product_Type_Bundle
+     */
     public function saveData()
     {
         $connection       = $this->_entityModel->getConnection();
@@ -138,6 +166,9 @@ class Danslo_ApiImport_Model_Import_Entity_Product_Type_Bundle
                         $this->_entityModel->addRowError(self::ERROR_INVALID_BUNDLE_PRODUCT_SKU, $rowNum);
                     }
 
+                    /**
+                     * If we have a valid product, create the selection.
+                     */
                     if ($selectionEntityId) {
                         $bundleSelections[$productId][$rowData['_bundle_option_title']][] = array(
                             'parent_product_id'         => $productId,
@@ -154,6 +185,9 @@ class Danslo_ApiImport_Model_Import_Entity_Product_Type_Bundle
             }
 
             if (count($bundleOptions)) {
+                /**
+                 * Only delete options, selection and relations when we are not appending.
+                 */
                 if ($this->_entityModel->getBehavior() != Mage_ImportExport_Model_Import::BEHAVIOR_APPEND) {
                     $quoted = $connection->quoteInto('IN (?)', array_keys($bundleOptions));
                     $connection->delete($optionTable, "parent_id {$quoted}");
@@ -161,8 +195,8 @@ class Danslo_ApiImport_Model_Import_Entity_Product_Type_Bundle
                     $connection->delete($relationTable, "parent_id {$quotes}");
                 }
 
-                /*
-                 * Insert options.
+                /**
+                 * Insert bundle options.
                  */
                 $optionData = array();
                 foreach ($bundleOptions as $productId => $options) {
@@ -172,7 +206,7 @@ class Danslo_ApiImport_Model_Import_Entity_Product_Type_Bundle
                 }
                 $connection->insertOnDuplicate($optionTable, $optionData);
 
-                /*
+                /**
                  * Insert option titles.
                  */
                 $optionId = $connection->lastInsertId();
@@ -187,7 +221,7 @@ class Danslo_ApiImport_Model_Import_Entity_Product_Type_Bundle
                     }
                 }
                 $connection->insertOnDuplicate($optionValueTable, $optionValues);
-                $optionId -= count($optionData);
+                $optionId -= count($optionData); // TODO: Do this more nicely.
 
                 if (count($bundleSelections)) {
                     $optionSelections = array();
@@ -207,12 +241,12 @@ class Danslo_ApiImport_Model_Import_Entity_Product_Type_Bundle
                         }
                     }
 
-                    /*
+                    /**
                      * Insert option selections.
                      */
                     $connection->insertOnDuplicate($selectionTable, $optionSelections);
 
-                    /*
+                    /**
                      * Insert product relations.
                      */
                     $connection->insertOnDuplicate($relationTable, $productRelations);

@@ -19,12 +19,46 @@ class Danslo_ApiImport_Model_Resource_Import_Data
     implements IteratorAggregate
 {
 
-    protected $_entities         = array();
-    protected $_bunches          = array();
-    protected $_entityTypeCode   = null;
-    protected $_behavior         = null;
-    protected $_iterator         = null;
+    /**
+     * Stores all data passed to us by the user.
+     *
+     * @var array
+     */
+    protected $_entities = array();
 
+    /**
+     * Stores all data in bunches (configurable number).
+     *
+     * @var array
+     */
+    protected $_bunches = array();
+
+    /**
+     * Stores the entity type.
+     *
+     * @var string
+     */
+    protected $_entityTypeCode = null;
+
+    /**
+     * Stores the import behavior.
+     *
+     * @var string
+     */
+    protected $_behavior = null;
+
+    /**
+     * Array iterator for bunches.
+     *
+     * @var ArrayIterator
+     */
+    protected $_iterator = null;
+
+    /**
+     * Optionally creates and returns an iterator for bunches.
+     *
+     * @return ArrayIterator
+     */
     public function getIterator()
     {
         if ($this->_iterator === null) {
@@ -37,11 +71,13 @@ class Danslo_ApiImport_Model_Resource_Import_Data
         return $this->_iterator;
     }
 
+    /**
+     * Splits up entities array by bunches.
+     *
+     * @return void
+     */
     public function _generateBunches()
     {
-        /*
-         * Split up entities by bunches.
-         */
         $this->_bunches = array();
         $products = array();
         $bunchNum = Mage::getStoreConfig('api_import/import_settings/bunch_num');
@@ -56,6 +92,12 @@ class Danslo_ApiImport_Model_Resource_Import_Data
         }
     }
 
+    /**
+     * Stores entities and resets iterator.
+     *
+     * @param array $entities
+     * @return \Danslo_ApiImport_Model_Resource_Import_Data
+     */
     public function setEntities($entities)
     {
         if (count($entities)) {
@@ -65,11 +107,21 @@ class Danslo_ApiImport_Model_Resource_Import_Data
         return $this;
     }
 
+    /**
+     * Returns entities.
+     *
+     * @return array
+     */
     public function getEntities()
     {
         return $this->_entities;
     }
 
+    /**
+     * Returns the entity type.
+     *
+     * @return string
+     */
     public function getEntityTypeCode()
     {
         if ($this->_entityTypeCode === null) {
@@ -78,6 +130,11 @@ class Danslo_ApiImport_Model_Resource_Import_Data
         return $this->_entityTypeCode;
     }
 
+    /**
+     * Returns the import behavior.
+     *
+     * @return string
+     */
     public function getBehavior()
     {
         if ($this->_behavior === null) {
@@ -86,6 +143,12 @@ class Danslo_ApiImport_Model_Resource_Import_Data
         return $this->_behavior;
     }
 
+    /**
+     * Validates and sets the import behavior.
+     *
+     * @param string $behavior
+     * @return Danslo_ApiImport_Model_Resource_Import_Data
+     */
     public function setBehavior($behavior)
     {
         $allowedBehaviors = array(
@@ -100,6 +163,12 @@ class Danslo_ApiImport_Model_Resource_Import_Data
         return $this;
     }
 
+    /**
+     * Valdiates and sets the entity type.
+     *
+     * @param string $entityTypeCode
+     * @return Danslo_ApiImport_Model_Resource_Import_Data
+     */
     public function setEntityTypeCode($entityTypeCode)
     {
         $allowedEntities = array_keys(Mage_ImportExport_Model_Config::getModels(Danslo_ApiImport_Model_Import::CONFIG_KEY_ENTITIES));
@@ -110,6 +179,11 @@ class Danslo_ApiImport_Model_Resource_Import_Data
         return $this;
     }
 
+    /**
+     * Returns the next bunch in line.
+     *
+     * @return array
+     */
     public function getNextBunch()
     {
         if ($this->_iterator === null) {

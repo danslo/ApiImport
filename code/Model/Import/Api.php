@@ -19,18 +19,36 @@ class Danslo_ApiImport_Model_Import_Api
     extends Mage_Api_Model_Resource_Abstract
 {
 
+    /**
+     * Cached import model.
+     *
+     * @var Mage_ApiImport_Model_Import
+     */
     protected $_api;
 
+    /**
+     * Sets up the import model and loads area parts.
+     *
+     * @return void
+     */
     public function __construct()
     {
         $this->_api = Mage::getModel('api_import/import');
 
-        /*
+        /**
          * Event part is not loaded by default for API.
          */
         Mage::app()->loadAreaPart(Mage_Core_Model_App_Area::AREA_GLOBAL, Mage_Core_Model_App_Area::PART_EVENTS);
     }
 
+    /**
+     * Fires off the import process through the import model.
+     *
+     * @param array $entities
+     * @param string $entityType
+     * @param string $behavior
+     * @return array
+     */
     public function importEntities($entities, $entityType = null, $behavior = null)
     {
         $this->_setEntityTypeCode($entityType ? $entityType : Mage_Catalog_Model_Product::ENTITY);
@@ -46,6 +64,12 @@ class Danslo_ApiImport_Model_Import_Api
         return array($result);
     }
 
+    /**
+     * Sets entity type in the source model.
+     *
+     * @param string $entityType
+     * @return void
+     */
     protected function _setEntityTypeCode($entityType)
     {
         try {
@@ -55,6 +79,12 @@ class Danslo_ApiImport_Model_Import_Api
         }
     }
 
+    /**
+     * Sets import behavior in the source model.
+     *
+     * @param string $behavior
+     * @return void
+     */
     protected function _setBehavior($behavior)
     {
         try {

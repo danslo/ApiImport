@@ -20,8 +20,18 @@ class Danslo_ApiImport_Model_Import_Entity_Customer
     extends Mage_ImportExport_Model_Import_Entity_Customer
 {
 
+    /**
+     * Prepended to all events fired in this class.
+     *
+     * @var string
+     */
     protected $_eventPrefix = 'api_import_entity_customer';
 
+    /**
+     * Sets the proper data source model and adress model.
+     *
+     * @return void
+     */
     public function __construct()
     {
         parent::__construct();
@@ -29,6 +39,11 @@ class Danslo_ApiImport_Model_Import_Entity_Customer
         $this->_addressEntity   = Mage::getModel('api_import/import_entity_customer_address', $this);
     }
 
+    /**
+     * Adds events before and after importing.
+     *
+     * @return boolean
+     */
     public function _importData()
     {
         Mage::dispatchEvent($this->_eventPrefix . '_before_import', array('data_source_model' => $this->_dataSourceModel));

@@ -19,8 +19,18 @@ class Danslo_ApiImport_Model_Import_Entity_Product
     extends Mage_ImportExport_Model_Import_Entity_Product
 {
 
+    /**
+     * Prepended to all events fired in this class.
+     *
+     * @var string
+     */
     protected $_eventPrefix = 'api_import_entity_product';
 
+    /**
+     * Sets the proper data source model and makes sure dropdown options are imported.
+     *
+     * @return void
+     */
     public function __construct()
     {
         $entityType = Mage::getSingleton('eav/config')->getEntityType($this->getEntityTypeCode());
@@ -38,6 +48,11 @@ class Danslo_ApiImport_Model_Import_Entity_Product
              ->_initCustomerGroups();
     }
 
+    /**
+     * Imports dropdown options for select/multiselect attributes.
+     *
+     * @return Danslo_ApiImport_Model_Import_Entity_Product
+     */
     protected function _importAttributes()
     {
         $productAttributes = Mage::getModel('eav/entity_type')->loadByCode($this->getEntityTypeCode())
@@ -73,6 +88,11 @@ class Danslo_ApiImport_Model_Import_Entity_Product
         return $this;
     }
 
+    /**
+     * Adds events before and after importing.
+     *
+     * @return boolean
+     */
     public function _importData()
     {
         Mage::dispatchEvent($this->_eventPrefix . '_before_import', array('data_source_model' => $this->_dataSourceModel));
@@ -136,8 +156,7 @@ class Danslo_ApiImport_Model_Import_Entity_Product
                 }
 
                 /**
-                 * Below line is the only change in this method.
-                 * This is a core bugfix, please see the following github change;
+                 * Line below is a core bugfix, please see the following github change;
                  * https://github.com/mageplus/mageplus/commit/89a7362a3907a9fa9ff3d435394dc28b9fb42f95
                  */
                 $row = array();

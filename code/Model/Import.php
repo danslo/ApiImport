@@ -19,17 +19,39 @@ class Danslo_ApiImport_Model_Import
     extends Mage_ImportExport_Model_Import
 {
 
-    const CONFIG_KEY_ENTITIES  = 'global/api_import/import_entities';
+    /**
+     * Overwrite XML path to entities so we can replace them with our own versions.
+     */
+    const CONFIG_KEY_ENTITIES = 'global/api_import/import_entities';
 
-    protected $_debugMode = true;
+    /**
+     * Determines whether or not ApiImport writes import logs to var/log.
+     *
+     * @var boolean
+     */
+    protected $_debugMode = false;
 
+    /**
+     * Gets the data source model.
+     *
+     * @return Danslo_ApiImport_Model_Resource_Import_Data
+     */
     public static function getDataSourceModel()
     {
         return Mage::getResourceSingleton('api_import/import_data');
     }
 
+    /**
+     * Imports entities from the source modle and logs the result.
+     * This method will always return true because that's what core returns.
+     *
+     * @return boolean
+     */
     public function importSource()
     {
+        /**
+         * Grab the entity type and import behavior from source model and store it.
+         */
         $this->setData(
             array(
                 'entity'   => self::getDataSourceModel()->getEntityTypeCode(),
@@ -38,7 +60,7 @@ class Danslo_ApiImport_Model_Import
         );
         $this->addLogComment(Mage::helper('importexport')->__('Begin import of "%s" with "%s" behavior', $this->getEntity(), $this->getBehavior()));
 
-        /*
+        /**
          * Import entities and log the result.
          */
         $result = $this->_getEntityAdapter()->importData();
@@ -53,19 +75,22 @@ class Danslo_ApiImport_Model_Import
             )
         );
 
-        /*
+        /**
          * We circumvent validateSource, so we output the errors (if any) ourselves here.
          */
         foreach ($this->getErrors() as $errorCode => $rows) {
-            $error = $errorCode .
-                ' ' .
-                Mage::helper('importexport')->__('in rows') . ': ' .
-                implode(', ', $rows);
-            $this->addLogComment($error);
+            $this->addLogComment($errorCode . ' ' . Mage::helper('importexport')->__('in rows') . ': ' . implode(', ', $rows));
         }
         return $result;
     }
 
+    /**
+     * The only reason for rewriting this method is so that the proper CONFIG_KEY_ENTITIES const value is used.
+     * Nothing in this method has been changed.
+     *
+     * @throws Mage_Core_Exception
+     * @return Mage_ImportExport_Model_Import_Entity_Abstract
+     */
     protected function _getEntityAdapter()
     {
         if (!$this->_entityAdapter) {
@@ -97,25 +122,5 @@ class Danslo_ApiImport_Model_Import
         }
         return $this->_entityAdapter;
     }
-
-    public function addLogComment($debugData)
-    {
-        if (is_array($debugData)) {
-            $this->_logTrace = array_merge($this->_logTrace, $debugData);
-        } else {
-            $this->_logTrace[] = $debugData;
-        }
-        if (!$this->_debugMode) {
-            return $this;
-        }
-
-        if (!$this->_logInstance) {
-            $fileName = 'api_import_' . date('Y_m_d_H_i_s') . '.log';
-            $this->_logInstance = Mage::getModel('core/log_adapter', $fileName)
-                ->setFilterDataKeys($this->_debugReplacePrivateDataKeys);
-        }
-        $this->_logInstance->log($debugData);
-        return $this;
-    }
-
+    
 }

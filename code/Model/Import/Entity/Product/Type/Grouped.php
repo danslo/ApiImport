@@ -24,8 +24,7 @@ class Danslo_ApiImport_Model_Import_Entity_Product_Type_Grouped
      * Magento uses a seperate getBehavior implementation rather than getting
      * the behavior directly from the entityModel.
      *
-     * Unfortunately this does break importing grouped products when not done through
-     * ApiImport. But there is no other way.
+     * @return string
      */
     public function getBehavior()
     {

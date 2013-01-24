@@ -18,34 +18,70 @@
 class Danslo_ApiImport_Model_Observer
 {
 
+    /**
+     * Indexes product stock.
+     *
+     * @param Mage_Index_Model_Event $event
+     * @return Mage_CatalogInventory_Model_Resource_Indexer_Stock
+     */
     protected function _indexStock(&$event)
     {
         return Mage::getResourceSingleton('cataloginventory/indexer_stock')->catalogProductMassAction($event);
     }
 
+    /**
+     * Indexes product price.
+     *
+     * @param Mage_Index_Model_Event $event
+     * @return Mage_Catalog_Model_Resource_Product_Indexer_Price
+     */
     protected function _indexPrice(&$event)
     {
         return Mage::getResourceSingleton('catalog/product_indexer_price')->catalogProductMassAction($event);
     }
 
+    /**
+     * Indexes product category relation.
+     *
+     * @param Mage_Index_Model_Event $event
+     * @return Mage_Catalog_Model_Resource_Category_Indexer_Product
+     */
     protected function _indexCategoryRelation(&$event)
     {
         return Mage::getResourceSingleton('catalog/category_indexer_product')->catalogProductMassAction($event);
     }
 
+    /**
+     * Indexes product EAV attributes.
+     *
+     * @param Mage_Index_Model_Event $event
+     * @return Mage_Catalog_Model_Resource_Product_Indexer_Eav
+     */
     protected function _indexEav(&$event)
     {
         return Mage::getResourceSingleton('catalog/product_indexer_eav')->catalogProductMassAction($event);
     }
 
+    /**
+     * Indexes product search.
+     *
+     * @param array $productIds
+     * @return Mage_CatalogSearch_Model_Resource_Fulltext
+     */
     protected function _indexSearch(&$productIds)
     {
         return Mage::getResourceSingleton('catalogsearch/fulltext')->rebuildIndex(null, $productIds);
     }
 
+    /**
+     * Indexes product URL rewrites.
+     *
+     * @param array $productIds
+     * @return Danslo_ApiImport_Model_Observer
+     */
     protected function _indexRewrites(&$productIds)
     {
-        /*
+        /**
          * Only generate URL rewrites when this module is enabled.
          */
         $indexer = Mage::getResourceSingleton('ecomdev_urlrewrite/indexer');
@@ -55,17 +91,15 @@ class Danslo_ApiImport_Model_Observer
         return $this;
     }
 
-    public function indexProducts($observer)
+    /**
+     * Generates an index event based on imported entity IDs.
+     *
+     * @param array $entityIds
+     * @return Mage_Index_Model_Event
+     */
+    protected function _getIndexEvent(&$entityIds)
     {
-        /*
-         * Obtain all imported entity IDs.
-         */
-        $entityIds = array();
-        foreach ($observer->getEntities() as $entity) {
-            $entityIds[] = $entity['entity_id'];
-        }
-
-        /*
+        /**
          * Generate a fake mass update event that we pass to our indexers.
          */
         $event = Mage::getModel('index/event');
@@ -75,8 +109,27 @@ class Danslo_ApiImport_Model_Observer
             'product_ids'               => &$entityIds, // for category_indexer_product
             'reindex_eav_product_ids'   => &$entityIds  // for product_indexer_eav
         ));
+        return $event;
+    }
 
-        /*
+    /**
+     * Partial product index after import.
+     *
+     * @param Varien_Event_Observer $observer
+     * @return boolean
+     */
+    public function indexProducts($observer)
+    {
+        /**
+         * Obtain all imported entity IDs and an event.
+         */
+        $entityIds = array();
+        foreach ($observer->getEntities() as $entity) {
+            $entityIds[] = $entity['entity_id'];
+        }
+        $event = $this->_getIndexEvent($entityIds);
+
+        /**
          * Index our product entities.
          */
         try {
@@ -99,6 +152,7 @@ class Danslo_ApiImport_Model_Observer
                 $this->_indexRewrites($entityIds);
             }
         } catch (Exception $e) {
+            Mage::logException($e);
             return false;
         }
 

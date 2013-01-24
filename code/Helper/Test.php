@@ -18,8 +18,18 @@
 class Danslo_ApiImport_Helper_Test
 {
 
+    /**
+     * Stores array of imported simple products used for configurable, bundle and grouped product creation.
+     *
+     * @var array
+     */
     protected $_linkedProducts = null;
 
+    /**
+     * Default attributes that are used for every product entity.
+     *
+     * @var array
+     */
     protected $_defaultProductAttributes = array(
         'description'       => 'Some description',
         '_attribute_set'    => 'Default',
@@ -31,26 +41,42 @@ class Danslo_ApiImport_Helper_Test
         'is_in_stock'       => 1
     );
 
+    /**
+     * Default attributes that are used for customers.
+     *
+     * @var array
+     */
     protected $_defaultCustomerAttributes = array(
         '_website'          => 'base',
         '_store'            => 'default',
         'group_id'          => 1
     );
 
+    /**
+     * Removes all products by truncating the entity table. Be careful with this.
+     *
+     * @return void
+     */
     public function removeAllProducts()
     {
         Mage::getSingleton('core/resource')->getConnection('core_write')->query('TRUNCATE TABLE catalog_product_entity');
     }
 
+    /**
+     * Creates and stores 3 simple products with different values for the color attribute.
+     * These products are used for configurable, bundle and grouped product generation.
+     *
+     * @return array
+     */
     protected function _getLinkedProducts()
     {
-        /*
+        /**
          * We create 3 simple products so we can test configurable/bundle links.
          */
         if ($this->_linkedProducts === null) {
             $this->_linkedProducts = $this->generateRandomSimpleProducts(3);
 
-            /*
+            /**
              * Use the color option for configurables. Note that this attribute
              * must be added to the specified attribute set!
              */
@@ -62,6 +88,12 @@ class Danslo_ApiImport_Helper_Test
         return $this->_linkedProducts;
     }
 
+    /**
+     * Generates random simple products.
+     *
+     * @param int $numProducts
+     * @return array
+     */
     public function generateRandomSimpleProducts($numProducts)
     {
         $products = array();
@@ -83,12 +115,18 @@ class Danslo_ApiImport_Helper_Test
         return $products;
     }
 
+    /**
+     * Generates random configurable products.
+     *
+     * @param int $numProducts
+     * @return array
+     */
     public function generateRandomConfigurableProducts($numProducts)
     {
         $products = array();
 
         for ($i = 1, $counter = 1; $i <= $numProducts; $i++) {
-            /*
+            /**
              * Generate configurable product.
              */
             $products[$counter] = array_merge(
@@ -102,7 +140,7 @@ class Danslo_ApiImport_Helper_Test
                 )
             );
 
-            /*
+            /**
              * Associate child products.
              */
             foreach ($this->_getLinkedProducts() as $linkedProduct) {
@@ -121,12 +159,18 @@ class Danslo_ApiImport_Helper_Test
         return $products;
     }
 
+    /**
+     * Generates random bundle products.
+     *
+     * @param int $numProducts
+     * @return array
+     */
     public function generateRandomBundleProducts($numProducts)
     {
         $products = array();
 
         for ($i = 1, $counter = 1; $i <= $numProducts; $i++) {
-            /*
+            /**
              * Generate bundle product.
              */
             $products[$counter] = array_merge(
@@ -141,14 +185,14 @@ class Danslo_ApiImport_Helper_Test
                 )
             );
 
-            /*
+            /**
              * Create an option.
              */
             $optionTitle = 'Select a bundle item!';
             $products[$counter]['_bundle_option_title'] = $optionTitle;
             $products[$counter]['_bundle_option_type']  = Danslo_ApiImport_Model_Import_Entity_Product_Type_Bundle::DEFAULT_OPTION_TYPE;
 
-            /*
+            /**
              * Associate option selections.
              */
             foreach ($this->_getLinkedProducts() as $linkedProduct) {
@@ -167,11 +211,17 @@ class Danslo_ApiImport_Helper_Test
         return $products;
     }
 
+    /**
+     * Generates random grouped products.
+     *
+     * @param int $numProducts
+     * @return array
+     */
     public function generateRandomGroupedProducts($numProducts)
     {
         $products = array();
 
-        /*
+        /**
          * Generate grouped product.
          */
         for ($i = 1, $counter = 1; $i <= $numProducts; $i++) {
@@ -203,6 +253,12 @@ class Danslo_ApiImport_Helper_Test
         return $products;
     }
 
+    /**
+     * Generates random customers.
+     *
+     * @param int $numCustomers
+     * @return array
+     */
     public function generateRandomStandardCustomers($numCustomers)
     {
         $customers = array();
