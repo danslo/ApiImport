@@ -101,7 +101,7 @@ There were good reasons for not making it compatible with 1.5, but if you absolu
 
 No bug reports will be considered for 1.5 installs.
 
-### Benchmark
+## Benchmark
 
 The following is a very simple benchmark run done on a Virtual Machine running Debian, with 1GB RAM and without any MySQL optimizations. Your experience may vary. These are fully indexed results, mind you.
 
@@ -109,38 +109,38 @@ The following is a very simple benchmark run done on a Virtual Machine running D
     Starting import...
     Done! Magento reports 5000 products in catalog.
     ========== Import statistics ==========
-    Total duration:		37.475983s
-    Average per product:	0.007495s
-    Products per second:	133.418781s
-    Products per hour:	480307.612782s
+    Total duration:      37.475983s
+    Average per product: 0.007495s
+    Products per second: 133.418781s
+    Products per hour:   480307.612782s
     =======================================
 
     Generating 5000 configurable products...
     Starting import...
     Done! Magento reports 10000 products in catalog.
     ========== Import statistics ==========
-    Total duration:		68.099526s
-    Average per product:	0.013620s
-    Products per second:	73.421950s
-    Products per hour:	264319.020648s
+    Total duration:      68.099526s
+    Average per product: 0.013620s
+    Products per second: 73.421950s
+    Products per hour:   264319.020648s
     =======================================
 
     Generating 5000 bundle products...
     Starting import...
     Done! Magento reports 15000 products in catalog.
     ========== Import statistics ==========
-    Total duration:		113.453821s
-    Average per product:	0.022691s
-    Products per second:	44.070794s
-    Products per hour:	158654.859310s
+    Total duration:      113.453821s
+    Average per product: 0.022691s
+    Products per second: 44.070794s
+    Products per hour:   158654.859310s
     =======================================
 
     Generating 5000 grouped products...
     Starting import...
     Done! Magento reports 20000 products in catalog.
     ========== Import statistics ==========
-    Total duration:		62.553724s
-    Average per product:	0.012511s
-    Products per second:	79.931292s
-    Products per hour:	287752.652192s
+    Total duration:      62.553724s
+    Average per product: 0.012511s
+    Products per second: 79.931292s
+    Products per hour:   287752.652192s
     =======================================
