@@ -86,20 +86,13 @@ The second parameter to importEntities specifies what kind of entity is imported
 
 As long as you have enabled developer mode (see index.php) and logging (see backend), ApiImport will write a log file every time it is run to:
 
-``var/log/api_import_YYYY_MM_DD_hh_mm_ss.log``
+``var/log/import_export/%Y/%m/%d/%time%_%operation_type%_%entity_type%.log``
 
 There are plans to make this easily available through the backend.
 
 ## What Magento versions are supported by ApiImport?
 
 ApiImport is intentionally only compatible with **Magento 1.6+**.
-
-There were good reasons for not making it compatible with 1.5, but if you absolutely must:
-
-1. Add the following config.xml node: config -> global -> models -> api_import_resource -> deprecatedNode = api_import_mysql4
-2. Implement proxy resource classes with the old Mysql4 naming convention and then have them extend from the current resource models.
-
-No bug reports will be considered for 1.5 installs.
 
 ## Benchmark
 

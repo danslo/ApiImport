@@ -29,7 +29,7 @@ class Danslo_ApiImport_Model_Import
      *
      * @var boolean
      */
-    protected $_debugMode = false;
+    protected $_debugMode = true;
 
     /**
      * Gets the data source model.
@@ -122,5 +122,5 @@ class Danslo_ApiImport_Model_Import
         }
         return $this->_entityAdapter;
     }
-    
+
 }
