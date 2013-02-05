@@ -47,6 +47,20 @@ class Danslo_ApiImport_Model_Import_Entity_Product
              ->_initSkus()
              ->_initCustomerGroups();
     }
+    
+    /**
+     * Set uploader
+     * 
+     * Overcome the hardcoded $this->_fileUploader in parent::_getUploader()
+     * 
+     * @param Mage_ImportExport_Model_Import_Uploader $uploader
+     * @return Danslo_ApiImport_Model_Import_Entity_Product
+     */
+    public function setUploader(Mage_ImportExport_Model_Import_Uploader $uploader)
+    {
+        $this->_fileUploader = $uploader;
+        return $this;
+    }
 
     /**
      * Imports dropdown options for select/multiselect attributes.
