@@ -182,7 +182,7 @@ class Danslo_ApiImport_Model_Import_Entity_Product_Type_Bundle
                     $quoted = $connection->quoteInto('IN (?)', array_keys($bundleOptions));
                     $connection->delete($optionTable, "parent_id {$quoted}");
                     $connection->delete($selectionTable, "parent_product_id {$quoted}");
-                    $connection->delete($relationTable, "parent_id {$quotes}");
+                    $connection->delete($relationTable, "parent_id {$quoted}");
                 }
 
                 // Insert bundle options.
