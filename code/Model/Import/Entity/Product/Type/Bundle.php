@@ -177,13 +177,11 @@ class Danslo_ApiImport_Model_Import_Entity_Product_Type_Bundle
             }
 
             if (count($bundleOptions)) {
-                // Only delete options, selection and relations when we are not appending.
-                if ($this->_entityModel->getBehavior() != Mage_ImportExport_Model_Import::BEHAVIOR_APPEND) {
-                    $quoted = $connection->quoteInto('IN (?)', array_keys($bundleOptions));
-                    $connection->delete($optionTable, "parent_id {$quoted}");
-                    $connection->delete($selectionTable, "parent_product_id {$quoted}");
-                    $connection->delete($relationTable, "parent_id {$quoted}");
-                }
+                // Do some cleanup before inserting stuff.
+                $quoted = $connection->quoteInto('IN (?)', array_keys($bundleOptions));
+                $connection->delete($optionTable, "parent_id {$quoted}");
+                $connection->delete($selectionTable, "parent_product_id {$quoted}");
+                $connection->delete($relationTable, "parent_id {$quoted}");
 
                 // Insert bundle options.
                 $optionData = array();
