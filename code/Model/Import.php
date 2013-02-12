@@ -25,6 +25,11 @@ class Danslo_ApiImport_Model_Import
     const CONFIG_KEY_ENTITIES = 'global/api_import/import_entities';
 
     /**
+     * Log directory.
+     */
+    const LOG_DIRECTORY = 'log/import_export/';
+
+    /**
      * Determines whether or not ApiImport writes import logs to var/log.
      *
      * @var boolean
@@ -49,9 +54,7 @@ class Danslo_ApiImport_Model_Import
      */
     public function importSource()
     {
-        /**
-         * Grab the entity type and import behavior from source model and store it.
-         */
+        // Grab the entity type and import behavior from source model and store it.
         $this->setData(
             array(
                 'entity'   => self::getDataSourceModel()->getEntityTypeCode(),
@@ -60,9 +63,7 @@ class Danslo_ApiImport_Model_Import
         );
         $this->addLogComment(Mage::helper('importexport')->__('Begin import of "%s" with "%s" behavior', $this->getEntity(), $this->getBehavior()));
 
-        /**
-         * Import entities and log the result.
-         */
+        // Import entities and log the result.
         $result = $this->_getEntityAdapter()->importData();
         $this->addLogComment(
             array(
@@ -75,9 +76,7 @@ class Danslo_ApiImport_Model_Import
             )
         );
 
-        /**
-         * We circumvent validateSource, so we output the errors (if any) ourselves here.
-         */
+        // We circumvent validateSource, so we output the errors (if any) ourselves here.
         foreach ($this->getErrors() as $errorCode => $rows) {
             $this->addLogComment($errorCode . ' ' . Mage::helper('importexport')->__('in rows') . ': ' . implode(', ', $rows));
         }
@@ -121,6 +120,47 @@ class Danslo_ApiImport_Model_Import
             $this->_entityAdapter->setParameters($this->getData());
         }
         return $this->_entityAdapter;
+    }
+
+    /**
+     * This fixes a core bug in at least 1.7.0.2 that references a constant of non-existent class.
+     * This class is present in Enterprise, but has never existed in community.
+     * The only changes are that we use a different LOG_DIRECTORY constant and remove some unused filename parts.
+     *
+     * @param mixed $debugData
+     * @return Mage_ImportExport_Model_Abstract
+     */
+    public function addLogComment($debugData)
+    {
+        if (is_array($debugData)) {
+            $this->_logTrace = array_merge($this->_logTrace, $debugData);
+        } else {
+            $this->_logTrace[] = $debugData;
+        }
+        if (!$this->_debugMode) {
+            return $this;
+        }
+
+        if (!$this->_logInstance) {
+            if (!$this->getRunAt()) {
+                $this->setRunAt(date('H-i-s'));
+            }
+            $dirName  = date('Y' . DS .'m' . DS .'d' . DS);
+            $fileName = join('_', array(
+                $this->getRunAt(),
+                $this->getBehavior(),
+                $this->getEntity()
+            ));
+            $dirPath = Mage::getBaseDir('var') . DS . self::LOG_DIRECTORY . $dirName;
+            if (!is_dir($dirPath)) {
+                mkdir($dirPath, 0777, true);
+            }
+            $fileName = substr(strstr(self::LOG_DIRECTORY, DS), 1) . $dirName . $fileName . '.log';
+            $this->_logInstance = Mage::getModel('core/log_adapter', $fileName)
+                ->setFilterDataKeys($this->_debugReplacePrivateDataKeys);
+        }
+        $this->_logInstance->log($debugData);
+        return $this;
     }
 
 }
