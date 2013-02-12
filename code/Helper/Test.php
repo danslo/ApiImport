@@ -70,16 +70,11 @@ class Danslo_ApiImport_Helper_Test
      */
     protected function _getLinkedProducts()
     {
-        /**
-         * We create 3 simple products so we can test configurable/bundle links.
-         */
+        // We create 3 simple products so we can test configurable/bundle links.
         if ($this->_linkedProducts === null) {
             $this->_linkedProducts = $this->generateRandomSimpleProducts(3);
 
-            /**
-             * Use the color option for configurables. Note that this attribute
-             * must be added to the specified attribute set!
-             */
+            // Use the color option for configurables. Note that this attribute must be added to the specified attribute set!
             foreach (array('red', 'yellow', 'green') as $key => $color) {
                 $this->_linkedProducts[$key + 1]['color'] = $color;
             }
@@ -126,9 +121,7 @@ class Danslo_ApiImport_Helper_Test
         $products = array();
 
         for ($i = 1, $counter = 1; $i <= $numProducts; $i++) {
-            /**
-             * Generate configurable product.
-             */
+            // Generate configurable product.
             $products[$counter] = array_merge(
                 $this->_defaultProductAttributes,
                 array(
@@ -140,9 +133,7 @@ class Danslo_ApiImport_Helper_Test
                 )
             );
 
-            /**
-             * Associate child products.
-             */
+            // Associate child products.
             foreach ($this->_getLinkedProducts() as $linkedProduct) {
                 $products[$counter] = array_merge(
                     (isset($products[$counter]) ? $products[$counter] : array()),
@@ -170,9 +161,7 @@ class Danslo_ApiImport_Helper_Test
         $products = array();
 
         for ($i = 1, $counter = 1; $i <= $numProducts; $i++) {
-            /**
-             * Generate bundle product.
-             */
+            // Generate bundle product.
             $products[$counter] = array_merge(
                 $this->_defaultProductAttributes, array(
                     'sku'        => 'some_bundle_' . $i,
@@ -185,16 +174,12 @@ class Danslo_ApiImport_Helper_Test
                 )
             );
 
-            /**
-             * Create an option.
-             */
+            // Create an option.
             $optionTitle = 'Select a bundle item!';
             $products[$counter]['_bundle_option_title'] = $optionTitle;
             $products[$counter]['_bundle_option_type']  = Danslo_ApiImport_Model_Import_Entity_Product_Type_Bundle::DEFAULT_OPTION_TYPE;
 
-            /**
-             * Associate option selections.
-             */
+            // Associate option selections.
             foreach ($this->_getLinkedProducts() as $linkedProduct) {
                 $products[$counter] = array_merge(
                     (isset($products[$counter]) ? $products[$counter] : array()),
@@ -221,9 +206,7 @@ class Danslo_ApiImport_Helper_Test
     {
         $products = array();
 
-        /**
-         * Generate grouped product.
-         */
+        // Generate grouped product.
         for ($i = 1, $counter = 1; $i <= $numProducts; $i++) {
             $products[$counter] = array_merge(
                 $this->_defaultProductAttributes,
@@ -234,9 +217,7 @@ class Danslo_ApiImport_Helper_Test
                 )
             );
 
-            /*
-             * Associated child products.
-             */
+            // Associated child products.
             foreach ($this->_getLinkedProducts() as $linkedProduct) {
                 $products[$counter] = array_merge(
                     (isset($products[$counter]) ? $products[$counter] : array()),

@@ -47,12 +47,12 @@ class Danslo_ApiImport_Model_Import_Entity_Product
              ->_initSkus()
              ->_initCustomerGroups();
     }
-    
+
     /**
      * Set uploader
-     * 
+     *
      * Overcome the hardcoded $this->_fileUploader in parent::_getUploader()
-     * 
+     *
      * @param Mage_ImportExport_Model_Import_Uploader $uploader
      * @return Danslo_ApiImport_Model_Import_Entity_Product
      */
@@ -149,9 +149,7 @@ class Danslo_ApiImport_Model_Import_Entity_Product
         $entityTable = Mage::getResourceModel('cataloginventory/stock_item')->getMainTable();
         $helper      = Mage::helper('catalogInventory');
 
-        /**
-         * This column was added in migration 1.6.0.0.1-1.6.0.0.2, preserve backwards compatibility.
-         */
+        // This column was added in migration 1.6.0.0.1-1.6.0.0.2, preserve backwards compatibility.
         if ($this->_connection->tableColumnExists($entityTable, 'is_decimal_divided')) {
             $defaultStockData['is_decimal_divided'] = 0;
         }

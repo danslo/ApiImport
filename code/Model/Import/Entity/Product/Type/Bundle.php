@@ -71,10 +71,7 @@ class Danslo_ApiImport_Model_Import_Entity_Product_Type_Bundle
     {
         parent::_initAttributes();
 
-        /*
-         * Price type does not live in an attribute set, so it is not picked up
-         * by abstract _initAttributes method. We add it here manually.
-         */
+        // Price type does not live in an attribute set, so it is not picked up by abstract _initAttributes method. We add it here manually.
         $attribute = Mage::getResourceModel('catalog/eav_attribute')->load('price_type', 'attribute_code');
         foreach ($this->_attributes as $attrSetName => $attributes) {
             $this->_addAttributeParams(
@@ -159,16 +156,11 @@ class Danslo_ApiImport_Model_Import_Entity_Product_Type_Bundle
                     } elseif (isset($oldSku[$rowData['_bundle_product_sku']])) {
                         $selectionEntityId = $oldSku[$rowData['_bundle_product_sku']]['entity_id'];
                     } else {
-                        /*
-                         * TODO: We should move this to _isParticularAttributeValid, but
-                         * entity model is not filled with newSku / oldSku there.
-                         */
+                        // TODO: We should move this to _isParticularAttributeValid, but entity model is not filled with newSku / oldSku there.
                         $this->_entityModel->addRowError(self::ERROR_INVALID_BUNDLE_PRODUCT_SKU, $rowNum);
                     }
 
-                    /**
-                     * If we have a valid product, create the selection.
-                     */
+                    // If we have a valid product, create the selection.
                     if ($selectionEntityId) {
                         $bundleSelections[$productId][$rowData['_bundle_option_title']][] = array(
                             'parent_product_id'         => $productId,
@@ -185,9 +177,7 @@ class Danslo_ApiImport_Model_Import_Entity_Product_Type_Bundle
             }
 
             if (count($bundleOptions)) {
-                /**
-                 * Only delete options, selection and relations when we are not appending.
-                 */
+                // Only delete options, selection and relations when we are not appending.
                 if ($this->_entityModel->getBehavior() != Mage_ImportExport_Model_Import::BEHAVIOR_APPEND) {
                     $quoted = $connection->quoteInto('IN (?)', array_keys($bundleOptions));
                     $connection->delete($optionTable, "parent_id {$quoted}");
@@ -195,9 +185,7 @@ class Danslo_ApiImport_Model_Import_Entity_Product_Type_Bundle
                     $connection->delete($relationTable, "parent_id {$quotes}");
                 }
 
-                /**
-                 * Insert bundle options.
-                 */
+                // Insert bundle options.
                 $optionData = array();
                 foreach ($bundleOptions as $productId => $options) {
                     foreach ($options as $title => $option) {
@@ -206,9 +194,7 @@ class Danslo_ApiImport_Model_Import_Entity_Product_Type_Bundle
                 }
                 $connection->insertOnDuplicate($optionTable, $optionData);
 
-                /**
-                 * Insert option titles.
-                 */
+                // Insert option titles.
                 $optionId = $connection->lastInsertId();
                 $optionValues = array();
                 foreach ($bundleOptions as $productId => $options) {
@@ -241,19 +227,14 @@ class Danslo_ApiImport_Model_Import_Entity_Product_Type_Bundle
                         }
                     }
 
-                    /**
-                     * Insert option selections.
-                     */
+                    // Insert option selections.
                     $connection->insertOnDuplicate($selectionTable, $optionSelections);
 
-                    /**
-                     * Insert product relations.
-                     */
+                    // Insert product relations.
                     $connection->insertOnDuplicate($relationTable, $productRelations);
                 }
             }
         }
-
         return $this;
     }
 

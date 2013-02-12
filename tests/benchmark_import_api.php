@@ -27,10 +27,7 @@ define('USE_API', true);
 $helper = Mage::helper('api_import/test');
 
 if (USE_API) {
-    /*
-     * Create an API connection.
-     * Standard timeout for Zend_Http_Client is 10 seconds, so we must lengthen it.
-     */
+    // Create an API connection. Standard timeout for Zend_Http_Client is 10 seconds, so we must lengthen it.
     $client = new Zend_XmlRpc_Client(Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_WEB) . 'api/xmlrpc/');
     $client->getHttpClient()->setConfig(array('timeout' => -1));
     $session = $client->call('login', array(API_USER, API_KEY));
@@ -58,15 +55,11 @@ $entityTypes = array(
 
 foreach ($entityTypes as $typeName => $entityType) {
     foreach ($entityType['types'] as $subType) {
-        /*
-        * Generation method depends on product type.
-        */
+        // Generation method depends on product type.
         printf('Generating %d %s %ss...' . PHP_EOL, NUM_ENTITIES, $subType, $typeName);
         $entities = $helper->{sprintf('generateRandom%s%ss', ucfirst($subType), ucfirst($typeName))}(NUM_ENTITIES);
 
-        /*
-         * Attempt to import generated products.
-        */
+        // Attempt to import generated products.
         printf('Starting import...' . PHP_EOL);
         $totalTime = microtime(true);
 
@@ -80,17 +73,13 @@ foreach ($entityTypes as $typeName => $entityType) {
                 exit;
             }
         } else {
-            /*
-            * For debugging purposes only.
-            */
+            // For debugging purposes only.
             Mage::getModel('api_import/import_api')->importEntities($entities, $entityType['entity']);
         }
         printf('Done! Magento reports %d %ss.' . PHP_EOL, Mage::getModel($entityType['model'])->getCollection()->count(), $typeName);
         $totalTime = microtime(true) - $totalTime;
 
-        /*
-        * Generate some rough statistics.
-        */
+        // Generate some rough statistics.
         printf('========== Import statistics ==========' . PHP_EOL);
         printf("Total duration:\t\t%fs"    . PHP_EOL, $totalTime);
         printf("Average per %s:\t%fs" . PHP_EOL, $typeName, $totalTime / NUM_ENTITIES);
@@ -100,9 +89,7 @@ foreach ($entityTypes as $typeName => $entityType) {
     }
 }
 
-/*
- * Cleanup.
- */
+// Cleanup.
 if (USE_API) {
     $client->call('endSession', array($session));
 }

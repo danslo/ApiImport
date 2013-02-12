@@ -81,9 +81,7 @@ class Danslo_ApiImport_Model_Observer
      */
     protected function _indexRewrites(&$productIds)
     {
-        /**
-         * Only generate URL rewrites when this module is enabled.
-         */
+        // Only generate URL rewrites when this module is enabled.
         $indexer = Mage::getResourceSingleton('ecomdev_urlrewrite/indexer');
         if ($indexer) {
             return $indexer->updateProductRewrites($productIds);
@@ -99,9 +97,7 @@ class Danslo_ApiImport_Model_Observer
      */
     protected function _getIndexEvent(&$entityIds)
     {
-        /**
-         * Generate a fake mass update event that we pass to our indexers.
-         */
+        // Generate a fake mass update event that we pass to our indexers.
         $event = Mage::getModel('index/event');
         $event->setNewData(array(
             'reindex_price_product_ids' => &$entityIds, // for product_indexer_price
@@ -120,18 +116,14 @@ class Danslo_ApiImport_Model_Observer
      */
     public function indexProducts($observer)
     {
-        /**
-         * Obtain all imported entity IDs and an event.
-         */
+        // Obtain all imported entity IDs and an event.
         $entityIds = array();
         foreach ($observer->getEntities() as $entity) {
             $entityIds[] = $entity['entity_id'];
         }
         $event = $this->_getIndexEvent($entityIds);
 
-        /**
-         * Index our product entities.
-         */
+        // Index our product entities.
         try {
             if (Mage::getStoreConfig('api_import/import_settings/enable_stock_index')) {
                 $this->_indexStock($event);
@@ -155,7 +147,6 @@ class Danslo_ApiImport_Model_Observer
             Mage::logException($e);
             return false;
         }
-
         return true;
     }
 
