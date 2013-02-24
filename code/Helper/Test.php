@@ -16,6 +16,7 @@
 */
 
 class Danslo_ApiImport_Helper_Test
+    extends Mage_Core_Helper_Abstract
 {
 
     /**
@@ -53,13 +54,13 @@ class Danslo_ApiImport_Helper_Test
     );
 
     /**
-     * Removes all products by truncating the entity table. Be careful with this.
+     * Removes all products by deleting all rows in the entity table. Be careful with this.
      *
      * @return void
      */
     public function removeAllProducts()
     {
-        Mage::getSingleton('core/resource')->getConnection('core_write')->query('TRUNCATE TABLE catalog_product_entity');
+        Mage::getSingleton('core/resource')->getConnection('core_write')->query('DELETE FROM catalog_product_entity');
     }
 
     /**

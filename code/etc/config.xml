@@ -1,15 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <config>
+    <modules>
+        <Danslo_ApiImport>
+            <version>0.0.1</version>
+        </Danslo_ApiImport>
+    </modules>
     <global>
         <models>
-            <api_import>
+           <api_import>
                 <class>Danslo_ApiImport_Model</class>
                 <resourceModel>api_import_resource</resourceModel>
             </api_import>
             <api_import_resource>
                 <class>Danslo_ApiImport_Model_Resource</class>
+                <entities>
+                    <index_entity>
+                        <table>api_import_index_entity</table>
+                    </index_entity>
+                </entities>
             </api_import_resource>
         </models>
+        <resources>
+            <api_import_setup>
+                <setup>
+                    <module>Danslo_ApiImport</module>
+                </setup>
+            </api_import_setup>
+        </resources>
         <events>
             <api_import_entity_product_after_import>
                 <observers>
@@ -55,8 +72,8 @@
                 <bunch_num>1000</bunch_num>
                 <enable_stock_index>1</enable_stock_index>
                 <enable_price_index>1</enable_price_index>
-                <enable_category_relation_index>1</enable_category_relation_index>
-                <enable_attribute_index>1</enable_attribute_index>
+                <enable_category_index>1</enable_category_index>
+                <enable_eav_index>1</enable_eav_index>
                 <enable_search_index>1</enable_search_index>
                 <enable_rewrite_index>1</enable_rewrite_index>
             </import_settings>

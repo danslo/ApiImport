@@ -19,135 +19,52 @@ class Danslo_ApiImport_Model_Observer
 {
 
     /**
-     * Indexes product stock.
+     * Returns a connection.
      *
-     * @param Mage_Index_Model_Event $event
-     * @return Mage_CatalogInventory_Model_Resource_Indexer_Stock
+     * @return Varien_Db_Adapter_Pdo_Mysql
      */
-    protected function _indexStock(&$event)
+    protected function _getConnection()
     {
-        return Mage::getResourceSingleton('cataloginventory/indexer_stock')->catalogProductMassAction($event);
+        return Mage::getSingleton('core/resource')->getConnection('core_write');
     }
 
     /**
-     * Indexes product price.
-     *
-     * @param Mage_Index_Model_Event $event
-     * @return Mage_Catalog_Model_Resource_Product_Indexer_Price
-     */
-    protected function _indexPrice(&$event)
-    {
-        return Mage::getResourceSingleton('catalog/product_indexer_price')->catalogProductMassAction($event);
-    }
-
-    /**
-     * Indexes product category relation.
-     *
-     * @param Mage_Index_Model_Event $event
-     * @return Mage_Catalog_Model_Resource_Category_Indexer_Product
-     */
-    protected function _indexCategoryRelation(&$event)
-    {
-        return Mage::getResourceSingleton('catalog/category_indexer_product')->catalogProductMassAction($event);
-    }
-
-    /**
-     * Indexes product EAV attributes.
-     *
-     * @param Mage_Index_Model_Event $event
-     * @return Mage_Catalog_Model_Resource_Product_Indexer_Eav
-     */
-    protected function _indexEav(&$event)
-    {
-        return Mage::getResourceSingleton('catalog/product_indexer_eav')->catalogProductMassAction($event);
-    }
-
-    /**
-     * Indexes product search.
-     *
-     * @param array $productIds
-     * @return Mage_CatalogSearch_Model_Resource_Fulltext
-     */
-    protected function _indexSearch(&$productIds)
-    {
-        return Mage::getResourceSingleton('catalogsearch/fulltext')->rebuildIndex(null, $productIds);
-    }
-
-    /**
-     * Indexes product URL rewrites.
-     *
-     * @param array $productIds
-     * @return Danslo_ApiImport_Model_Observer
-     */
-    protected function _indexRewrites(&$productIds)
-    {
-        // Only generate URL rewrites when this module is enabled.
-        $indexer = Mage::getResourceSingleton('ecomdev_urlrewrite/indexer');
-        if ($indexer) {
-            return $indexer->updateProductRewrites($productIds);
-        }
-        return $this;
-    }
-
-    /**
-     * Generates an index event based on imported entity IDs.
-     *
-     * @param array $entityIds
-     * @return Mage_Index_Model_Event
-     */
-    protected function _getIndexEvent(&$entityIds)
-    {
-        // Generate a fake mass update event that we pass to our indexers.
-        $event = Mage::getModel('index/event');
-        $event->setNewData(array(
-            'reindex_price_product_ids' => &$entityIds, // for product_indexer_price
-            'reindex_stock_product_ids' => &$entityIds, // for indexer_stock
-            'product_ids'               => &$entityIds, // for category_indexer_product
-            'reindex_eav_product_ids'   => &$entityIds  // for product_indexer_eav
-        ));
-        return $event;
-    }
-
-    /**
-     * Partial product index after import.
+     * Index products.
      *
      * @param Varien_Event_Observer $observer
-     * @return boolean
+     * @return Danslo_ApiImport_Model_Observer
      */
     public function indexProducts($observer)
     {
-        // Obtain all imported entity IDs and an event.
-        $entityIds = array();
-        foreach ($observer->getEntities() as $entity) {
-            $entityIds[] = $entity['entity_id'];
-        }
-        $event = $this->_getIndexEvent($entityIds);
+        // Obtain all imported entity IDs.
+        $entities   = $observer->getEntities();
+        $connection = $this->_getConnection();
+        $table      = $connection->getTableName('api_import_index_entity');
+        $indexers   = Mage::helper('api_import/index')->getIndexers();
 
-        // Index our product entities.
-        try {
-            if (Mage::getStoreConfig('api_import/import_settings/enable_stock_index')) {
-                $this->_indexStock($event);
+        // Store entity IDs in database.
+        foreach ($indexers as $indexType => $indexConfig) {
+            if (Mage::getStoreConfig(sprintf('api_import/import_settings/enable_%s_index', $indexConfig))) {
+                // Determine data to be stored.
+                $indexData = array();
+                foreach ($entities as $entity) {
+                    $indexData[$entity['entity_id']] = array(
+                        'entity_id'  => $entity['entity_id'],
+                        'index_type' => $indexType
+                    );
+                }
+
+                // Delete old data first.
+                $connection->delete($table, $connection->quoteInto(array(
+                    'entity_id IN(?)' => array_keys($indexData),
+                    'index_type = ?'  => $indexType
+                )));
+
+                // Insert new data.
+                $connection->insertMultiple($table, $indexData);
             }
-            if (Mage::getStoreConfig('api_import/import_settings/enable_price_index')) {
-                $this->_indexPrice($event);
-            }
-            if (Mage::getStoreConfig('api_import/import_settings/enable_category_relation_index')) {
-                $this->_indexCategoryRelation($event);
-            }
-            if (Mage::getStoreConfig('api_import/import_settings/enable_attribute_index')) {
-                $this->_indexEav($event);
-            }
-            if (Mage::getStoreConfig('api_import/import_settings/enable_search_index')) {
-                $this->_indexSearch($entityIds);
-            }
-            if (Mage::getStoreConfig('api_import/import_settings/enable_rewrite_index')) {
-                $this->_indexRewrites($entityIds);
-            }
-        } catch (Exception $e) {
-            Mage::logException($e);
-            return false;
         }
-        return true;
+        return $this;
     }
 
 }
