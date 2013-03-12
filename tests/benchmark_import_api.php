@@ -50,6 +50,13 @@ $entityTypes = array(
         'types'  => array(
             'standard'
         )
+    ),
+    'category' => array(
+        'entity' => Danslo_ApiImport_Model_Import_Entity_Category::getEntityTypeCode(),
+        'model'  => 'catalog/category',
+        'types'  => array(
+            'standard'
+        )
     )
 );
 
@@ -57,7 +64,7 @@ foreach ($entityTypes as $typeName => $entityType) {
     foreach ($entityType['types'] as $subType) {
         // Generation method depends on product type.
         printf('Generating %d %s %ss...' . PHP_EOL, NUM_ENTITIES, $subType, $typeName);
-        $entities = $helper->{sprintf('generateRandom%s%ss', ucfirst($subType), ucfirst($typeName))}(NUM_ENTITIES);
+        $entities = $helper->{sprintf('generateRandom%s%s', ucfirst($subType), ucfirst($typeName))}(NUM_ENTITIES);
 
         // Attempt to import generated products.
         printf('Starting import...' . PHP_EOL);

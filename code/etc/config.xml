@@ -13,13 +13,22 @@
         <events>
             <api_import_entity_product_after_import>
                 <observers>
-                    <api_import_observer>
+                    <api_import_index_products>
                         <class>api_import/observer</class>
                         <method>indexProducts</method>
                         <type>singleton</type>
-                    </api_import_observer>
+                    </api_import_index_products>
                 </observers>
             </api_import_entity_product_after_import>
+            <api_import_entity_category_after_import>
+                <observers>
+                    <api_import_index_categories>
+                        <class>api_import/observer</class>
+                        <method>indexCategories</method>
+                        <type>singleton</type>
+                    </api_import_index_categories>
+                </observers>
+            </api_import_entity_category_after_import>
         </events>
         <helpers>
             <api_import>

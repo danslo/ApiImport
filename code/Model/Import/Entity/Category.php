@@ -301,7 +301,7 @@ class Danslo_ApiImport_Model_Import_Entity_Category
         } else {
             $this->_saveCategories();
         }
-        Mage::dispatchEvent($this->_eventPrefix . '_after_import', array('entity_model' => $this));
+        Mage::dispatchEvent($this->_eventPrefix . '_after_import', array('entities' => $this->_newCategory));
         return true;
     }
 

@@ -79,12 +79,28 @@ class Danslo_ApiImport_Model_Observer
      * @param array $productIds
      * @return Danslo_ApiImport_Model_Observer
      */
-    protected function _indexRewrites(&$productIds)
+    protected function _indexProductRewrites(&$productIds)
     {
         // Only generate URL rewrites when this module is enabled.
         $indexer = Mage::getResourceSingleton('ecomdev_urlrewrite/indexer');
         if ($indexer) {
             return $indexer->updateProductRewrites($productIds);
+        }
+        return $this;
+    }
+
+    /**
+     * Indexes category URL rewrites.
+     *
+     * @param array $categoryIds
+     * @return Danslo_ApiImport_Model_Observer
+     */
+    protected function _indexCategoryRewrites(&$categoryIds)
+    {
+        // Only generate URL rewrites when this module is enabled.
+        $indexer = Mage::getResourceSingleton('ecomdev_urlrewrite/indexer');
+        if ($indexer) {
+            return $indexer->updateCategoryRewrites($categoryIds);
         }
         return $this;
     }
@@ -109,6 +125,39 @@ class Danslo_ApiImport_Model_Observer
     }
 
     /**
+     * Partial category index after import.
+     *
+     * @param Varien_Event_Observer $observer
+     * @return boolean
+     */
+    public function indexCategories($observer)
+    {
+        // We need to flatten the entities because category import passes multidimensional.
+        $entityIds = array();
+        foreach ($observer->getEntities() as $rootCategory) {
+            foreach ($rootCategory as $category) {
+                if ($category['entity_id'] !== null) {
+                    $entityIds[] = $category['entity_id'];
+                }
+            }
+        }
+        if (!count($entityIds)) {
+            return false;
+        }
+
+        // Index our category entities.
+        try {
+            if (Mage::getStoreConfig('api_import/import_settings/enable_rewrite_index')) {
+                $this->_indexCategoryRewrites($entityIds);
+            }
+        } catch (Exception $e) {
+            Mage::logException($e);
+            return false;
+        }
+        return true;
+    }
+
+    /**
      * Partial product index after import.
      *
      * @param Varien_Event_Observer $observer
@@ -116,14 +165,17 @@ class Danslo_ApiImport_Model_Observer
      */
     public function indexProducts($observer)
     {
-        // Obtain all imported entity IDs and an event.
+        // Obtain all imported entity IDs.
         $entityIds = array();
         foreach ($observer->getEntities() as $entity) {
             $entityIds[] = $entity['entity_id'];
         }
-        $event = $this->_getIndexEvent($entityIds);
+        if (!count($entityIds)) {
+            return false;
+        }
 
         // Index our product entities.
+        $event = $this->_getIndexEvent($entityIds);
         try {
             if (Mage::getStoreConfig('api_import/import_settings/enable_stock_index')) {
                 $this->_indexStock($event);
@@ -141,7 +193,7 @@ class Danslo_ApiImport_Model_Observer
                 $this->_indexSearch($entityIds);
             }
             if (Mage::getStoreConfig('api_import/import_settings/enable_rewrite_index')) {
-                $this->_indexRewrites($entityIds);
+                $this->_indexProductRewrites($entityIds);
             }
         } catch (Exception $e) {
             Mage::logException($e);

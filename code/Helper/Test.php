@@ -53,14 +53,19 @@ class Danslo_ApiImport_Helper_Test
     );
 
     /**
-     * Removes all products by truncating the entity table. Be careful with this.
+     * Default attributes that are used for categories. 
      *
-     * @return void
+     * @var array
      */
-    public function removeAllProducts()
-    {
-        Mage::getSingleton('core/resource')->getConnection('core_write')->query('TRUNCATE TABLE catalog_product_entity');
-    }
+    protected $_defaultCategoryAttributes = array(
+        '_root'             => 'Default Category',
+        'is_active'         => 'yes',
+        'include_in_menu'   => 'yes',
+        'description'       => 'Category description',
+        'meta_description'  => 'Category meta description',
+        'available_sort_by' => 'position',
+        'default_sort_by'   => 'position'
+    );
 
     /**
      * Creates and stores 3 simple products with different values for the color attribute.
@@ -72,7 +77,7 @@ class Danslo_ApiImport_Helper_Test
     {
         // We create 3 simple products so we can test configurable/bundle links.
         if ($this->_linkedProducts === null) {
-            $this->_linkedProducts = $this->generateRandomSimpleProducts(3);
+            $this->_linkedProducts = $this->generateRandomSimpleProduct(3);
 
             // Use the color option for configurables. Note that this attribute must be added to the specified attribute set!
             foreach (array('red', 'yellow', 'green') as $key => $color) {
@@ -89,7 +94,7 @@ class Danslo_ApiImport_Helper_Test
      * @param int $numProducts
      * @return array
      */
-    public function generateRandomSimpleProducts($numProducts)
+    public function generateRandomSimpleProduct($numProducts)
     {
         $products = array();
 
@@ -116,7 +121,7 @@ class Danslo_ApiImport_Helper_Test
      * @param int $numProducts
      * @return array
      */
-    public function generateRandomConfigurableProducts($numProducts)
+    public function generateRandomConfigurableProduct($numProducts)
     {
         $products = array();
 
@@ -156,7 +161,7 @@ class Danslo_ApiImport_Helper_Test
      * @param int $numProducts
      * @return array
      */
-    public function generateRandomBundleProducts($numProducts)
+    public function generateRandomBundleProduct($numProducts)
     {
         $products = array();
 
@@ -202,7 +207,7 @@ class Danslo_ApiImport_Helper_Test
      * @param int $numProducts
      * @return array
      */
-    public function generateRandomGroupedProducts($numProducts)
+    public function generateRandomGroupedProduct($numProducts)
     {
         $products = array();
 
@@ -240,7 +245,7 @@ class Danslo_ApiImport_Helper_Test
      * @param int $numCustomers
      * @return array
      */
-    public function generateRandomStandardCustomers($numCustomers)
+    public function generateRandomStandardCustomer($numCustomers)
     {
         $customers = array();
 
@@ -256,6 +261,30 @@ class Danslo_ApiImport_Helper_Test
         }
 
         return $customers;
+    }
+
+    /**
+     * Generates random categories.
+     *
+     * @param int $numCategories
+     * @return array
+     */
+    public function generateRandomStandardCategory($numCategories)
+    {   
+        $categories = array();
+        
+        for ($i = 1; $i <= $numCategories; $i++) {
+            $categories[$i - 1] = array_merge(
+                $this->_defaultCategoryAttributes,
+                array(
+                    'name'          => sprintf('Test Category %d', $i),
+                    '_category'     => sprintf('Test Category %d', $i),
+                    'url_key'       => sprintf('test%d', $i),
+                )
+            );
+        } 
+
+        return $categories;
     }
 
 }
