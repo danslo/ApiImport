@@ -33,7 +33,7 @@ class Danslo_ApiImport_Model_Import_Api
      */
     public function __construct()
     {
-        $this->_api = Mage::getModel('api_import/import');
+        $this->_api = Mage::getModel('Danslo_ApiImport_Model_Import');
 
         // Event part is not loaded by default for API.
         Mage::app()->loadAreaPart(Mage_Core_Model_App_Area::AREA_GLOBAL, Mage_Core_Model_App_Area::PART_EVENTS);

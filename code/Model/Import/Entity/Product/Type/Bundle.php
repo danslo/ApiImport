@@ -72,7 +72,7 @@ class Danslo_ApiImport_Model_Import_Entity_Product_Type_Bundle
         parent::_initAttributes();
 
         // Price type does not live in an attribute set, so it is not picked up by abstract _initAttributes method. We add it here manually.
-        $attribute = Mage::getResourceModel('catalog/eav_attribute')->load('price_type', 'attribute_code');
+        $attribute = Mage::getResourceModel('Mage_Catalog_Model_Resource_Eav_Attribute')->load('price_type', 'attribute_code');
         foreach ($this->_attributes as $attrSetName => $attributes) {
             $this->_addAttributeParams(
                 $attrSetName,
@@ -106,10 +106,10 @@ class Danslo_ApiImport_Model_Import_Entity_Product_Type_Bundle
         $connection       = $this->_entityModel->getConnection();
         $newSku           = $this->_entityModel->getNewSku();
         $oldSku           = $this->_entityModel->getOldSku();
-        $optionTable      = Mage::getSingleton('core/resource')->getTableName('bundle/option');
-        $optionValueTable = Mage::getSingleton('core/resource')->getTableName('bundle/option_value');
-        $selectionTable   = Mage::getSingleton('core/resource')->getTableName('bundle/selection');
-        $relationTable    = Mage::getSingleton('core/resource')->getTableName('catalog/product_relation');
+        $optionTable      = Mage::getSingleton('Mage_Core_Model_Resource')->getTableName('catalog_product_bundle_option');
+        $optionValueTable = Mage::getSingleton('Mage_Core_Model_Resource')->getTableName('catalog_product_bundle_option_value');
+        $selectionTable   = Mage::getSingleton('Mage_Core_Model_Resource')->getTableName('catalog_product_bundle_selection');
+        $relationTable    = Mage::getSingleton('Mage_Core_Model_Resource')->getTableName('catalog_product_relation');
         $productData      = null;
         $productId        = null;
 

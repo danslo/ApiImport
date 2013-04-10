@@ -43,7 +43,7 @@ class Danslo_ApiImport_Model_Import
      */
     public static function getDataSourceModel()
     {
-        return Mage::getResourceSingleton('api_import/import_data');
+        return Mage::getResourceSingleton('Danslo_ApiImport_Model_Resource_Import_Data');
     }
 
     /**
@@ -61,24 +61,24 @@ class Danslo_ApiImport_Model_Import
                 'behavior' => self::getDataSourceModel()->getBehavior()
             )
         );
-        $this->addLogComment(Mage::helper('importexport')->__('Begin import of "%s" with "%s" behavior', $this->getEntity(), $this->getBehavior()));
+        $this->addLogComment(Mage::helper('Mage_ImportExport_Helper_Data')->__('Begin import of "%s" with "%s" behavior', $this->getEntity(), $this->getBehavior()));
 
         // Import entities and log the result.
         $result = $this->_getEntityAdapter()->importData();
         $this->addLogComment(
             array(
-                Mage::helper('importexport')->__(
+                Mage::helper('Mage_ImportExport_Helper_Data')->__(
                     'Checked rows: %d, checked entities: %d, invalid rows: %d, total errors: %d',
                     $this->getProcessedRowsCount(), $this->getProcessedEntitiesCount(),
                     $this->getInvalidRowsCount(), $this->getErrorsCount()
                 ),
-                Mage::helper('importexport')->__('Import has been done successfuly.')
+                Mage::helper('Mage_ImportExport_Helper_Data')->__('Import has been done successfuly.')
             )
         );
 
         // We circumvent validateSource, so we output the errors (if any) ourselves here.
         foreach ($this->getErrors() as $errorCode => $rows) {
-            $this->addLogComment($errorCode . ' ' . Mage::helper('importexport')->__('in rows') . ': ' . implode(', ', $rows));
+            $this->addLogComment($errorCode . ' ' . Mage::helper('Mage_ImportExport_Helper_Data')->__('in rows') . ': ' . implode(', ', $rows));
         }
         return $result;
     }
@@ -101,20 +101,21 @@ class Danslo_ApiImport_Model_Import
                 } catch (Exception $e) {
                     Mage::logException($e);
                     Mage::throwException(
-                        Mage::helper('importexport')->__('Invalid entity model')
+                        Mage::helper('Mage_ImportExport_Helper_Data')->__('Invalid entity model: ' . $e->getMessage())
                     );
                 }
-                if (!($this->_entityAdapter instanceof Mage_ImportExport_Model_Import_Entity_Abstract)) {
+                if (!($this->_entityAdapter instanceof Mage_ImportExport_Model_Import_Entity_Abstract ||
+                      $this->_entityAdapter instanceof Mage_ImportExport_Model_Import_EntityAbstract)) {
                     Mage::throwException(
-                        Mage::helper('importexport')->__('Entity adapter object must be an instance of Mage_ImportExport_Model_Import_Entity_Abstract')
+                        Mage::helper('Mage_ImportExport_Helper_Data')->__('Entity adapter object must be an instance of Mage_ImportExport_Model_Import_Entity_Abstract')
                     );
                 }
             } else {
-                Mage::throwException(Mage::helper('importexport')->__('Invalid entity'));
+                Mage::throwException(Mage::helper('Mage_ImportExport_Helper_Data')->__('Invalid entity'));
             }
             if ($this->getEntity() != $this->_entityAdapter->getEntityTypeCode()) {
                 Mage::throwException(
-                    Mage::helper('importexport')->__('Input entity code is not equal to entity adapter code')
+                    Mage::helper('Mage_ImportExport_Helper_Data')->__('Input entity code is not equal to entity adapter code')
                 );
             }
             $this->_entityAdapter->setParameters($this->getData());
@@ -156,7 +157,7 @@ class Danslo_ApiImport_Model_Import
                 mkdir($dirPath, 0777, true);
             }
             $fileName = substr(strstr(self::LOG_DIRECTORY, DS), 1) . $dirName . $fileName . '.log';
-            $this->_logInstance = Mage::getModel('core/log_adapter', $fileName)
+            $this->_logInstance = Mage::getModel('Mage_Core_Model_Log_Adapter', $fileName)
                 ->setFilterDataKeys($this->_debugReplacePrivateDataKeys);
         }
         $this->_logInstance->log($debugData);

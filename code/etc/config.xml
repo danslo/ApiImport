@@ -1,20 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <config>
+    <modules>
+        <Danslo_ApiImport>
+            <active>true</active>
+            <codePool>local</codePool>
+            <depends>
+                <Mage_ImportExport />
+            </depends>
+        </Danslo_ApiImport>
+    </modules>
     <global>
-        <models>
-            <api_import>
-                <class>Danslo_ApiImport_Model</class>
-                <resourceModel>api_import_resource</resourceModel>
-            </api_import>
-            <api_import_resource>
-                <class>Danslo_ApiImport_Model_Resource</class>
-            </api_import_resource>
-        </models>
         <events>
             <api_import_entity_product_after_import>
                 <observers>
                     <api_import_index_products>
-                        <class>api_import/observer</class>
+                        <class>Danslo_ApiImport_Model_Observer</class>
                         <method>indexProducts</method>
                         <type>singleton</type>
                     </api_import_index_products>
@@ -23,38 +23,33 @@
             <api_import_entity_category_after_import>
                 <observers>
                     <api_import_index_categories>
-                        <class>api_import/observer</class>
+                        <class>Danslo_ApiImport_Model_Observer</class>
                         <method>indexCategories</method>
                         <type>singleton</type>
                     </api_import_index_categories>
                 </observers>
             </api_import_entity_category_after_import>
         </events>
-        <helpers>
-            <api_import>
-                <class>Danslo_ApiImport_Helper</class>
-            </api_import>
-        </helpers>
         <api_import>
             <import_entities>
                 <catalog_product>
-                    <model_token>api_import/import_entity_product</model_token>
+                    <model_token>Danslo_ApiImport_Model_Import_Entity_Product</model_token>
                     <label>Products</label>
                 </catalog_product>
                 <catalog_category>
-                    <model_token>api_import/import_entity_category</model_token>
+                    <model_token>Danslo_ApiImport_Model_Import_Entity_Category</model_token>
                     <label>Categories</label>
                 </catalog_category>
-                <customer>
-                    <model_token>api_import/import_entity_customer</model_token>
+                <customer_composite>
+                    <model_token>Danslo_ApiImport_Model_Import_Entity_CustomerComposite</model_token>
                     <label>Customers</label>
-                </customer>
+                </customer_composite>
             </import_entities>
         </api_import>
         <importexport>
             <import_product_types>
-                <bundle>api_import/import_entity_product_type_bundle</bundle>
-                <grouped>api_import/import_entity_product_type_grouped</grouped>
+                <bundle>Danslo_ApiImport_Model_Import_Entity_Product_Type_Bundle</bundle>
+                <grouped>Danslo_ApiImport_Model_Import_Entity_Product_Type_Grouped</grouped>
             </import_product_types>
         </importexport>
     </global>

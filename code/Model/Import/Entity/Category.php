@@ -211,7 +211,7 @@ class Danslo_ApiImport_Model_Import_Entity_Category
              ->_initAttributes();
 
         /* @var $categoryResource Mage_Catalog_Model_Resource_Category */
-        $categoryResource   = Mage::getModel('catalog/category')->getResource();
+        $categoryResource   = Mage::getModel('Mage_Catalog_Model_Category')->getResource();
         $this->_entityTable = $categoryResource->getEntityTable();
         $this->_dataSourceModel = Danslo_ApiImport_Model_Import::getDataSourceModel();
     }
@@ -312,8 +312,8 @@ class Danslo_ApiImport_Model_Import_Entity_Category
      */
     protected function _initCategories()
     {
-        $collection = Mage::getResourceModel('catalog/category_collection')->addNameToResult();
-        /* @var $collection Mage_Catalog_Model_Resource_Eav_Mysql4_Category_Collection */
+        $collection = Mage::getResourceModel('Mage_Catalog_Model_Resource_Category_Collection')->addNameToResult();
+        /* @var $collection Mage_Catalog_Model_Resource_Category_Collection */
 
         foreach ($collection as $category) {
             /** @var $category Mage_Catalog_Model_Category */
@@ -378,7 +378,7 @@ class Danslo_ApiImport_Model_Import_Entity_Category
      */
     protected function _initAttributes()
     {
-        $collection = Mage::getResourceModel('catalog/category_attribute_collection');
+        $collection = Mage::getResourceModel('Mage_Catalog_Model_Resource_Category_Attribute_Collection');
 
         foreach ($collection as $attribute) {
             /** @var $attribute Mage_Eav_Model_Entity_Attribute */
@@ -453,8 +453,8 @@ class Danslo_ApiImport_Model_Import_Entity_Category
      */
     protected function _saveCategories()
     {
-        $strftimeFormat = Varien_Date::convertZendToStrftime(Varien_Date::DATETIME_INTERNAL_FORMAT, true, true);
-        $nextEntityId   = Mage::getResourceHelper('importexport')->getNextAutoincrement($this->_entityTable);
+        $strftimeFormat = Danslo_ApiImport_Helper_Data::convertZendToStrftime(Varien_Date::DATETIME_INTERNAL_FORMAT, true, true);
+        $nextEntityId   = Mage::getResourceHelper('Mage_ImportExport')->getNextAutoincrement($this->_entityTable);
         static $entityId;
 
         while ($bunch = $this->_dataSourceModel->getNextBunch()) {
@@ -521,7 +521,7 @@ class Danslo_ApiImport_Model_Import_Entity_Category
                 $rowStore = self::SCOPE_STORE == $rowScope ? $this->_storeCodeToId[$rowData[self::COL_STORE]] : 0;
 
                 /* @var $category Mage_Catalog_Model_Category */
-                $category = Mage::getModel('catalog/category', $rowData);
+                $category = Mage::getModel('Mage_Catalog_Model_Category', $rowData);
 
                 foreach (array_intersect_key($rowData, $this->_attributes) as $attrCode => $attrValue) {
                     if (!$this->_attributes[$attrCode]['is_static'] && strlen($attrValue)) {
@@ -878,8 +878,8 @@ class Danslo_ApiImport_Model_Import_Entity_Category
         $message = '';
         switch ($attrParams['type']) {
             case 'varchar':
-                $val   = Mage::helper('core/string')->cleanString($rowData[$attrCode]);
-                $valid = Mage::helper('core/string')->strlen($val) < self::DB_MAX_VARCHAR_LENGTH;
+                $val   = Mage::helper('Mage_Core_Helper_String')->cleanString($rowData[$attrCode]);
+                $valid = Mage::helper('Mage_Core_Helper_String')->strlen($val) < self::DB_MAX_VARCHAR_LENGTH;
                 $message = 'String is too long, only ' . self::DB_MAX_VARCHAR_LENGTH . ' characters allowed.';
                 break;
             case 'decimal':
@@ -904,8 +904,8 @@ class Danslo_ApiImport_Model_Import_Entity_Category
                 $message = 'Datetime value expected.';
                 break;
             case 'text':
-                $val   = Mage::helper('core/string')->cleanString($rowData[$attrCode]);
-                $valid = Mage::helper('core/string')->strlen($val) < self::DB_MAX_TEXT_LENGTH;
+                $val   = Mage::helper('Mage_Core_Helper_String')->cleanString($rowData[$attrCode]);
+                $valid = Mage::helper('Mage_Core_Helper_String')->strlen($val) < self::DB_MAX_TEXT_LENGTH;
                 $message = 'String is too long, only ' . self::DB_MAX_TEXT_LENGTH . ' characters allowed.';
                 break;
             default:
@@ -914,10 +914,10 @@ class Danslo_ApiImport_Model_Import_Entity_Category
         }
 
         if (!$valid) {
-            $this->addRowError(Mage::helper('importexport')->__("Invalid value for '%s'") . '. ' . $message, $rowNum, $attrCode);
+            $this->addRowError(Mage::helper('Mage_ImportExport_Helper_Data')->__("Invalid value for '%s'") . '. ' . $message, $rowNum, $attrCode);
         } elseif (!empty($attrParams['is_unique'])) {
             if (isset($this->_uniqueAttributes[$attrCode][$rowData[$attrCode]])) {
-                $this->addRowError(Mage::helper('importexport')->__("Duplicate Unique Attribute for '%s'"), $rowNum, $attrCode);
+                $this->addRowError(Mage::helper('Mage_ImportExport_Helper_Data')->__("Duplicate Unique Attribute for '%s'"), $rowNum, $attrCode);
                 return false;
             }
             $this->_uniqueAttributes[$attrCode][$rowData[$attrCode]] = true;
