@@ -53,7 +53,7 @@ class Danslo_ApiImport_Helper_Test
     );
 
     /**
-     * Default attributes that are used for categories.
+     * Default attributes that are used for categories. 
      *
      * @var array
      */
@@ -83,7 +83,7 @@ class Danslo_ApiImport_Helper_Test
             foreach (array('red', 'yellow', 'green') as $key => $color) {
                 $this->_linkedProducts[$key + 1]['color'] = $color;
             }
-            Mage::getModel('Danslo_ApiImport_Model_Import_Api')->importEntities($this->_linkedProducts);
+            Mage::getModel('api_import/import_api')->importEntities($this->_linkedProducts);
         }
         return $this->_linkedProducts;
     }
@@ -270,9 +270,9 @@ class Danslo_ApiImport_Helper_Test
      * @return array
      */
     public function generateRandomStandardCategory($numCategories)
-    {
+    {   
         $categories = array();
-
+        
         for ($i = 1; $i <= $numCategories; $i++) {
             $categories[$i - 1] = array_merge(
                 $this->_defaultCategoryAttributes,
@@ -282,7 +282,7 @@ class Danslo_ApiImport_Helper_Test
                     'url_key'       => sprintf('test%d', $i),
                 )
             );
-        }
+        } 
 
         return $categories;
     }

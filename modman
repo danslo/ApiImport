@@ -1,2 +1,2 @@
-code    app/code/Danslo/ApiImport/
-tests   dev/tests/api-import/
+bootstrap.xml   app/etc/modules/Danslo_ApiImport.xml
+code            app/code/local/Danslo/ApiImport/

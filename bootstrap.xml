@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config>
+    <modules>
+        <Danslo_ApiImport>
+            <active>true</active>
+            <codePool>local</codePool>
+            <depends>
+                <Mage_ImportExport />
+            </depends>
+        </Danslo_ApiImport>
+    </modules>
+</config>

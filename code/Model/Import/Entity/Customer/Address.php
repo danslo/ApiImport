@@ -16,18 +16,18 @@
  * limitations under the License.
  */
 
-class Danslo_ApiImport_Model_Import_Entity_Eav_Customer_Address
-    extends Mage_ImportExport_Model_Import_Entity_Eav_Customer_Address
+class Danslo_ApiImport_Model_Import_Entity_Customer_Address
+    extends Mage_ImportExport_Model_Import_Entity_Customer_Address
 {
 
     /**
      * Makes sure address model is using the proper data source model.
      *
-     * @param array $data
+     * @param Mage_ImportExport_Model_Import_Entity_Customer $customer
      */
-    public function __construct(array $data = array())
+    public function __construct(Mage_ImportExport_Model_Import_Entity_Customer $customer)
     {
-        parent::__construct($data);
+        parent::__construct($customer);
         $this->_dataSourceModel = Danslo_ApiImport_Model_Import::getDataSourceModel();
     }
 

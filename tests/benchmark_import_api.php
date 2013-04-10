@@ -14,18 +14,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-require_once dirname(__FILE__) . '/../../../app/bootstrap.php';
 
-error_reporting(E_ALL & ~E_NOTICE & ~E_STRICT);
+require_once 'app/Mage.php';
 
-$entryPoint = new Mage_Core_Model_EntryPoint_Http(new Mage_Core_Model_Config_Primary(BP, $_SERVER));
+Mage::init();
 
-define('NUM_ENTITIES', 100);
+define('NUM_ENTITIES', 5000);
 define('API_USER', 'apiUser');
 define('API_KEY', 'someApiKey123');
-define('USE_API', false);
+define('USE_API', true);
 
-$helper = Mage::helper('Danslo_ApiImport_Helper_Test');
+$helper = Mage::helper('api_import/test');
 
 if (USE_API) {
     // Create an API connection. Standard timeout for Zend_Http_Client is 10 seconds, so we must lengthen it.
@@ -37,7 +36,7 @@ if (USE_API) {
 $entityTypes = array(
     'product' => array(
         'entity' => Mage_ImportExport_Model_Export_Entity_Product::getEntityTypeCode(),
-        'model'  => 'Mage_Catalog_Model_Product',
+        'model'  => 'catalog/product',
         'types'  => array(
             'simple',
             'configurable',
@@ -46,15 +45,15 @@ $entityTypes = array(
         )
     ),
     'customer' => array(
-        'entity' => Mage_ImportExport_Model_Import_Entity_CustomerComposite::getEntityTypeCode(),
-        'model'  => 'Mage_Customer_Model_Customer',
+        'entity' => Mage_ImportExport_Model_Export_Entity_Customer::getEntityTypeCode(),
+        'model'  => 'customer/customer',
         'types'  => array(
             'standard'
         )
     ),
     'category' => array(
         'entity' => Danslo_ApiImport_Model_Import_Entity_Category::getEntityTypeCode(),
-        'model'  => 'Mage_Catalog_Model_Category',
+        'model'  => 'catalog/category',
         'types'  => array(
             'standard'
         )
@@ -71,19 +70,18 @@ foreach ($entityTypes as $typeName => $entityType) {
         printf('Starting import...' . PHP_EOL);
         $totalTime = microtime(true);
 
-        try {
-            if (USE_API) {
+        if (USE_API) {
+            try {
                 $client->call('call', array($session, 'import.importEntities', array($entities, $entityType['entity'])));
-            } else {
-                Mage::getModel('Danslo_ApiImport_Model_Import_Api')->importEntities($entities, $entityType['entity']);
             }
-        }
-        catch(Exception $e) {
-            printf('Import failed: %s' . PHP_EOL, $e->getMessage());
-            if (USE_API) {
+            catch(Exception $e) {
+                printf('Import failed: ' . PHP_EOL, $e->getMessage());
                 printf('Server returned: %s' . PHP_EOL, $client->getHttpClient()->getLastResponse()->getBody());
+                exit;
             }
-            exit;
+        } else {
+            // For debugging purposes only.
+            Mage::getModel('api_import/import_api')->importEntities($entities, $entityType['entity']);
         }
         printf('Done! Magento reports %d %ss.' . PHP_EOL, Mage::getModel($entityType['model'])->getCollection()->count(), $typeName);
         $totalTime = microtime(true) - $totalTime;
