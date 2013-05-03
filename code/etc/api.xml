@@ -5,6 +5,7 @@
             <import translate="title" module="api_import">
                 <model>api_import/import_api</model>
                 <title>Import API</title>
+                <acl>api_import</acl>
                 <methods>
                     <importEntities translate="title" module="api_import">
                         <title>Import entities</title>
@@ -26,5 +27,21 @@
                 </faults>
             </import>
         </resources>
+        <v2>
+            <resources_function_prefix>
+                <import>apiImport</import>
+            </resources_function_prefix>
+        </v2>
+        <acl>
+            <resources>
+                <api_import translate="title" module="api_import">
+                    <title>API Import</title>
+                    <sort_order>1</sort_order>
+                    <importEntities translate="title" module="api_import">
+                        <title>Import entities</title>
+                    </importEntities>
+                </api_import>
+            </resources>
+        </acl>
     </api>
 </config>
