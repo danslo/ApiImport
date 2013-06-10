@@ -17,35 +17,48 @@
 
 class Danslo_ApiImport_Model_Import_Api_V2 extends Danslo_ApiImport_Model_Import_Api
 {
-	
+
 	/**
 	 * (non-PHPdoc)
 	 * @see Danslo_ApiImport_Model_Import_Api::importEntities()
 	 */
 	public function importEntities($entities, $entityType = null, $behavior = null)
 	{
-		$this->_prepareEntites($entities);
+		$entities = $this->_prepareEntites($entities);
 		return parent::importEntities($entities, $entityType, $behavior);
 	}
-	
+
 	/**
 	 * Prepare incoming entities encoded as complexType apiImportImportEntitiesArray
 	 * for passthru to API V1 as associative array
-	 * 
+	 *
 	 * @param array $entities
 	 * @return void
 	 */
-	protected function _prepareEntites(Array &$entities)
+	protected function _prepareEntites(Array $entities)
     {
-    	foreach ($entities as &$entity) {
-   			foreach ($entity as $j => &$object) {
-   				if (!$object->key) continue;
-   				$entity[$object->key] = $object->value;
-   				unset($entity[$j]);
-   				unset($object);
+		$return = array();
+
+    	foreach ($entities as $i => &$entity) {
+			$return[$i] = array();
+   			
+			foreach ($entity as $j => &$object) {
+				if (is_numeric($j)) {
+					$value = $object->value;
+
+					// Nullify empty values
+					if (!trim($value)) $value = NULL;
+   					
+					$return[$i][$object->key] = $value;
+				}
+   				
+				unset($object);
    			}
-   			unset($entity);
+   			
+			unset($entity);
     	}
+
+		return $return;
     }
-	
+
 }
