@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright 2013 Alexander Buch
  *
@@ -15,8 +16,7 @@
  * limitations under the License.
  */
 
-class Danslo_ApiImport_Model_Import_Api_V2
-    extends Danslo_ApiImport_Model_Import_Api
+class Danslo_ApiImport_Model_Import_Api_V2 extends Danslo_ApiImport_Model_Import_Api
 {
 
     /**
@@ -25,7 +25,7 @@ class Danslo_ApiImport_Model_Import_Api_V2
      */
     public function importEntities($entities, $entityType = null, $behavior = null)
     {
-        $this->_prepareEntites($entities);
+        $entities = $this->_prepareEntities($entities);
         return parent::importEntities($entities, $entityType, $behavior);
     }
 
@@ -36,19 +36,25 @@ class Danslo_ApiImport_Model_Import_Api_V2
      * @param array $entities
      * @return void
      */
-    protected function _prepareEntites(Array &$entities)
+    protected function _prepareEntities(Array $entities)
     {
-        foreach ($entities as &$entity) {
+        $return = array();
+        foreach ($entities as $i => &$entity) {
+            $return[$i] = array();
             foreach ($entity as $j => &$object) {
-                if (!$object->key) {
-                    continue;
+                if (is_numeric($j)) {
+                    $value = $object->value;
+                    // Nullify empty values
+                    if (!trim($value)) {
+                        $value = NULL;
+                    }
+                    $return[$i][$object->key] = $value;
                 }
-                $entity[$object->key] = $object->value;
-                unset($entity[$j]);
                 unset($object);
             }
             unset($entity);
         }
+        return $return;
     }
 
 }
