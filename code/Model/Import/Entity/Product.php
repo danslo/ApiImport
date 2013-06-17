@@ -49,6 +49,16 @@ class Danslo_ApiImport_Model_Import_Entity_Product
     }
 
     /**
+     * Gets the internal category array used for category mapping.
+     *
+     * @return array
+     */
+    public function getCategories()
+    {
+        return $this->_categories;
+    }
+
+    /**
      * Set uploader
      *
      * Overcome the hardcoded $this->_fileUploader in parent::_getUploader()
@@ -109,9 +119,15 @@ class Danslo_ApiImport_Model_Import_Entity_Product
      */
     public function _importData()
     {
-        Mage::dispatchEvent($this->_eventPrefix . '_before_import', array('data_source_model' => $this->_dataSourceModel));
+        Mage::dispatchEvent($this->_eventPrefix . '_before_import', array(
+            'entity_model'      => $this,
+            'data_source_model' => $this->_dataSourceModel
+        ));
         $result = parent::_importData();
-        Mage::dispatchEvent($this->_eventPrefix . '_after_import', array('entities' => $this->_newSku));
+        Mage::dispatchEvent($this->_eventPrefix . '_after_import', array(
+            'entity_model'      => $this,
+            'entities' => $this->_newSku
+        ));
         return $result;
     }
 
