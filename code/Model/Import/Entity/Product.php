@@ -125,8 +125,8 @@ class Danslo_ApiImport_Model_Import_Entity_Product
         ));
         $result = parent::_importData();
         Mage::dispatchEvent($this->_eventPrefix . '_after_import', array(
-            'entity_model'      => $this,
-            'entities' => $this->_newSku
+            'entity_model' => $this,
+            'entities'     => $this->_newSku
         ));
         return $result;
     }
