@@ -154,7 +154,8 @@ class Danslo_ApiImport_Model_Resource_Import_Data
         $allowedBehaviors = array(
             Mage_ImportExport_Model_Import::BEHAVIOR_APPEND,
             Mage_ImportExport_Model_Import::BEHAVIOR_REPLACE,
-            Mage_ImportExport_Model_Import::BEHAVIOR_DELETE
+            Mage_ImportExport_Model_Import::BEHAVIOR_DELETE,
+            Danslo_ApiImport_Model_Import::BEHAVIOR_STOCK
         );
         if (!in_array($behavior, $allowedBehaviors)) {
             Mage::throwException('Specified import behavior (%s) is not in allowed behaviors: %s', $behavior, implode(', ', $allowedBehaviors));

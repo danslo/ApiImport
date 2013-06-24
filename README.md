@@ -27,7 +27,7 @@ require_once 'app/Mage.php';
 Mage::init();
 
 $api = Mage::getModel('api_import/import_api');
-$api->importEntities($anArrayWithYourEntities, $entityType);
+$api->importEntities($anArrayWithYourEntities, $entityType, $optionalImportBehavior);
 ```
 ### Access it through the Magento Webservices API (any SOAP/XMLRPC capable language)
 
@@ -56,7 +56,7 @@ $session = $client->call('login', array($yourApiUser, $yourApiKey));
 /*
  * Do your import.
  */
-$client->call('call', array($session, 'import.importEntities', array($anArrayWithYourEntities, $entityType)));
+$client->call('call', array($session, 'import.importEntities', array($anArrayWithYourEntities, $entityType, $optionalImportBehavior)));
 
 /*
  * Clean up.
@@ -81,6 +81,48 @@ The second parameter to importEntities specifies what kind of entity is imported
 1. ``Mage_ImportExport_Model_Import_Entity_Product::getEntityTypeCode()``
 2. ``Mage_ImportExport_Model_Import_Entity_Customer::getEntityTypeCode()``
 3. ``Danslo_ApiImport_Model_Import_Entity_Category::getEntityTypeCode()``
+
+### Import behaviors
+
+Magento will choose a replace behavior by default. If you would like to use another import behavior, you can pick one of these:
+
+1. ``Mage_ImportExport_Model_Import::BEHAVIOR_APPEND`` - Tries to append images, related products, etc. instead of replacing them.
+2. ``Mage_ImportExport_Model_Import::BEHAVIOR_REPLACE`` - Simply replaces the data in Magento with whatever you have in the entity array. Any data you do not specify in your array will not be deleted!
+3. ``Mage_ImportExport_Model_Import::BEHAVIOR_DELETE`` - Deletes every product you have specified. You probably don't want to use this.
+4. ``Danslo_ApiImport_Model_Import::BEHAVIOR_STOCK`` - Magento normally requires ``sku``, ``_type``, ``_attribute_set``. This is not useful when you simply want to update stock of existing entities. With this behavior you can simply specify ``sku`` and ``qty``!
+
+## Could you give me an example for updating stock?
+
+Sure!
+
+``` php
+<?php
+
+<?php
+
+require_once 'app/Mage.php';
+
+Mage::init();
+
+$api = Mage::getModel('api_import/import_api');
+$api->importEntities(
+    array(
+        array(
+            'sku' => 'some_sku',
+            'qty' => 10
+        ),
+        array(
+            'sku' => 'some_other_sku',
+            'qty' => 20
+        )
+        // etc
+    ),
+    Mage_ImportExport_Model_Import_Entity_Product::getEntityTypeCode(),
+    Danslo_ApiImport_Model_Import::BEHAVIOR_STOCK
+);
+```
+
+Obviously you would generate your entities array programmatically.
 
 ## Where can I see the results?
 

@@ -25,6 +25,12 @@ class Danslo_ApiImport_Model_Import
     const CONFIG_KEY_ENTITIES = 'global/api_import/import_entities';
 
     /**
+     * Special import behavior.
+     * This causes oldSku fields to be merged into row data.
+     */
+    const BEHAVIOR_STOCK = 'stock';
+
+    /**
      * Log directory.
      */
     const LOG_DIRECTORY = 'log/import_export/';
