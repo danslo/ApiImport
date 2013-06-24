@@ -91,13 +91,11 @@ Magento will choose a replace behavior by default. If you would like to use anot
 3. ``Mage_ImportExport_Model_Import::BEHAVIOR_DELETE`` - Deletes every product you have specified. You probably don't want to use this.
 4. ``Danslo_ApiImport_Model_Import::BEHAVIOR_STOCK`` - Magento normally requires ``sku``, ``_type``, ``_attribute_set``. This is not useful when you simply want to update stock of existing entities. With this behavior you can simply specify ``sku`` and ``qty``!
 
-## Could you give me an example for updating stock?
+## Example for updating stock 
 
 Sure!
 
 ``` php
-<?php
-
 <?php
 
 require_once 'app/Mage.php';
