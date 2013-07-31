@@ -46,10 +46,26 @@ class Danslo_ApiImport_Model_Import_Entity_Customer
      */
     public function _importData()
     {
-        Mage::dispatchEvent($this->_eventPrefix . '_before_import', array('data_source_model' => $this->_dataSourceModel));
+        Mage::dispatchEvent($this->_eventPrefix . '_before_import', array(
+            'data_source_model' => $this->_dataSourceModel,
+            'entity_model'      => $this
+        ));
         $result = parent::_importData();
-        Mage::dispatchEvent($this->_eventPrefix . '_after_import', array('entities' => $this->_newCustomers));
+        Mage::dispatchEvent($this->_eventPrefix . '_after_import', array(
+            'entities'      => $this->_newCustomers,
+            'entity_model'  => $this
+        ));
         return $result;
+    }
+    
+    /**
+     * Get old customers.
+     * 
+     * @return array
+     */
+    public function getOldCustomers()
+    {
+        return $this->_oldCustomers;
     }
 
 }
