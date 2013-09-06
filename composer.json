@@ -1,0 +1,15 @@
+{
+    "name": "danslo/api-import",
+    "type": "magento-module",
+    "license":"OSL-3.0",
+    "description":"Boilerplate code between the Magento API and ImportExport, so that you can do fast XMLRPC/SOAP based product imports.",
+    "authors":[
+        {
+            "name":"Daniel Sloof",
+            "email":"goapsychadelic@gmail.com"
+        }
+    ],
+    "require": {
+        "magento-hackathon/magento-composer-installer": "*"
+    }
+}
