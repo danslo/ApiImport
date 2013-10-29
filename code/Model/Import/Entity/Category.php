@@ -583,6 +583,7 @@ class Danslo_ApiImport_Model_Import_Entity_Category
             $this->_saveCategoryEntity($entityRowsIn, $entityRowsUp);
             $this->_saveCategoryAttributes($attributes);
         }
+        $this->_updateChildCount();
         return $this;
     }
 
@@ -934,4 +935,31 @@ class Danslo_ApiImport_Model_Import_Entity_Category
     {
         $this->_parameters['behavior'] = $behavior;
     }
+
+    /**
+     * Updates child counts for categories.
+     *
+     * @return void
+     */
+    protected function _updateChildCount()
+    {
+        if (!in_array($this->getBehavior(), array(
+            Mage_ImportExport_Model_Import::BEHAVIOR_REPLACE,
+            Mage_ImportExport_Model_Import::BEHAVIOR_APPEND))) {
+            return;
+        }
+
+        $categoryTable = Mage::getSingleton('core/resource')->getTableName('catalog/category');
+        $categoryTableTmp = $categoryTable . '_tmp';
+        $this->_connection->query("CREATE TEMPORARY TABLE {$categoryTableTmp} LIKE {$categoryTable};
+            INSERT INTO {$categoryTableTmp} SELECT * FROM {$categoryTable};
+            UPDATE {$categoryTable} cce
+            SET children_count = (
+                SELECT count(cce2.entity_id) - 1 as children_county
+                FROM {$categoryTableTmp} cce2
+                WHERE PATH LIKE CONCAT(cce.path,'%')
+            );
+        ");
+    }
+
 }
