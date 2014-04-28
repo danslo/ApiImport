@@ -236,4 +236,13 @@ class Danslo_ApiImport_Model_Import_Entity_Product_Type_Bundle
         return $this;
     }
 
+    /**
+     * check if Mage_Bundle module is enabled
+     * 
+     * @return boolean
+     */
+    public function isSuitable()
+    {
+        return Mage::getConfig()->getModuleConfig('Mage_Bundle')->is('active', 'true');
+    }
 }
