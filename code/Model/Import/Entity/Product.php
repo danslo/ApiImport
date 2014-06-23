@@ -158,6 +158,28 @@ class Danslo_ApiImport_Model_Import_Entity_Product
     }
 
     /**
+     * Preload stock data for products that we are importing.
+     * This prevents excessive amounts of stock_item model loads with large stock updates.
+     *
+     * @return Danslo_ApiImport_Model_Import_Entity_Product
+     */
+    protected function _getStockItemData()
+    {
+        // Grab stock items for newSku.
+        $productIds = array_map(function($e) { return $e['entity_id']; }, $this->_newSku);
+        $stockItemCollection = Mage::getModel('cataloginventory/stock_item')
+            ->getCollection()
+            ->addFieldToFilter('product_id', array('in' => $productIds));
+
+        // Index them by product ID.
+        $stockItemData = array();
+        foreach ($stockItemCollection as $stockItem) {
+            $stockItemData[$stockItem['product_id']] = $stockItem;
+        }
+        return $stockItemData;
+    }
+
+    /**
      * Stock item saving.
      *
      * @return Mage_ImportExport_Model_Import_Entity_Product
@@ -196,6 +218,9 @@ class Danslo_ApiImport_Model_Import_Entity_Product
             $defaultStockData['is_decimal_divided'] = 0;
         }
 
+        // Do this in advance to prevent excessive loads.
+        $stockItemData = $this->_getStockItemData();
+
         while ($bunch = $this->_dataSourceModel->getNextBunch()) {
             $stockData = array();
 
@@ -218,8 +243,11 @@ class Danslo_ApiImport_Model_Import_Entity_Product
                 $row['stock_id'] = 1;
 
                 /** @var $stockItem Mage_CatalogInventory_Model_Stock_Item */
-                $stockItem = Mage::getModel('cataloginventory/stock_item');
-                $stockItem->loadByProduct($row['product_id']);
+                if (isset($stockItemData[$row['product_id']])) {
+                    $stockItem = $stockItemData[$row['product_id']];
+                } else {
+                    $stockItem = Mage::getModel('cataloginventory/stock_item');
+                }
                 $existStockData = $stockItem->getData();
 
                 $row = array_merge(
