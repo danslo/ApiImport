@@ -180,6 +180,12 @@ class Danslo_ApiImport_Model_Observer
             if (Mage::getStoreConfig('api_import/import_settings/enable_stock_index')) {
                 $this->_indexStock($event);
             }
+
+            // If we're doing stock updates, no need to index beyond this point.
+            if ($observer->getEntityModel()->getBehavior() === Danslo_ApiImport_Model_Import::BEHAVIOR_STOCK) {
+                return true;
+            }
+
             if (Mage::getStoreConfig('api_import/import_settings/enable_price_index')) {
                 $this->_indexPrice($event);
             }
