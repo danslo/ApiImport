@@ -951,7 +951,7 @@ class Danslo_ApiImport_Model_Import_Entity_Category
 
         $categoryTable = Mage::getSingleton('core/resource')->getTableName('catalog/category');
         $categoryTableTmp = $categoryTable . '_tmp';
-        $this->_connection->query("CREATE TEMPORARY TABLE {$categoryTableTmp} LIKE {$categoryTable};
+        $this->_connection->query("CREATE TEMPORARY TABLE IF NOT EXISTS {$categoryTableTmp} LIKE {$categoryTable};
             INSERT INTO {$categoryTableTmp} SELECT * FROM {$categoryTable};
             UPDATE {$categoryTable} cce
             SET children_count = (
