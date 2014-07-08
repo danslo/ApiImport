@@ -125,6 +125,28 @@ class Danslo_ApiImport_Model_Observer
     }
 
     /**
+     * Verify if media info are given
+     *
+     * @param array $entity
+     * @param string $attribute
+     *
+     * @return bool
+     */
+    protected function _areSetMediaInfo($entity, $attribute)
+    {
+        if (isset($entity[$attribute . '_content']) && !empty($entity[$attribute . '_content'])
+            && isset($entity[$attribute . '_name']) && !empty($entity[$attribute . '_name'])
+            && isset($entity[$attribute . '_type']) && !empty($entity[$attribute . '_type'])
+            && is_string($entity[$attribute . '_content'])
+            && is_string($entity[$attribute . '_name'])
+            && is_integer($entity[$attribute . '_type'])
+        ) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
      * Partial category index after import.
      *
      * @param Varien_Event_Observer $observer
@@ -199,6 +221,58 @@ class Danslo_ApiImport_Model_Observer
             Mage::logException($e);
             return false;
         }
+        return true;
+    }
+
+    /**
+     * Import images before products
+     *
+     * @param Varien_Event_Observer $observer
+     *
+     * @return boolean
+     */
+    public function importMedia($observer)
+    {
+        $ioAdapter    = new Varien_Io_File();
+        $importFolder = Mage::getBaseDir('media') . DS . 'import';
+        $entities     = $observer->getData('data_source_model')->getEntities();
+        $attributes   = Mage::getResourceModel('catalog/product_attribute_collection')->getItems();
+        $mediaAttr    = array();
+
+        foreach ($attributes as $attr) {
+            if ($attr->getFrontendInput() === 'media_image') {
+                $mediaAttr[] = $attr->getAttributeCode();
+            }
+        }
+
+        foreach($entities as $key => $entity) {
+            foreach ($mediaAttr as $attr) {
+                if ($this->_areSetMediaInfo($entity, $attr)) {
+                    $entityMediaFolder = $importFolder . DS . $entity['sku'] . DS . $attr;
+                    $imageExt = explode('/', image_type_to_mime_type($entity[$attr . '_type']))[1];
+
+                    try {
+                        $ioAdapter->checkAndCreateFolder($entityMediaFolder);
+                        $ioAdapter->open(array('path' => $entityMediaFolder));
+                        $ioAdapter->write($entity[$attr . '_name'] . '.' . $imageExt, base64_decode($entity[$attr . '_content']), 0666);
+                        unset(
+                            $entities[$key][$attr . '_content'],
+                            $entities[$key][$attr . '_type'],
+                            $entities[$key][$attr . '_name']
+                        );
+                    } catch (Exception $e) {
+
+                    }
+                } else {
+                    // Soit il n'y a pas d'image envoyé donc on ne fait rien
+                    // Soit les infos ne sont pas présentes
+                    // Soit les infos ne sont pas correctes
+                }
+            }
+        }
+
+        $observer->getData('data_source_model')->setEntities($entities);
+
         return true;
     }
 
