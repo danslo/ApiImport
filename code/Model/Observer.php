@@ -125,25 +125,18 @@ class Danslo_ApiImport_Model_Observer
     }
 
     /**
-     * Verify if media info are given
+     * Verify if information are set in the entity and correct for the given media attribute
      *
-     * @param array $entity
+     * @param array  $entity
      * @param string $attribute
      *
      * @return bool
      */
-    protected function _areSetMediaInfo($entity, $attribute)
+    protected function _isImageToImport($entity, $attribute)
     {
-        if (isset($entity[$attribute . '_content']) && !empty($entity[$attribute . '_content'])
-            && isset($entity[$attribute . '_name']) && !empty($entity[$attribute . '_name'])
-            && isset($entity[$attribute . '_type']) && !empty($entity[$attribute . '_type'])
-            && is_string($entity[$attribute . '_content'])
-            && is_string($entity[$attribute . '_name'])
-            && is_integer($entity[$attribute . '_type'])
-        ) {
-            return true;
-        }
-        return false;
+        return (isset($entity[$attribute . '_content']) && !empty($entity[$attribute . '_content'])
+            && isset($entity[$attribute]) && !empty($entity[$attribute])
+            && is_string($entity[$attribute]) && is_string($entity[$attribute . '_content']));
     }
 
     /**
@@ -248,30 +241,18 @@ class Danslo_ApiImport_Model_Observer
 
         foreach($entities as $key => $entity) {
             foreach ($mediaAttr as $attr) {
-                if ($this->_areSetMediaInfo($entity, $attr)) {
-                    $imageExt = explode('/', image_type_to_mime_type($entity[$attr . '_type']))[1];
-
+                if ($this->_isImageToImport($entity, $attr)) {
                     try {
-                        $media = $entity[$attr . '_name'] . '.' . $imageExt;
                         $ioAdapter->open(array('path' => $tmpImportFolder));
-                        $ioAdapter->write($media, base64_decode($entity[$attr . '_content']), 0666);
+                        $ioAdapter->write(end(explode('/', $entity[$attr])), base64_decode($entity[$attr . '_content']), 0666);
 
-                        unset(
-                            $entities[$key][$attr . '_content'],
-                            $entities[$key][$attr . '_type'],
-                            $entities[$key][$attr . '_name']
-                        );
-                        $entities[$key][$attr] = $media;
+                        unset($entities[$key][$attr . '_content']);
 
                         // If your memory_limit is set to -1 this stuff will not works
                         // https://github.com/avstudnitz/AvS_FastSimpleImport/issues/120
                     } catch (Exception $e) {
-                        Mage::throwException('Error during import media');
+                        Mage::throwException($e->getMessage());
                     }
-                } else {
-                    // Soit il n'y a pas d'image envoyé donc on ne fait rien
-                    // Soit les infos ne sont pas présentes
-                    // Soit les infos ne sont pas correctes
                 }
             }
         }
