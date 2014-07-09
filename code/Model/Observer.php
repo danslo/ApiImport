@@ -249,7 +249,6 @@ class Danslo_ApiImport_Model_Observer
         foreach($entities as $key => $entity) {
             foreach ($mediaAttr as $attr) {
                 if ($this->_areSetMediaInfo($entity, $attr)) {
-                    // pathinfo()
                     $imageExt = explode('/', image_type_to_mime_type($entity[$attr . '_type']))[1];
 
                     try {
@@ -262,10 +261,10 @@ class Danslo_ApiImport_Model_Observer
                             $entities[$key][$attr . '_type'],
                             $entities[$key][$attr . '_name']
                         );
+                        $entities[$key][$attr] = $media;
 
                         // If your memory_limit is set to -1 this stuff will not works
                         // https://github.com/avstudnitz/AvS_FastSimpleImport/issues/120
-                        $entities[$key][$attr] = $uploader->move($media)['type'];
                     } catch (Exception $e) {
                         Mage::throwException('Error during import media');
                     }
@@ -276,7 +275,6 @@ class Danslo_ApiImport_Model_Observer
                 }
             }
         }
-        $ioAdapter->rmdirRecursive($tmpImportFolder);
         $observer->getData('data_source_model')->setEntities($entities);
 
         return true;

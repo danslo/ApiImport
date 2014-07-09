@@ -145,15 +145,15 @@ class Danslo_ApiImport_Model_Import_Entity_Product
      */
     public function _importData()
     {
-        Mage::dispatchEvent($this->_eventPrefix . '_before_import', array(
-            'entity_model'      => $this,
-            'data_source_model' => $this->_dataSourceModel
-        ));
         $ioAdapter = new Varien_Io_File();
         $ioAdapter->checkAndCreateFolder(Mage::getConfig()->getOptions()->getMediaDir() . '/import');
         Mage::dispatchEvent($this->_eventPrefix . '_import_media', array(
             'data_source_model' => $this->_dataSourceModel,
             'uploader'          => $this->_getUploader()
+        ));
+        Mage::dispatchEvent($this->_eventPrefix . '_before_import', array(
+            'entity_model'      => $this,
+            'data_source_model' => $this->_dataSourceModel
         ));
         $result = parent::_importData();
 
