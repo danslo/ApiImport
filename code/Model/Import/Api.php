@@ -91,5 +91,4 @@ class Danslo_ApiImport_Model_Import_Api
             $this->_fault('invalid_behavior', $e->getMessage());
         }
     }
-
 }

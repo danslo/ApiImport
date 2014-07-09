@@ -233,11 +233,12 @@ class Danslo_ApiImport_Model_Observer
      */
     public function importMedia($observer)
     {
-        $ioAdapter    = new Varien_Io_File();
-        $importFolder = Mage::getBaseDir('media') . DS . 'import';
-        $entities     = $observer->getData('data_source_model')->getEntities();
-        $attributes   = Mage::getResourceModel('catalog/product_attribute_collection')->getItems();
-        $mediaAttr    = array();
+        $ioAdapter       = new Varien_Io_File();
+        $entities        = $observer->getData('data_source_model')->getEntities();
+        $uploader        = $observer->getData('uploader');
+        $tmpImportFolder = $uploader->getTmpDir();
+        $attributes      = Mage::getResourceModel('catalog/product_attribute_collection')->getItems();
+        $mediaAttr       = array();
 
         foreach ($attributes as $attr) {
             if ($attr->getFrontendInput() === 'media_image') {
@@ -248,20 +249,25 @@ class Danslo_ApiImport_Model_Observer
         foreach($entities as $key => $entity) {
             foreach ($mediaAttr as $attr) {
                 if ($this->_areSetMediaInfo($entity, $attr)) {
-                    $entityMediaFolder = $importFolder . DS . $entity['sku'] . DS . $attr;
+                    // pathinfo()
                     $imageExt = explode('/', image_type_to_mime_type($entity[$attr . '_type']))[1];
 
                     try {
-                        $ioAdapter->checkAndCreateFolder($entityMediaFolder);
-                        $ioAdapter->open(array('path' => $entityMediaFolder));
-                        $ioAdapter->write($entity[$attr . '_name'] . '.' . $imageExt, base64_decode($entity[$attr . '_content']), 0666);
+                        $media = $entity[$attr . '_name'] . '.' . $imageExt;
+                        $ioAdapter->open(array('path' => $tmpImportFolder));
+                        $ioAdapter->write($media, base64_decode($entity[$attr . '_content']), 0666);
+
                         unset(
                             $entities[$key][$attr . '_content'],
                             $entities[$key][$attr . '_type'],
                             $entities[$key][$attr . '_name']
                         );
-                    } catch (Exception $e) {
 
+                        // If your memory_limit is set to -1 this stuff will not works
+                        // https://github.com/avstudnitz/AvS_FastSimpleImport/issues/120
+                        $entities[$key][$attr] = $uploader->move($media)['type'];
+                    } catch (Exception $e) {
+                        Mage::throwException('Error during import media');
                     }
                 } else {
                     // Soit il n'y a pas d'image envoyé donc on ne fait rien
@@ -270,10 +276,9 @@ class Danslo_ApiImport_Model_Observer
                 }
             }
         }
-
+        $ioAdapter->rmdirRecursive($tmpImportFolder);
         $observer->getData('data_source_model')->setEntities($entities);
 
         return true;
     }
-
 }
