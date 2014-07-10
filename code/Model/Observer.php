@@ -226,12 +226,15 @@ class Danslo_ApiImport_Model_Observer
      */
     public function importMedia($observer)
     {
-        $ioAdapter       = new Varien_Io_File();
-        $entities        = $observer->getData('data_source_model')->getEntities();
-        $uploader        = $observer->getData('uploader');
-        $tmpImportFolder = $uploader->getTmpDir();
-        $attributes      = Mage::getResourceModel('catalog/product_attribute_collection')->getItems();
-        $mediaAttr       = array();
+        $ioAdapter        = new Varien_Io_File();
+        $entities         = $observer->getData('data_source_model')->getEntities();
+        $uploader         = $observer->getData('uploader');
+        $tmpImportFolder  = $uploader->getTmpDir();
+        $attributes       = Mage::getResourceModel('catalog/product_attribute_collection')->getItems();
+        $mediaAttr        = array();
+        $mediaAttributeId = Mage::getModel('eav/entity_attribute')
+            ->load('media_gallery', 'attribute_code')
+            ->getAttributeId();
 
         foreach ($attributes as $attr) {
             if ($attr->getFrontendInput() === 'media_image') {
@@ -246,6 +249,8 @@ class Danslo_ApiImport_Model_Observer
                         $ioAdapter->open(array('path' => $tmpImportFolder));
                         $ioAdapter->write(end(explode('/', $entity[$attr])), base64_decode($entity[$attr . '_content']), 0666);
 
+                        // à mettre ailleurs
+                        $entities[$key]['_media_attribute_id'] = $mediaAttributeId;
                         unset($entities[$key][$attr . '_content']);
 
                         // If your memory_limit is set to -1 this stuff will not works
