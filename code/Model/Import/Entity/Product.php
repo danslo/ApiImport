@@ -155,6 +155,9 @@ class Danslo_ApiImport_Model_Import_Entity_Product
             'entity_model'      => $this,
             'data_source_model' => $this->_dataSourceModel
         ));
+
+        // If your memory_limit is set to -1 this stuff will not works
+        // https://github.com/avstudnitz/AvS_FastSimpleImport/issues/120
         $result = parent::_importData();
 
         Mage::dispatchEvent($this->_eventPrefix . '_after_import', array(

@@ -249,12 +249,8 @@ class Danslo_ApiImport_Model_Observer
                         $ioAdapter->open(array('path' => $tmpImportFolder));
                         $ioAdapter->write(end(explode('/', $entity[$attr])), base64_decode($entity[$attr . '_content']), 0666);
 
-                        // à mettre ailleurs
                         $entities[$key]['_media_attribute_id'] = $mediaAttributeId;
                         unset($entities[$key][$attr . '_content']);
-
-                        // If your memory_limit is set to -1 this stuff will not works
-                        // https://github.com/avstudnitz/AvS_FastSimpleImport/issues/120
                     } catch (Exception $e) {
                         Mage::throwException($e->getMessage());
                     }

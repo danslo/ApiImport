@@ -20,6 +20,7 @@ require_once 'app/Mage.php';
 Mage::init();
 
 define('NUM_ENTITIES', 5000);
+define('NUM_ROWS_BY_CALL', 2500);
 define('API_USER', 'apiUser');
 define('API_KEY', 'someApiKey123');
 define('USE_API', true);
@@ -41,22 +42,27 @@ $entityTypes = array(
             'simple',
             'configurable',
             'bundle',
-            'grouped'
-        )
+            'grouped',
+            'image',
+            'localizable'
+        ),
+        'behavior' => 'append'
     ),
     'customer' => array(
         'entity' => Mage_ImportExport_Model_Export_Entity_Customer::getEntityTypeCode(),
         'model'  => 'customer/customer',
         'types'  => array(
             'standard'
-        )
+        ),
+        'behavior' => 'append'
     ),
     'category' => array(
         'entity' => Danslo_ApiImport_Model_Import_Entity_Category::getEntityTypeCode(),
         'model'  => 'catalog/category',
         'types'  => array(
             'standard'
-        )
+        ),
+        'behavior' => 'append'
     )
 );
 
@@ -71,8 +77,18 @@ foreach ($entityTypes as $typeName => $entityType) {
         $totalTime = microtime(true);
 
         if (USE_API) {
+            $data = array();
+
+            if (count($entities) <= NUM_ROWS_BY_CALL || !NUM_ROWS_BY_CALL) {
+                $data[] = $entities;
+            } else {
+                $data = array_chunk($entities, NUM_ROWS_BY_CALL);
+            }
+
             try {
-                $client->call('call', array($session, 'import.importEntities', array($entities, $entityType['entity'])));
+                foreach($data as $bulk) {
+                    $client->call('call', array($session, 'import.importEntities', array($bulk, $entityType['entity']), $entityType['behavior']));
+                }
             }
             catch(Exception $e) {
                 printf('Import failed: ' . PHP_EOL, $e->getMessage());
