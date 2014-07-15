@@ -21,8 +21,8 @@ Mage::init();
 
 define('NUM_ENTITIES', 5000);
 define('NUM_ROWS_BY_CALL', false);
-define('API_USER', 'soap');
-define('API_KEY', 'magento1');
+define('API_USER', 'apiUser');
+define('API_KEY', 'someApiKey123');
 define('USE_API', true);
 ini_set('memory_limit', '2048M');
 
