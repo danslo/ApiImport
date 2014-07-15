@@ -57,7 +57,7 @@ class Danslo_ApiImport_Helper_Test
      *
      * @var array
      */
-    protected $_defaultStoreView = array(
+    protected $_storeViews = array(
         'default',
         'fr_fr'
     );
@@ -169,7 +169,7 @@ class Danslo_ApiImport_Helper_Test
 
         for ($i = 1; $i <= $numProducts; $i++) {
 
-            foreach ($this->_defaultStoreView as $locale) {
+            foreach ($this->_storeViews as $locale) {
                 if ('default' === $locale) {
                     $products[$j++] = array_merge(
                         $this->_defaultProductAttributes,
