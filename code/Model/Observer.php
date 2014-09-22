@@ -125,6 +125,21 @@ class Danslo_ApiImport_Model_Observer
     }
 
     /**
+     * Verify if information are set in the entity and correct for the given media attribute
+     *
+     * @param array  $entity
+     * @param string $attribute
+     *
+     * @return bool
+     */
+    protected function _isImageToImport($entity, $attribute)
+    {
+        return (isset($entity[$attribute . '_content']) && !empty($entity[$attribute . '_content'])
+            && isset($entity[$attribute]) && !empty($entity[$attribute])
+            && is_string($entity[$attribute]) && is_string($entity[$attribute . '_content']));
+    }
+
+    /**
      * Partial category index after import.
      *
      * @param Varien_Event_Observer $observer
@@ -202,4 +217,48 @@ class Danslo_ApiImport_Model_Observer
         return true;
     }
 
+    /**
+     * Import images before products
+     *
+     * @param Varien_Event_Observer $observer
+     *
+     * @return boolean
+     */
+    public function importMedia($observer)
+    {
+        $ioAdapter        = new Varien_Io_File();
+        $entities         = $observer->getData('data_source_model')->getEntities();
+        $uploader         = $observer->getData('uploader');
+        $tmpImportFolder  = $uploader->getTmpDir();
+        $attributes       = Mage::getResourceModel('catalog/product_attribute_collection')->getItems();
+        $mediaAttr        = array();
+        $mediaAttributeId = Mage::getModel('eav/entity_attribute')
+            ->load('media_gallery', 'attribute_code')
+            ->getAttributeId();
+
+        foreach ($attributes as $attr) {
+            if ($attr->getFrontendInput() === 'media_image') {
+                $mediaAttr[] = $attr->getAttributeCode();
+            }
+        }
+
+        foreach($entities as $key => $entity) {
+            foreach ($mediaAttr as $attr) {
+                if ($this->_isImageToImport($entity, $attr)) {
+                    try {
+                        $ioAdapter->open(array('path' => $tmpImportFolder));
+                        $ioAdapter->write(end(explode('/', $entity[$attr])), base64_decode($entity[$attr . '_content']), 0666);
+
+                        $entities[$key]['_media_attribute_id'] = $mediaAttributeId;
+                        unset($entities[$key][$attr . '_content']);
+                    } catch (Exception $e) {
+                        Mage::throwException($e->getMessage());
+                    }
+                }
+            }
+        }
+        $observer->getData('data_source_model')->setEntities($entities);
+
+        return true;
+    }
 }

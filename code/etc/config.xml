@@ -11,6 +11,15 @@
             </api_import_resource>
         </models>
         <events>
+            <api_import_entity_product_import_media>
+                <observers>
+                    <api_import_import_media>
+                        <class>api_import/observer</class>
+                        <method>importMedia</method>
+                        <type>singleton</type>
+                    </api_import_import_media>
+                </observers>
+            </api_import_entity_product_import_media>
             <api_import_entity_product_after_import>
                 <observers>
                     <api_import_index_products>

@@ -53,7 +53,17 @@ class Danslo_ApiImport_Helper_Test
     );
 
     /**
-     * Default attributes that are used for categories. 
+     * Store views. Don't remove default and add yours after it
+     *
+     * @var array
+     */
+    protected $_storeViews = array(
+        'default',
+        'fr_fr'
+    );
+
+    /**
+     * Default attributes that are used for categories.
      *
      * @var array
      */
@@ -110,6 +120,77 @@ class Danslo_ApiImport_Helper_Test
                     'qty'    => rand(1, 30)
                 )
             );
+        }
+
+        return $products;
+    }
+
+    /**
+     * Generates random simple products with image.
+     *
+     * @param int $numProducts
+     * @return array
+     */
+    public function generateRandomImageProduct($numProducts)
+    {
+        $products = array();
+
+        for ($i = 1; $i <= $numProducts; $i++) {
+            $products[$i] = array_merge(
+                $this->_defaultProductAttributes,
+                array(
+                    'sku'                => 'some_sku_' . $i,
+                    '_type'              => Mage_Catalog_Model_Product_Type::TYPE_SIMPLE,
+                    'name'               => 'Some product ( ' . $i . ' )',
+                    'price'              => rand(1, 1000),
+                    'weight'             => rand(1, 1000),
+                    'qty'                => rand(1, 30),
+                    'image'              => '/example_image.png',
+                    'image_content'      => base64_encode(file_get_contents('example_image.png')),
+                    '_media_image'       => '/example_image.png',
+                    '_media_is_disabled' => '0'
+                )
+            );
+        }
+
+        return $products;
+    }
+
+    /**
+     * Generates random localizable simple products.
+     *
+     * @param int $numProducts
+     * @return array
+     */
+    public function generateRandomLocalizableProduct($numProducts)
+    {
+        $products = array();
+        $j = 0;
+
+        for ($i = 1; $i <= $numProducts; $i++) {
+
+            foreach ($this->_storeViews as $locale) {
+                if ('default' === $locale) {
+                    $products[$j++] = array_merge(
+                        $this->_defaultProductAttributes,
+                        array(
+                            'sku'              => 'some_sku_' . $i,
+                            '_type'            => Mage_Catalog_Model_Product_Type::TYPE_SIMPLE,
+                            'name'             => 'Some product ( ' . $i . ' ) - ' . $locale,
+                            'price'            => rand(1, 1000),
+                            'weight'           => rand(1, 1000),
+                            'qty'              => rand(1, 30)
+                        )
+                    );
+                } else {
+                    $products[$j++] = array(
+                        '_store'            => $locale,
+                        'short_description' => 'Courte description ' . $locale,
+                        'description'       => 'Description du produit - ' . $locale,
+                        'name'              => 'Un produit ( ' . $i . ' )',
+                    );
+                }
+            }
         }
 
         return $products;
@@ -270,9 +351,9 @@ class Danslo_ApiImport_Helper_Test
      * @return array
      */
     public function generateRandomStandardCategory($numCategories)
-    {   
+    {
         $categories = array();
-        
+
         for ($i = 1; $i <= $numCategories; $i++) {
             $categories[$i - 1] = array_merge(
                 $this->_defaultCategoryAttributes,
@@ -282,7 +363,7 @@ class Danslo_ApiImport_Helper_Test
                     'url_key'       => sprintf('test%d', $i),
                 )
             );
-        } 
+        }
 
         return $categories;
     }

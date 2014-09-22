@@ -20,17 +20,32 @@ require_once 'app/Mage.php';
 Mage::init();
 
 define('NUM_ENTITIES', 5000);
+define('NUM_ROWS_BY_CALL', false);
 define('API_USER', 'apiUser');
 define('API_KEY', 'someApiKey123');
 define('USE_API', true);
+ini_set('memory_limit', '2048M');
 
 $helper = Mage::helper('api_import/test');
 
 if (USE_API) {
-    // Create an API connection. Standard timeout for Zend_Http_Client is 10 seconds, so we must lengthen it.
-    $client = new Zend_XmlRpc_Client(Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_WEB) . 'api/xmlrpc/');
-    $client->getHttpClient()->setConfig(array('timeout' => -1));
-    $session = $client->call('login', array(API_USER, API_KEY));
+    // Create an API connection
+    $soapOptions = array(
+        'encoding'   => 'UTF-8',
+        'trace'      => true,
+        'exceptions' => true,
+        'login'      => API_USER,
+        'password'   => API_KEY,
+        'cache_wsdl' => 3,
+        'keep_alive' => 1
+    );
+
+    try{
+        $client = new SoapClient(Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_WEB) . 'index.php/api/soap/?wsdl', $soapOptions);
+        $session = $client->login(API_USER, API_KEY);
+    } catch (Exception $e) {
+        echo 'Exception :' . $e->getMessage();
+    }
 }
 
 $entityTypes = array(
@@ -41,22 +56,27 @@ $entityTypes = array(
             'simple',
             'configurable',
             'bundle',
-            'grouped'
-        )
+            'grouped',
+            'image',
+            'localizable'
+        ),
+        'behavior' => 'append'
     ),
     'customer' => array(
         'entity' => Mage_ImportExport_Model_Export_Entity_Customer::getEntityTypeCode(),
         'model'  => 'customer/customer',
         'types'  => array(
             'standard'
-        )
+        ),
+        'behavior' => 'append'
     ),
     'category' => array(
         'entity' => Danslo_ApiImport_Model_Import_Entity_Category::getEntityTypeCode(),
         'model'  => 'catalog/category',
         'types'  => array(
             'standard'
-        )
+        ),
+        'behavior' => 'append'
     )
 );
 
@@ -71,19 +91,29 @@ foreach ($entityTypes as $typeName => $entityType) {
         $totalTime = microtime(true);
 
         if (USE_API) {
+            $data = array();
+
+            if (count($entities) <= NUM_ROWS_BY_CALL || !NUM_ROWS_BY_CALL) {
+                $data[] = $entities;
+            } else {
+                $data = array_chunk($entities, NUM_ROWS_BY_CALL);
+            }
+
             try {
-                $client->call('call', array($session, 'import.importEntities', array($entities, $entityType['entity'])));
+                foreach($data as $bulk) {
+                    $client->call($session, 'import.importEntities', array($bulk, $entityType['entity'], $entityType['behavior']));
+                }
             }
             catch(Exception $e) {
                 printf('Import failed: ' . PHP_EOL, $e->getMessage());
-                printf('Server returned: %s' . PHP_EOL, $client->getHttpClient()->getLastResponse()->getBody());
+                var_dump($e);
                 exit;
             }
         } else {
             // For debugging purposes only.
             Mage::getModel('api_import/import_api')->importEntities($entities, $entityType['entity']);
         }
-        printf('Done! Magento reports %d %ss.' . PHP_EOL, Mage::getModel($entityType['model'])->getCollection()->count(), $typeName);
+        printf('Done! Magento reports %d %s.' . PHP_EOL, count($entities), 'rows');
         $totalTime = microtime(true) - $totalTime;
 
         // Generate some rough statistics.
@@ -98,5 +128,5 @@ foreach ($entityTypes as $typeName => $entityType) {
 
 // Cleanup.
 if (USE_API) {
-    $client->call('endSession', array($session));
+    $client->endSession($session);
 }

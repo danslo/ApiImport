@@ -145,11 +145,21 @@ class Danslo_ApiImport_Model_Import_Entity_Product
      */
     public function _importData()
     {
+        $ioAdapter = new Varien_Io_File();
+        $ioAdapter->checkAndCreateFolder(Mage::getConfig()->getOptions()->getMediaDir() . '/import');
+        Mage::dispatchEvent($this->_eventPrefix . '_import_media', array(
+            'data_source_model' => $this->_dataSourceModel,
+            'uploader'          => $this->_getUploader()
+        ));
         Mage::dispatchEvent($this->_eventPrefix . '_before_import', array(
             'entity_model'      => $this,
             'data_source_model' => $this->_dataSourceModel
         ));
+
+        // If your memory_limit is set to -1 this stuff will not works
+        // https://github.com/avstudnitz/AvS_FastSimpleImport/issues/120
         $result = parent::_importData();
+
         Mage::dispatchEvent($this->_eventPrefix . '_after_import', array(
             'entity_model' => $this,
             'entities'     => $this->_newSku
