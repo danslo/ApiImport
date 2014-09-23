@@ -63,6 +63,96 @@ class Danslo_ApiImport_Model_Import_Api
     }
 
     /**
+     * @param $data
+     */
+    public function importAttributes($data)
+    {
+
+    }
+
+    public function importAttributeSets($data, $behavior = null)
+    {
+        if (null === $behavior) {
+            $behavior = Mage_ImportExport_Model_Import::BEHAVIOR_APPEND;
+        }
+
+        $setup = new Mage_Catalog_Model_Resource_Eav_Mysql4_Setup('catalog_product_attribute_set');
+        $entityTypeId = 'catalog_product';
+
+        if (Mage_ImportExport_Model_Import::BEHAVIOR_DELETE === $behavior) {
+
+            foreach ($data as $attributeSet) {
+                $setup->removeAttributeSet($entityTypeId, $attributeSet['name']);
+            }
+        } else if (Mage_ImportExport_Model_Import::BEHAVIOR_REPLACE === $behavior
+            || Mage_ImportExport_Model_Import::BEHAVIOR_APPEND === $behavior
+        ) {
+            $connexion = $setup->getConnection();
+            $getOldGroupsQuery = $connexion
+                ->select()
+                ->from($setup->getTable('eav/attribute_group'))
+                ->where('attribute_set_id = :attribute_set_id');
+
+            foreach ($data as $attributeSet) {
+                $attrSetName     = $attributeSet['name'];
+                $sortOrder       = $attributeSet['sortOrder'];
+                $attributeGroups = $attributeSet;
+                unset($attributeGroups['name']);
+                unset($attributeGroups['sortOrder']);
+
+                $setup->addAttributeSet('catalog_product', $attrSetName, $sortOrder);
+                $attrSetId = $setup->getAttributeSet($entityTypeId, $attrSetName, 'attribute_set_id');
+
+                $bind = array('attribute_set_id' => $attrSetId);
+
+                $currentGroups = [];
+                foreach ($connexion->fetchAssoc($getOldGroupsQuery, $bind) as $attrGroup) {
+                    $currentGroups[$attrGroup['attribute_group_name']] = $attrGroup['sort_order'];
+                }
+
+                $groupsToRemove = array_keys(array_diff_key($currentGroups, $attributeGroups));
+                foreach ($groupsToRemove as $groupToRemoveName) {
+                    unset($currentGroups[$groupToRemoveName]);
+                    $setup->removeAttributeGroup($entityTypeId, $attrSetId, $groupToRemoveName);
+                }
+
+                $groupsToUpdate = array_diff_assoc($currentGroups, $attributeGroups);
+                foreach ($groupsToUpdate as $groupToUpdateName => $groupSortOrder) {
+                    unset($attributeGroups[$groupToUpdateName]);
+                    $setup->updateAttributeGroup(
+                        $entityTypeId,
+                        $attrSetId,
+                        $groupToUpdateName,
+                        'sort_order',
+                        $groupSortOrder
+                    );
+                }
+
+                foreach ($attributeGroups as $groupName => $groupSortOrder) {
+                    $setup->addAttributeGroup($entityTypeId, $attrSetId, $groupName, $groupSortOrder);
+                }
+            }
+        }
+
+        return true;
+    }
+
+    public function importAttributeGroups($data)
+    {
+        $setup = new Mage_Catalog_Model_Resource_Eav_Mysql4_Setup('catalog_product_attribute_set');
+
+        foreach ($data as $group) {
+            $attrSetName   = $group['attribute set'];
+            $attrGroupName = $group['name'];
+
+            $attrSetId = $setup->getAttributeSet('catalog_product', $attrSetName, 'attribute_set_id');
+            $setup->addAttributeGroup('catalog_product', $attrSetId, $attrGroupName);
+        }
+
+        return true;
+    }
+
+    /**
      * Sets entity type in the source model.
      *
      * @param string $entityType

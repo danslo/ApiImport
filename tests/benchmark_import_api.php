@@ -62,6 +62,13 @@ $entityTypes = array(
         ),
         'behavior' => 'append'
     ),
+    'attributeSet' => array(
+        'entity' => 'attributeSets',
+        'types'  => array(
+            'standard'
+        ),
+        'behavior' => 'append'
+    ),
     'customer' => array(
         'entity' => Mage_ImportExport_Model_Export_Entity_Customer::getEntityTypeCode(),
         'model'  => 'customer/customer',
@@ -99,19 +106,34 @@ foreach ($entityTypes as $typeName => $entityType) {
                 $data = array_chunk($entities, NUM_ROWS_BY_CALL);
             }
 
-            try {
-                foreach($data as $bulk) {
-                    $client->call($session, 'import.importEntities', array($bulk, $entityType['entity'], $entityType['behavior']));
+            if ('attributeSets' !== $entityType['entity']) {
+                try {
+                    foreach ($data as $bulk) {
+                        $client->call($session, 'import.importEntities', array($bulk, $entityType['entity'], $entityType['behavior']));
+                    }
+                } catch (Exception $e) {
+                    printf('Import failed: ' . PHP_EOL, $e->getMessage());
+                    var_dump($e);
+                    exit;
+                }
+            } else if ('attributeSets' === $entityType['entity']) {
+                try {
+                    foreach ($data as $bulk) {
+                        $client->call($session, 'import.importAttributeSets', array($bulk, $entityType['behavior']));
+                    }
+                } catch (Exception $e) {
+                    printf('Import failed: ' . PHP_EOL, $e->getMessage());
+                    var_dump($e);
+                    exit;
                 }
             }
-            catch(Exception $e) {
-                printf('Import failed: ' . PHP_EOL, $e->getMessage());
-                var_dump($e);
-                exit;
-            }
         } else {
-            // For debugging purposes only.
-            Mage::getModel('api_import/import_api')->importEntities($entities, $entityType['entity']);
+            if ('attributeSets' !== $entityType['entity']) {
+                Mage::getModel('api_import/import_api')->importEntities($entities, $entityType['entity'], $entityType['behavior']);
+            } else if ('attributeSets' === $entityType['entity']) {
+                // For debugging purposes only.
+                Mage::getModel('api_import/import_api')->importAttributeSets($entities, $entityType['behavior']);
+            }
         }
         printf('Done! Magento reports %d %s.' . PHP_EOL, count($entities), 'rows');
         $totalTime = microtime(true) - $totalTime;
