@@ -126,6 +126,30 @@ class Danslo_ApiImport_Helper_Test
     }
 
     /**
+     * Generates random standard attribute sets.
+     *
+     * @param int $numProducts
+     * @return array
+     */
+    public function generateRandomStandardAttributeSet($numProducts)
+    {
+        $attributeSets = array();
+
+        for ($i = 1; $i <= $numProducts; $i++) {
+            $attributeSets[$i] = array(
+                'name'      => 'set ' . $i,
+                'sortOrder' => $i,
+                'General'   => 1,
+                'Prices'    => 2,
+                'Marketing' => 4,
+                'Color'     => 3
+            );
+        }
+
+        return $attributeSets;
+    }
+
+    /**
      * Generates random simple products with image.
      *
      * @param int $numProducts
