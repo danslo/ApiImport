@@ -16,9 +16,9 @@
                     <importAttributeSets translate="title" module="api_import">
                         <title>Import attribute sets</title>
                     </importAttributeSets>
-                    <importAttributeGroups translate="title" module="api_import">
-                        <title>Import attribute groups</title>
-                    </importAttributeGroups>
+                    <importAttributeAssociations translate="title" module="api_import">
+                        <title>Import attribute associations</title>
+                    </importAttributeAssociations>
                 </methods>
                 <faults module="api_import">
                     <invalid_entity_type>
@@ -55,9 +55,9 @@
                     <importAttributeSets translate="title" module="api_import">
                         <title>Import attribute sets</title>
                     </importAttributeSets>
-                    <importAttributeGroups translate="title" module="api_import">
-                        <title>Import attribute groups</title>
-                    </importAttributeGroups>
+                    <importAttributeAssociations translate="title" module="api_import">
+                        <title>Import attribute associations</title>
+                    </importAttributeAssociations>
                 </api_import>
             </resources>
         </acl>
