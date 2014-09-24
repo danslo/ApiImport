@@ -40,8 +40,11 @@ if (USE_API) {
         'keep_alive' => 1
     );
 
-    try{
-        $client = new SoapClient(Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_WEB) . 'index.php/api/soap/?wsdl', $soapOptions);
+    try {
+        $client = new SoapClient(
+            Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_WEB) . 'index.php/api/soap/?wsdl',
+            $soapOptions
+        );
         $session = $client->login(API_USER, API_KEY);
     } catch (Exception $e) {
         echo 'Exception :' . $e->getMessage();

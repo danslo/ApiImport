@@ -42,9 +42,9 @@ class Danslo_ApiImport_Model_Import_Api
     /**
      * Fires off the import process through the import model.
      *
-     * @param array $entities
-     * @param string $entityType
-     * @param string $behavior
+     * @param  array  $entities
+     * @param  string $entityType
+     * @param  string $behavior
      * @return array
      */
     public function importEntities($entities, $entityType = null, $behavior = null)
@@ -55,7 +55,7 @@ class Danslo_ApiImport_Model_Import_Api
         $this->_api->getDataSourceModel()->setEntities($entities);
         try {
             $result = $this->_api->importSource();
-        } catch(Mage_Core_Exception $e) {
+        } catch (Mage_Core_Exception $e) {
             $this->_fault('import_failed', $e->getMessage());
         }
 
@@ -90,7 +90,7 @@ class Danslo_ApiImport_Model_Import_Api
                     || Mage_ImportExport_Model_Import::BEHAVIOR_APPEND === $behavior
                 ) {
                     $setup->addAttribute($entityTypeId, $attributeCode, $attribute);
-                } else if (Mage_ImportExport_Model_Import::BEHAVIOR_DELETE === $behavior) {
+                } elseif (Mage_ImportExport_Model_Import::BEHAVIOR_DELETE === $behavior) {
                     $setup->removeAttribute($entityTypeId, $attributeCode);
                 }
             }
@@ -121,7 +121,7 @@ class Danslo_ApiImport_Model_Import_Api
             foreach ($data as $attributeSet) {
                 $setup->removeAttributeSet($entityTypeId, $attributeSet['name']);
             }
-        } else if (Mage_ImportExport_Model_Import::BEHAVIOR_REPLACE === $behavior
+        } elseif (Mage_ImportExport_Model_Import::BEHAVIOR_REPLACE === $behavior
             || Mage_ImportExport_Model_Import::BEHAVIOR_APPEND === $behavior
         ) {
             $connexion = $setup->getConnection();
@@ -177,14 +177,14 @@ class Danslo_ApiImport_Model_Import_Api
     /**
      * Sets entity type in the source model.
      *
-     * @param string $entityType
+     * @param  string $entityType
      * @return void
      */
     protected function _setEntityTypeCode($entityType)
     {
         try {
             $this->_api->getDataSourceModel()->setEntityTypeCode($entityType);
-        } catch(Mage_Core_Exception $e) {
+        } catch (Mage_Core_Exception $e) {
             $this->_fault('invalid_entity_type', $e->getMessage());
         }
     }
@@ -192,14 +192,14 @@ class Danslo_ApiImport_Model_Import_Api
     /**
      * Sets import behavior in the source model.
      *
-     * @param string $behavior
+     * @param  string $behavior
      * @return void
      */
     protected function _setBehavior($behavior)
     {
         try {
             $this->_api->getDataSourceModel()->setBehavior($behavior);
-        } catch(Mage_Core_Exception $e) {
+        } catch (Mage_Core_Exception $e) {
             $this->_fault('invalid_behavior', $e->getMessage());
         }
     }
