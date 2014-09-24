@@ -118,7 +118,14 @@ foreach ($entityTypes as $typeName => $entityType) {
            ) {
                try {
                    foreach ($data as $bulk) {
-                       $client->call($session, 'import.import' . ucfirst($entityType['entity']), array($bulk, $entityType['behavior']));
+                       $client->call(
+                           $session,
+                           'import.import' . ucfirst($entityType['entity']),
+                           array(
+                               $bulk,
+                               $entityType['behavior']
+                           )
+                       );
                    }
                } catch (Exception $e) {
                    printf('Import failed: ' . PHP_EOL, $e->getMessage());
@@ -128,7 +135,14 @@ foreach ($entityTypes as $typeName => $entityType) {
            } else {
                try {
                    foreach ($data as $bulk) {
-                       $client->call($session, 'import.importEntities', array($bulk, $entityType['entity'], $entityType['behavior']));
+                       $client->call(
+                           $session,
+                           'import.import' . ucfirst($entityType['entity']),
+                           array(
+                               $bulk,
+                               $entityType['behavior']
+                           )
+                       );
                    }
                } catch (Exception $e) {
                    printf('Import failed: ' . PHP_EOL, $e->getMessage());
@@ -145,7 +159,11 @@ foreach ($entityTypes as $typeName => $entityType) {
                 Mage::getModel('api_import/import_api')->$method($entities, $entityType['behavior']);
 
             } else if ('attributeSets' !== $entityType['entity']) {
-                Mage::getModel('api_import/import_api')->importEntities($entities, $entityType['entity'], $entityType['behavior']);
+                Mage::getModel('api_import/import_api')->importEntities(
+                    $entities,
+                    $entityType['entity'],
+                    $entityType['behavior']
+                );
             }
         }
         printf('Done! Magento reports %d %s.' . PHP_EOL, count($entities), 'rows');

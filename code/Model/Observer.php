@@ -256,7 +256,7 @@ class Danslo_ApiImport_Model_Observer
             }
         }
 
-        foreach($entities as $key => $entity) {
+        foreach ($entities as $key => $entity) {
             foreach ($mediaAttr as $attr) {
                 if ($this->_isImageToImport($entity, $attr)) {
                     try {
