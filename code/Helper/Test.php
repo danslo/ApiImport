@@ -78,6 +78,28 @@ class Danslo_ApiImport_Helper_Test
     );
 
     /**
+     * Some attribute types used for attributes creation
+     *
+     * @var array
+     */
+    protected $_attributeTypes = array(
+        'text',
+        'textarea'
+    );
+
+    /**
+     * Some attribute groups used for attributes and attribute sets creation
+     *
+     * @var array
+     */
+    protected $_attributeGroups = array(
+        'General',
+        'Prices',
+        'Marketing',
+        'Color'
+    );
+
+    /**
      * Creates and stores 3 simple products with different values for the color attribute.
      * These products are used for configurable, bundle and grouped product generation.
      *
@@ -139,10 +161,10 @@ class Danslo_ApiImport_Helper_Test
             $attributeSets[$i] = array(
                 'name'      => 'set ' . $i,
                 'sortOrder' => $i,
-                'General'   => 1,
-                'Prices'    => 2,
-                'Marketing' => 4,
-                'Color'     => 3
+                $this->_attributeGroups[0] => 1,
+                $this->_attributeGroups[1] => 2,
+                $this->_attributeGroups[2] => 4,
+                $this->_attributeGroups[3] => 3
             );
         }
 
@@ -158,28 +180,31 @@ class Danslo_ApiImport_Helper_Test
     public function generateRandomStandardAttributes($numProducts)
     {
         $attributes = array();
-        $types = array('text', 'textarea');
-        $type = array_rand($types, 1);
 
         for ($i = 1; $i <= $numProducts; $i++) {
+            $type  = $this->_attributeTypes[array_rand($this->_attributeTypes)];
+            $group = $this->_attributeGroups[array_rand($this->_attributeGroups)];
+
             $attributes[$i] = array(
-                'attribute_code'     => 'attr_test_' . $i,
-                'type' => $type,
-                'default_value_' . $type => 'Default value for attribute test ' . $i,
-                'label' => 'My Attribute test ' . $i,
-                'input' => 'text',
-                'user_defined' => true,
-                'is_user_defined' => true,
-                'required' => false,
-                'global' => 1,
-                'visible' => true,
-                'visible_on_front' => true,
-                'searchable' => true,
-                'filterable' => true,
+                'attribute_code'          => 'attr_test_' . $i,
+                'type'                    => $type,
+                'default_value_' . $type  => 'Default value for attribute test ' . $i,
+                'label'                   => 'My Attribute test ' . $i,
+                'input'                   => 'text',
+                'user_defined'            => true,
+                'is_user_defined'         => true,
+                'required'                => false,
+                'global'                  => 1,
+                'visible'                 => true,
+                'visible_on_front'        => true,
+                'searchable'              => true,
+                'filterable'              => true,
                 'is_filterable_in_search' => false,
-                'used_for_sort_by' => true,
+                'used_for_sort_by'        => true,
                 'used_in_product_listing' => true,
-                'comparable' => true,
+                'comparable'              => true,
+                'attribute_set_id'        => 'set ' . rand(1, 10),
+                'group'                   => $group
             );
         }
 
@@ -235,12 +260,12 @@ class Danslo_ApiImport_Helper_Test
                     $products[$j++] = array_merge(
                         $this->_defaultProductAttributes,
                         array(
-                            'sku'              => 'some_sku_' . $i,
-                            '_type'            => Mage_Catalog_Model_Product_Type::TYPE_SIMPLE,
-                            'name'             => 'Some product ( ' . $i . ' ) - ' . $locale,
-                            'price'            => rand(1, 1000),
-                            'weight'           => rand(1, 1000),
-                            'qty'              => rand(1, 30)
+                            'sku'   => 'some_sku_' . $i,
+                            '_type' => Mage_Catalog_Model_Product_Type::TYPE_SIMPLE,
+                            'name'  => 'Some product ( ' . $i . ' ) - ' . $locale,
+                            'price' => rand(1, 1000),
+                            'weight'=> rand(1, 1000),
+                            'qty'   => rand(1, 30)
                         )
                     );
                 } else {
@@ -419,14 +444,13 @@ class Danslo_ApiImport_Helper_Test
             $categories[$i - 1] = array_merge(
                 $this->_defaultCategoryAttributes,
                 array(
-                    'name'          => sprintf('Test Category %d', $i),
-                    '_category'     => sprintf('Test Category %d', $i),
-                    'url_key'       => sprintf('test%d', $i),
+                    'name'      => sprintf('Test Category %d', $i),
+                    '_category' => sprintf('Test Category %d', $i),
+                    'url_key'   => sprintf('test%d', $i),
                 )
             );
         }
 
         return $categories;
     }
-
 }
