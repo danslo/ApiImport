@@ -31,6 +31,11 @@ class Danslo_ApiImport_Model_Import
     const BEHAVIOR_STOCK = 'stock';
 
     /**
+     * Special attribute set import behavior.
+     */
+    const BEHAVIOR_DELETE_IF_NOT_EXIST = 'delete_if_not_exist';
+
+    /**
      * Log directory.
      */
     const LOG_DIRECTORY = 'log/import_export/';

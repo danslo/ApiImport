@@ -79,6 +79,13 @@ $entityTypes = array(
         ),
         'behavior' => 'append'
     ),
+    'attributeAssociations' => array(
+        'entity' => 'attributeAssociations',
+        'types'  => array(
+            'standard'
+        ),
+        'behavior' => 'append'
+    ),
     'customer' => array(
         'entity' => Mage_ImportExport_Model_Export_Entity_Customer::getEntityTypeCode(),
         'model'  => 'customer/customer',
@@ -118,6 +125,7 @@ foreach ($entityTypes as $typeName => $entityType) {
 
            if ('attributeSets' === $entityType['entity']
                || 'attributes' === $entityType['entity']
+               || 'attributeAssociations' === $entityType['entity']
            ) {
                try {
                    foreach ($data as $bulk) {
@@ -140,9 +148,10 @@ foreach ($entityTypes as $typeName => $entityType) {
                    foreach ($data as $bulk) {
                        $client->call(
                            $session,
-                           'import.import' . ucfirst($entityType['entity']),
+                           'import.importEntities',
                            array(
-                               $bulk,
+                               $entities,
+                               $entityType['entity'],
                                $entityType['behavior']
                            )
                        );
@@ -156,12 +165,13 @@ foreach ($entityTypes as $typeName => $entityType) {
         } else {
             if ('attributeSets' === $entityType['entity']
                 || 'attributes' === $entityType['entity']
+                || 'attributeAssociations' === $entityType['entity']
             ) {
                 $method = 'import' . ucfirst($entityType['entity']);
                 // For debugging purposes only.
                 Mage::getModel('api_import/import_api')->$method($entities, $entityType['behavior']);
 
-            } else if ('attributeSets' !== $entityType['entity']) {
+            } else {
                 Mage::getModel('api_import/import_api')->importEntities(
                     $entities,
                     $entityType['entity'],
