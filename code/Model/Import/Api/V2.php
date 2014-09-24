@@ -26,6 +26,7 @@ class Danslo_ApiImport_Model_Import_Api_V2 extends Danslo_ApiImport_Model_Import
     public function importEntities($entities, $entityType = null, $behavior = null)
     {
         $entities = $this->_prepareEntities($entities);
+
         return parent::importEntities($entities, $entityType, $behavior);
     }
 
@@ -33,10 +34,10 @@ class Danslo_ApiImport_Model_Import_Api_V2 extends Danslo_ApiImport_Model_Import
      * Prepare incoming entities encoded as complexType apiImportImportEntitiesArray
      * for passthru to API V1 as associative array
      *
-     * @param array $entities
+     * @param  array $entities
      * @return void
      */
-    protected function _prepareEntities(Array $entities)
+    protected function _prepareEntities(array $entities)
     {
         $return = array();
         foreach ($entities as $i => &$entity) {
@@ -46,7 +47,7 @@ class Danslo_ApiImport_Model_Import_Api_V2 extends Danslo_ApiImport_Model_Import
                     $value = $object->value;
                     // Nullify empty values
                     if (!trim($value)) {
-                        $value = NULL;
+                        $value = null;
                     }
                     $return[$i][$object->key] = $value;
                 }
@@ -54,6 +55,7 @@ class Danslo_ApiImport_Model_Import_Api_V2 extends Danslo_ApiImport_Model_Import
             }
             unset($entity);
         }
+
         return $return;
     }
 

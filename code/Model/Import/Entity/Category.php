@@ -239,21 +239,22 @@ class Danslo_ApiImport_Model_Import_Entity_Category
                 );
             }
         }
+
         return $this;
     }
 
     /**
      * Explodes by delimiter, unless escaped by backslash.
      *
-     * @param string $delimiter
-     * @param string $string
+     * @param  string $delimiter
+     * @param  string $string
      * @return array
      */
     protected function _explodeEscaped($delimiter = '/', $string)
     {
         $exploded = explode($delimiter, $string);
         $fixed = array();
-        for ($k = 0, $l = count($exploded); $k < $l; ++$k){
+        for ($k = 0, $l = count($exploded); $k < $l; ++$k) {
             if ($exploded[$k][strlen($exploded[$k]) - 1] == '\\') {
                 if ($k + 1 >= $l) {
                     $fixed[] = trim($exploded[$k]);
@@ -268,14 +269,15 @@ class Danslo_ApiImport_Model_Import_Entity_Category
                 $fixed[] = trim($exploded[$k]);
             }
         }
+
         return $fixed;
     }
 
     /**
      * Counterpart to _explodeEscaped.
      *
-     * @param string $glue
-     * @param array $array
+     * @param  string $glue
+     * @param  array  $array
      * @return string
      */
     protected function _implodeEscaped($glue, $array)
@@ -284,6 +286,7 @@ class Danslo_ApiImport_Model_Import_Entity_Category
         foreach ($array as $value) {
             $newArray[] = str_replace($glue, '\\' . $glue, $value);
         }
+
         return implode('/', $newArray);
     }
 
@@ -291,7 +294,7 @@ class Danslo_ApiImport_Model_Import_Entity_Category
      * Create category entity from raw data.
      *
      * @throws Exception
-     * @return bool Result of operation.
+     * @return bool      Result of operation.
      */
     protected function _importData()
     {
@@ -302,6 +305,7 @@ class Danslo_ApiImport_Model_Import_Entity_Category
             $this->_saveCategories();
         }
         Mage::dispatchEvent($this->_eventPrefix . '_after_import', array('entities' => $this->_newCategory));
+
         return true;
     }
 
@@ -338,6 +342,7 @@ class Danslo_ApiImport_Model_Import_Entity_Category
                 );
             }
         }
+
         return $this;
     }
 
@@ -353,6 +358,7 @@ class Danslo_ApiImport_Model_Import_Entity_Category
             $this->_storeCodeToId[$store->getCode()] = $store->getId();
             $this->_storeIdToWebsiteStoreIds[$store->getId()] = $store->getWebsite()->getStoreIds();
         }
+
         return $this;
     }
 
@@ -368,6 +374,7 @@ class Danslo_ApiImport_Model_Import_Entity_Category
             $this->_websiteCodeToId[$website->getCode()] = $website->getId();
             $this->_websiteCodeToStoreIds[$website->getCode()] = array_flip($website->getStoreCodes());
         }
+
         return $this;
     }
 
@@ -392,13 +399,14 @@ class Danslo_ApiImport_Model_Import_Entity_Category
                 'attribute'   => $attribute
             );
         }
+
         return $this;
     }
 
     /**
      * Set valid attribute set and category type to rows with all scopes to ensure that existing categories don't get changed.
      *
-     * @param array $rowData
+     * @param  array $rowData
      * @return array
      */
     protected function _prepareRowForDb(array $rowData)
@@ -421,7 +429,7 @@ class Danslo_ApiImport_Model_Import_Entity_Category
     /**
      * Save category attributes.
      *
-     * @param array $attributesData
+     * @param  array                                         $attributesData
      * @return Danslo_ApiImport_Model_Import_Entity_Category
      */
     protected function _saveCategoryAttributes(array $attributesData)
@@ -443,6 +451,7 @@ class Danslo_ApiImport_Model_Import_Entity_Category
             }
             $this->_connection->insertOnDuplicate($tableName, $tableData, array('value'));
         }
+
         return $this;
     }
 
@@ -541,8 +550,7 @@ class Danslo_ApiImport_Model_Import_Entity_Category
                         $storeIds  = array(0);
 
                         if ('select' == $attrParams['type']) {
-                            if (isset($attrParams['options'][strtolower($attrValue)]))
-                            {
+                            if (isset($attrParams['options'][strtolower($attrValue)])) {
                                 $attrValue = $attrParams['options'][strtolower($attrValue)];
                             }
                         } elseif ('datetime' == $attribute->getBackendType() && strtotime($attrValue)) {
@@ -564,8 +572,8 @@ class Danslo_ApiImport_Model_Import_Entity_Category
                         }
 
                         foreach ($storeIds as $storeId) {
-                            if('multiselect' == $attribute->getFrontendInput()) {
-                                if(!isset($attributes[$attrTable][$entityId][$attrId][$storeId])) {
+                            if ('multiselect' == $attribute->getFrontendInput()) {
+                                if (!isset($attributes[$attrTable][$entityId][$attrId][$storeId])) {
                                     $attributes[$attrTable][$entityId][$attrId][$storeId] = '';
                                 } else {
                                     $attributes[$attrTable][$entityId][$attrId][$storeId] .= ',';
@@ -584,6 +592,7 @@ class Danslo_ApiImport_Model_Import_Entity_Category
             $this->_saveCategoryAttributes($attributes);
         }
         $this->_updateChildCount();
+
         return $this;
     }
 
@@ -612,6 +621,7 @@ class Danslo_ApiImport_Model_Import_Entity_Category
                 Mage::throwException("File directory '{$destDir}' is not writable.");
             }
         }
+
         return $this->_fileUploader;
     }
 
@@ -620,13 +630,14 @@ class Danslo_ApiImport_Model_Import_Entity_Category
      * Return a new file name if the same file is already exists.
      * @todo Solve the problem with images that get imported multiple times.
      *
-     * @param string $fileName
+     * @param  string $fileName
      * @return string
      */
     protected function _uploadMediaFiles($fileName)
     {
         try {
             $res = $this->_getUploader()->move($fileName);
+
             return $res['file'];
         } catch (Exception $e) {
             return '';
@@ -636,8 +647,8 @@ class Danslo_ApiImport_Model_Import_Entity_Category
     /**
      * Update and insert data in entity table.
      *
-     * @param array $entityRowsIn Row for insert
-     * @param array $entityRowsUp Row for update
+     * @param  array                                          $entityRowsIn Row for insert
+     * @param  array                                          $entityRowsUp Row for update
      * @return Mage_ImportExport_Model_Import_Entity_Customer
      */
     protected function _saveCategoryEntity(array $entityRowsIn, array $entityRowsUp)
@@ -652,6 +663,7 @@ class Danslo_ApiImport_Model_Import_Entity_Category
                 array('parent_id', 'path', 'position', 'level','children_count')
             );
         }
+
         return $this;
     }
 
@@ -689,7 +701,7 @@ class Danslo_ApiImport_Model_Import_Entity_Category
     /**
      * Obtain scope of the row from row data.
      *
-     * @param array $rowData
+     * @param  array $rowData
      * @return int
      */
     public function getRowScope(array $rowData)
@@ -716,7 +728,7 @@ class Danslo_ApiImport_Model_Import_Entity_Category
     /**
      * Get the category's parent ID.
      *
-     * @param array $rowData
+     * @param  array      $rowData
      * @return bool|mixed
      */
     protected function _getParentCategory($rowData)
@@ -741,7 +753,7 @@ class Danslo_ApiImport_Model_Import_Entity_Category
     /**
      * Gets category name from row data.
      *
-     * @param array $rowData
+     * @param  array  $rowData
      * @return string
      */
     protected function _getCategoryName($rowData)
@@ -750,14 +762,15 @@ class Danslo_ApiImport_Model_Import_Entity_Category
             return $rowData['name'];
         }
         $categoryParts = $this->_explodeEscaped('/', $rowData[self::COL_CATEGORY]);
+
         return end($categoryParts);
     }
 
     /**
      * Validate data row.
      *
-     * @param array $rowData
-     * @param int $rowNum
+     * @param  array   $rowData
+     * @param  int     $rowNum
      * @return boolean
      */
     public function validateRow(array $rowData, $rowNum)
@@ -774,6 +787,7 @@ class Danslo_ApiImport_Model_Import_Entity_Category
         //check for duplicates
         if (isset($this->_newCategory[$rowData[self::COL_ROOT]][$rowData[self::COL_CATEGORY]])) {
             $this->addRowError(self::ERROR_DUPLICATE_CATEGORY, $rowNum);
+
             return false;
         }
         $rowScope = $this->getRowScope($rowData);
@@ -784,8 +798,10 @@ class Danslo_ApiImport_Model_Import_Entity_Category
                 && !isset($this->_categoriesWithRoots[$rowData[self::COL_ROOT]][$rowData[self::COL_CATEGORY]]))
             {
                 $this->addRowError(self::ERROR_CATEGORY_NOT_FOUND_FOR_DELETE, $rowNum);
+
                 return false;
             }
+
             return true;
         }
 
@@ -801,6 +817,7 @@ class Danslo_ApiImport_Model_Import_Entity_Category
             //check if parent category exists
             if ($this->_getParentCategory($rowData) === false) {
                 $this->addRowError(self::ERROR_PARENT_NOT_FOUND, $rowNum);
+
                 return false;
             }
 
@@ -819,6 +836,7 @@ class Danslo_ApiImport_Model_Import_Entity_Category
             //check if the root exists
             if (! isset($this->_categoriesWithRoots[$root])) {
                 $this->addRowError(self::ERROR_INVALID_ROOT, $rowNum);
+
                 return false;
             }
 
@@ -839,6 +857,7 @@ class Danslo_ApiImport_Model_Import_Entity_Category
                 $this->addRowError(self::ERROR_INVALID_STORE, $rowNum);
             }
         }
+
         return !isset($this->_invalidRows[$rowNum]);
     }
 
@@ -861,6 +880,7 @@ class Danslo_ApiImport_Model_Import_Entity_Category
                 $categoryIds[] = $this->_newCategory[$rowData[self::COL_CATEGORY]]['entity_id'];
             }
         }
+
         return $categoryIds;
     }
 
@@ -868,10 +888,10 @@ class Danslo_ApiImport_Model_Import_Entity_Category
      * Check one attribute. Can be overridden in child. Copied this validator
      * from the customer importer.
      *
-     * @param string $attrCode Attribute code
-     * @param array $attrParams Attribute params
-     * @param array $rowData Row data
-     * @param int $rowNum
+     * @param  string  $attrCode   Attribute code
+     * @param  array   $attrParams Attribute params
+     * @param  array   $rowData    Row data
+     * @param  int     $rowNum
      * @return boolean
      */
     public function isAttributeValid($attrCode, array $attrParams, array $rowData, $rowNum)
@@ -885,7 +905,7 @@ class Danslo_ApiImport_Model_Import_Entity_Category
                 break;
             case 'decimal':
                 $val   = trim($rowData[$attrCode]);
-                $valid = (float)$val == $val;
+                $valid = (float) $val == $val;
                 $message = 'Decimal value expected.';
                 break;
             case 'select':
@@ -895,7 +915,7 @@ class Danslo_ApiImport_Model_Import_Entity_Category
                 break;
             case 'int':
                 $val   = trim($rowData[$attrCode]);
-                $valid = (int)$val == $val;
+                $valid = (int) $val == $val;
                 $message = 'Integer value expected.';
                 break;
             case 'datetime':
@@ -919,10 +939,12 @@ class Danslo_ApiImport_Model_Import_Entity_Category
         } elseif (!empty($attrParams['is_unique'])) {
             if (isset($this->_uniqueAttributes[$attrCode][$rowData[$attrCode]])) {
                 $this->addRowError(Mage::helper('importexport')->__("Duplicate Unique Attribute for '%s'"), $rowNum, $attrCode);
+
                 return false;
             }
             $this->_uniqueAttributes[$attrCode][$rowData[$attrCode]] = true;
         }
+
         return (bool) $valid;
     }
 

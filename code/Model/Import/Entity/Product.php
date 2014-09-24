@@ -71,6 +71,7 @@ class Danslo_ApiImport_Model_Import_Entity_Product
             }
             $this->_dataSourceModel->setEntities($entities);
         }
+
         return $this;
     }
 
@@ -89,12 +90,13 @@ class Danslo_ApiImport_Model_Import_Entity_Product
      *
      * Overcome the hardcoded $this->_fileUploader in parent::_getUploader()
      *
-     * @param Mage_ImportExport_Model_Import_Uploader $uploader
+     * @param  Mage_ImportExport_Model_Import_Uploader      $uploader
      * @return Danslo_ApiImport_Model_Import_Entity_Product
      */
     public function setUploader(Mage_ImportExport_Model_Import_Uploader $uploader)
     {
         $this->_fileUploader = $uploader;
+
         return $this;
     }
 
@@ -158,6 +160,7 @@ class Danslo_ApiImport_Model_Import_Entity_Product
             'entity_model' => $this,
             'entities'     => $this->_newSku
         ));
+
         return $result;
     }
 
@@ -170,7 +173,7 @@ class Danslo_ApiImport_Model_Import_Entity_Product
     protected function _getStockItemData()
     {
         // Grab stock items for newSku.
-        $productIds = array_map(function($e) { return $e['entity_id']; }, $this->_newSku);
+        $productIds = array_map(function ($e) { return $e['entity_id']; }, $this->_newSku);
         $stockItemCollection = Mage::getModel('cataloginventory/stock_item')
             ->getCollection()
             ->addFieldToFilter('product_id', array('in' => $productIds));
@@ -180,6 +183,7 @@ class Danslo_ApiImport_Model_Import_Entity_Product
         foreach ($stockItemCollection as $stockItem) {
             $stockItemData[$stockItem['product_id']] = $stockItem;
         }
+
         return $stockItemData;
     }
 
@@ -282,6 +286,7 @@ class Danslo_ApiImport_Model_Import_Entity_Product
                 $this->_connection->insertOnDuplicate($entityTable, $stockData);
             }
         }
+
         return $this;
     }
 
