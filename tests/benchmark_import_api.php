@@ -62,8 +62,15 @@ $entityTypes = array(
         ),
         'behavior' => 'append'
     ),
-    'attributeSet' => array(
+    'attributeSets' => array(
         'entity' => 'attributeSets',
+        'types'  => array(
+            'standard'
+        ),
+        'behavior' => 'append'
+    ),
+    'attributes' => array(
+        'entity' => 'attributes',
         'types'  => array(
             'standard'
         ),
@@ -106,33 +113,39 @@ foreach ($entityTypes as $typeName => $entityType) {
                 $data = array_chunk($entities, NUM_ROWS_BY_CALL);
             }
 
-            if ('attributeSets' !== $entityType['entity']) {
-                try {
-                    foreach ($data as $bulk) {
-                        $client->call($session, 'import.importEntities', array($bulk, $entityType['entity'], $entityType['behavior']));
-                    }
-                } catch (Exception $e) {
-                    printf('Import failed: ' . PHP_EOL, $e->getMessage());
-                    var_dump($e);
-                    exit;
-                }
-            } else if ('attributeSets' === $entityType['entity']) {
-                try {
-                    foreach ($data as $bulk) {
-                        $client->call($session, 'import.importAttributeSets', array($bulk, $entityType['behavior']));
-                    }
-                } catch (Exception $e) {
-                    printf('Import failed: ' . PHP_EOL, $e->getMessage());
-                    var_dump($e);
-                    exit;
-                }
-            }
+           if ('attributeSets' === $entityType['entity']
+               || 'attributes' === $entityType['entity']
+           ) {
+               try {
+                   foreach ($data as $bulk) {
+                       $client->call($session, 'import.import' . ucfirst($entityType['entity']), array($bulk, $entityType['behavior']));
+                   }
+               } catch (Exception $e) {
+                   printf('Import failed: ' . PHP_EOL, $e->getMessage());
+                   var_dump($e);
+                   exit;
+               }
+           } else {
+               try {
+                   foreach ($data as $bulk) {
+                       $client->call($session, 'import.importEntities', array($bulk, $entityType['entity'], $entityType['behavior']));
+                   }
+               } catch (Exception $e) {
+                   printf('Import failed: ' . PHP_EOL, $e->getMessage());
+                   var_dump($e);
+                   exit;
+               }
+           }
         } else {
-            if ('attributeSets' !== $entityType['entity']) {
-                Mage::getModel('api_import/import_api')->importEntities($entities, $entityType['entity'], $entityType['behavior']);
-            } else if ('attributeSets' === $entityType['entity']) {
+            if ('attributeSets' === $entityType['entity']
+                || 'attributes' === $entityType['entity']
+            ) {
+                $method = 'import' . ucfirst($entityType['entity']);
                 // For debugging purposes only.
-                Mage::getModel('api_import/import_api')->importAttributeSets($entities, $entityType['behavior']);
+                Mage::getModel('api_import/import_api')->$method($entities, $entityType['behavior']);
+
+            } else if ('attributeSets' !== $entityType['entity']) {
+                Mage::getModel('api_import/import_api')->importEntities($entities, $entityType['entity'], $entityType['behavior']);
             }
         }
         printf('Done! Magento reports %d %s.' . PHP_EOL, count($entities), 'rows');
