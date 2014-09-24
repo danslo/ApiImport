@@ -131,7 +131,7 @@ class Danslo_ApiImport_Helper_Test
      * @param int $numProducts
      * @return array
      */
-    public function generateRandomStandardAttributeSet($numProducts)
+    public function generateRandomStandardAttributeSets($numProducts)
     {
         $attributeSets = array();
 
@@ -147,6 +147,43 @@ class Danslo_ApiImport_Helper_Test
         }
 
         return $attributeSets;
+    }
+
+    /**
+     * Generates random standard attribute
+     *
+     * @param int $numProducts
+     * @return array
+     */
+    public function generateRandomStandardAttributes($numProducts)
+    {
+        $attributes = array();
+        $types = array('text', 'textarea');
+        $type = array_rand($types, 1);
+
+        for ($i = 1; $i <= $numProducts; $i++) {
+            $attributes[$i] = array(
+                'attribute_code'     => 'attr_test_' . $i,
+                'type' => $type,
+                'default_value_' . $type => 'Default value for attribute test ' . $i,
+                'label' => 'My Attribute test ' . $i,
+                'input' => 'text',
+                'user_defined' => true,
+                'is_user_defined' => true,
+                'required' => false,
+                'global' => 1,
+                'visible' => true,
+                'visible_on_front' => true,
+                'searchable' => true,
+                'filterable' => true,
+                'is_filterable_in_search' => false,
+                'used_for_sort_by' => true,
+                'used_in_product_listing' => true,
+                'comparable' => true,
+            );
+        }
+
+        return $attributes;
     }
 
     /**

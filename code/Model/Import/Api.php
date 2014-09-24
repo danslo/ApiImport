@@ -63,14 +63,51 @@ class Danslo_ApiImport_Model_Import_Api
     }
 
     /**
-     * @param $data
+     * Import attributes and put them in attribute sets and attribute group
+     *
+     * @param array  $data
+     * @param string $behavior
+     *
+     * @return true
      */
-    public function importAttributes($data)
+    public function importAttributes(array $data, $behavior = null)
     {
+        if (null === $behavior) {
+            $behavior = Mage_ImportExport_Model_Import::BEHAVIOR_APPEND;
+        }
 
+        $setup = new Mage_Catalog_Model_Resource_Eav_Mysql4_Setup('catalog_product_attribute_set');
+        $entityTypeId = 'catalog_product';
+
+        foreach ($data as $attribute) {
+
+            if (isset($attribute['attribute_code'])) {
+
+                $attributeCode = $attribute['attribute_code'];
+                unset($attribute['attribute_code']);
+
+                if (Mage_ImportExport_Model_Import::BEHAVIOR_REPLACE === $behavior
+                    || Mage_ImportExport_Model_Import::BEHAVIOR_APPEND === $behavior
+                ) {
+                    $setup->addAttribute($entityTypeId, $attributeCode, $attribute);
+                } else if (Mage_ImportExport_Model_Import::BEHAVIOR_DELETE === $behavior) {
+                    $setup->removeAttribute($entityTypeId, $attributeCode);
+                }
+            }
+        }
+
+        return true;
     }
 
-    public function importAttributeSets($data, $behavior = null)
+    /**
+     * Compute attributes sets and their groups and import them
+     *
+     * @param array  $data
+     * @param string $behavior
+     *
+     * @return true
+     */
+    public function importAttributeSets(array $data, $behavior = null)
     {
         if (null === $behavior) {
             $behavior = Mage_ImportExport_Model_Import::BEHAVIOR_APPEND;
@@ -132,21 +169,6 @@ class Danslo_ApiImport_Model_Import_Api
                     $setup->addAttributeGroup($entityTypeId, $attrSetId, $groupName, $groupSortOrder);
                 }
             }
-        }
-
-        return true;
-    }
-
-    public function importAttributeGroups($data)
-    {
-        $setup = new Mage_Catalog_Model_Resource_Eav_Mysql4_Setup('catalog_product_attribute_set');
-
-        foreach ($data as $group) {
-            $attrSetName   = $group['attribute set'];
-            $attrGroupName = $group['name'];
-
-            $attrSetId = $setup->getAttributeSet('catalog_product', $attrSetName, 'attribute_set_id');
-            $setup->addAttributeGroup('catalog_product', $attrSetId, $attrGroupName);
         }
 
         return true;
