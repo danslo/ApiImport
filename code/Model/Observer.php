@@ -21,7 +21,7 @@ class Danslo_ApiImport_Model_Observer
     /**
      * Indexes product stock.
      *
-     * @param  Mage_Index_Model_Event                             $event
+     * @param Mage_Index_Model_Event $event
      * @return Mage_CatalogInventory_Model_Resource_Indexer_Stock
      */
     protected function _indexStock(&$event)
@@ -32,7 +32,7 @@ class Danslo_ApiImport_Model_Observer
     /**
      * Indexes product price.
      *
-     * @param  Mage_Index_Model_Event                            $event
+     * @param Mage_Index_Model_Event $event
      * @return Mage_Catalog_Model_Resource_Product_Indexer_Price
      */
     protected function _indexPrice(&$event)
@@ -43,7 +43,7 @@ class Danslo_ApiImport_Model_Observer
     /**
      * Indexes product category relation.
      *
-     * @param  Mage_Index_Model_Event                               $event
+     * @param Mage_Index_Model_Event $event
      * @return Mage_Catalog_Model_Resource_Category_Indexer_Product
      */
     protected function _indexCategoryRelation(&$event)
@@ -54,7 +54,7 @@ class Danslo_ApiImport_Model_Observer
     /**
      * Indexes product EAV attributes.
      *
-     * @param  Mage_Index_Model_Event                          $event
+     * @param Mage_Index_Model_Event $event
      * @return Mage_Catalog_Model_Resource_Product_Indexer_Eav
      */
     protected function _indexEav(&$event)
@@ -65,7 +65,7 @@ class Danslo_ApiImport_Model_Observer
     /**
      * Indexes product search.
      *
-     * @param  array                                      $productIds
+     * @param array $productIds
      * @return Mage_CatalogSearch_Model_Resource_Fulltext
      */
     protected function _indexSearch(&$productIds)
@@ -76,7 +76,7 @@ class Danslo_ApiImport_Model_Observer
     /**
      * Indexes product URL rewrites.
      *
-     * @param  array                           $productIds
+     * @param array $productIds
      * @return Danslo_ApiImport_Model_Observer
      */
     protected function _indexProductRewrites(&$productIds)
@@ -86,14 +86,13 @@ class Danslo_ApiImport_Model_Observer
         if ($indexer) {
             return $indexer->updateProductRewrites($productIds);
         }
-
         return $this;
     }
 
     /**
      * Indexes category URL rewrites.
      *
-     * @param  array                           $categoryIds
+     * @param array $categoryIds
      * @return Danslo_ApiImport_Model_Observer
      */
     protected function _indexCategoryRewrites(&$categoryIds)
@@ -103,14 +102,13 @@ class Danslo_ApiImport_Model_Observer
         if ($indexer) {
             return $indexer->updateCategoryRewrites($categoryIds);
         }
-
         return $this;
     }
 
     /**
      * Generates an index event based on imported entity IDs.
      *
-     * @param  array                  $entityIds
+     * @param array $entityIds
      * @return Mage_Index_Model_Event
      */
     protected function _getIndexEvent(&$entityIds)
@@ -123,7 +121,6 @@ class Danslo_ApiImport_Model_Observer
             'product_ids'               => &$entityIds, // for category_indexer_product
             'reindex_eav_product_ids'   => &$entityIds  // for product_indexer_eav
         ));
-
         return $event;
     }
 
@@ -145,7 +142,7 @@ class Danslo_ApiImport_Model_Observer
     /**
      * Partial category index after import.
      *
-     * @param  Varien_Event_Observer $observer
+     * @param Varien_Event_Observer $observer
      * @return boolean
      */
     public function indexCategories($observer)
@@ -170,17 +167,15 @@ class Danslo_ApiImport_Model_Observer
             }
         } catch (Exception $e) {
             Mage::logException($e);
-
             return false;
         }
-
         return true;
     }
 
     /**
      * Partial product index after import.
      *
-     * @param  Varien_Event_Observer $observer
+     * @param Varien_Event_Observer $observer
      * @return boolean
      */
     public function indexProducts($observer)
@@ -217,10 +212,8 @@ class Danslo_ApiImport_Model_Observer
             }
         } catch (Exception $e) {
             Mage::logException($e);
-
             return false;
         }
-
         return true;
     }
 
@@ -249,7 +242,7 @@ class Danslo_ApiImport_Model_Observer
             }
         }
 
-        foreach ($entities as $key => $entity) {
+        foreach($entities as $key => $entity) {
             foreach ($mediaAttr as $attr) {
                 if ($this->_isImageToImport($entity, $attr)) {
                     try {
