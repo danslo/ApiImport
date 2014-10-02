@@ -88,7 +88,7 @@ class Danslo_ApiImport_Model_Import_Api
         $this->_init();
 
         if (Danslo_ApiImport_Model_Import::BEHAVIOR_DELETE_IF_NOT_EXIST === $behavior) {
-            $this->_removeAttributesIfNotExist($data);
+            $this->_pruneAttributes($data);
         } else {
 
             foreach ($data as $attribute) {
@@ -133,9 +133,9 @@ class Danslo_ApiImport_Model_Import_Api
         } elseif (Mage_ImportExport_Model_Import::BEHAVIOR_REPLACE === $behavior
             || Mage_ImportExport_Model_Import::BEHAVIOR_APPEND === $behavior
         ) {
-            $this->_updateAttributeSetsAndGroups($data);
+            $this->_updateAttributeSets($data);
         } elseif (Danslo_ApiImport_Model_Import::BEHAVIOR_DELETE_IF_NOT_EXIST === $behavior) {
-            $this->_removeAttributeSetsAndGroupsIfNotExist($data);
+            $this->_pruneAttributeSets($data);
         }
 
         return true;
@@ -164,7 +164,7 @@ class Danslo_ApiImport_Model_Import_Api
         ) {
             $this->_updateAttributeAssociations($data);
         } elseif (Danslo_ApiImport_Model_Import::BEHAVIOR_DELETE_IF_NOT_EXIST === $behavior) {
-            $this->_deleteAssociationsIfNotExist($data);
+            $this->_pruneAttributesFromAttributeSets($data);
         }
 
         return true;
@@ -174,8 +174,6 @@ class Danslo_ApiImport_Model_Import_Api
      * Initialize parameters
      *
      * @return void
-     *
-     * @throws Mage_Core_Exception
      */
     protected function _init()
     {
@@ -189,8 +187,6 @@ class Danslo_ApiImport_Model_Import_Api
      * @param array $data
      *
      * @return void
-     *
-     * @throws Mage_Core_Exception
      */
     protected function _removeAttributeFromGroup(array $data)
     {
@@ -224,7 +220,7 @@ class Danslo_ApiImport_Model_Import_Api
      *
      * @return void
      */
-    protected function _removeAttributesIfNotExist(array $data)
+    protected function _pruneAttributes(array $data)
     {
         $select = $this->_setup->getConnection()
             ->select()
@@ -254,10 +250,8 @@ class Danslo_ApiImport_Model_Import_Api
      * @param array $data
      *
      * @return array
-     *
-     * @throws Mage_Core_Exception
      */
-    protected function _deleteAssociationsIfNotExist(array $data)
+    protected function _pruneAttributesFromAttributeSets(array $data)
     {
         $entityTypeId = $this->_catalogProductEntityTypeId;
         $query = $this->_setup->getConnection()
@@ -348,7 +342,7 @@ class Danslo_ApiImport_Model_Import_Api
      *
      * @return void
      */
-    protected function _updateAttributeSetsAndGroups(array $data)
+    protected function _updateAttributeSets(array $data)
     {
         $entityTypeId = $this->_catalogProductEntityTypeId;
         foreach ($data as $attributeSet) {
@@ -362,7 +356,7 @@ class Danslo_ApiImport_Model_Import_Api
 
             $attrSetId = $this->_setup->getAttributeSet($entityTypeId, $attrSetName, 'attribute_set_id');
 
-            $currentGroups = $this->_getMagentoAttributeGroups($attrSetId);
+            $currentGroups = $this->_getAttributeGroups($attrSetId);
 
             $groupsToRemove = array_keys(array_diff_key($currentGroups, $attributeGroups));
             foreach ($groupsToRemove as $groupToRemoveName) {
@@ -382,10 +376,10 @@ class Danslo_ApiImport_Model_Import_Api
      *
      * @return void
      */
-    protected function _removeAttributeSetsAndGroupsIfNotExist(array $data)
+    protected function _pruneAttributeSets(array $data)
     {
         $entityTypeId         = $this->_catalogProductEntityTypeId;
-        $magAttributeSetsName = $this->_getMagentoAttributeSetsNameAsArray();
+        $magAttributeSetsName = $this->_getAttributeSetsNameAsArray();
         $attributeSetsName    = [];
 
         foreach ($data as $attributeSet) {
@@ -405,7 +399,7 @@ class Danslo_ApiImport_Model_Import_Api
 
             $attrSetId = $this->_setup->getAttributeSet($entityTypeId, $attrSetName, 'attribute_set_id');
 
-            $currentGroups = $this->_getMagentoAttributeGroups($attrSetId);
+            $currentGroups = $this->_getAttributeGroups($attrSetId);
 
             $groupsToRemove = array_keys(array_diff_key($currentGroups, $attributeGroups));
             foreach ($groupsToRemove as $groupToRemoveName) {
@@ -415,12 +409,12 @@ class Danslo_ApiImport_Model_Import_Api
     }
 
     /**
-     * Gives current Magento attribute sets name as array
+     * Gives current attribute sets name as array
      * Returns ['name', ...]
      *
      * @return array
      */
-    protected function _getMagentoAttributeSetsNameAsArray()
+    protected function _getAttributeSetsNameAsArray()
     {
         $attributeSetCollection = Mage::getModel('eav/entity_attribute_set')
             ->getCollection()
@@ -436,14 +430,14 @@ class Danslo_ApiImport_Model_Import_Api
     }
 
     /**
-     * Gives Magento attribute groups which come from the given attribute set
+     * Gives attribute groups which come from the given attribute set
      * Returns ['attribute group name' => 'sort order', ...]
      *
      * @param $attrSetId
      *
      * @return array
      */
-    protected function _getMagentoAttributeGroups($attrSetId)
+    protected function _getAttributeGroups($attrSetId)
     {
         $connexion = $this->_setup->getConnection();
         $getOldGroupsQuery = $connexion
