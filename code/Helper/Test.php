@@ -118,14 +118,13 @@ class Danslo_ApiImport_Helper_Test
             }
             Mage::getModel('api_import/import_api')->importEntities($this->_linkedProducts);
         }
-
         return $this->_linkedProducts;
     }
 
     /**
      * Generates random simple products.
      *
-     * @param  int   $numProducts
+     * @param int $numProducts
      * @return array
      */
     public function generateRandomSimpleProduct($numProducts)
@@ -244,7 +243,7 @@ class Danslo_ApiImport_Helper_Test
     /**
      * Generates random simple products with image.
      *
-     * @param  int   $numProducts
+     * @param int $numProducts
      * @return array
      */
     public function generateRandomImageProduct($numProducts)
@@ -275,7 +274,7 @@ class Danslo_ApiImport_Helper_Test
     /**
      * Generates random localizable simple products.
      *
-     * @param  int   $numProducts
+     * @param int $numProducts
      * @return array
      */
     public function generateRandomLocalizableProduct($numProducts)
@@ -290,12 +289,12 @@ class Danslo_ApiImport_Helper_Test
                     $products[$j++] = array_merge(
                         $this->_defaultProductAttributes,
                         array(
-                            'sku'   => 'some_sku_' . $i,
-                            '_type' => Mage_Catalog_Model_Product_Type::TYPE_SIMPLE,
-                            'name'  => 'Some product ( ' . $i . ' ) - ' . $locale,
-                            'price' => rand(1, 1000),
-                            'weight'=> rand(1, 1000),
-                            'qty'   => rand(1, 30)
+                            'sku'              => 'some_sku_' . $i,
+                            '_type'            => Mage_Catalog_Model_Product_Type::TYPE_SIMPLE,
+                            'name'             => 'Some product ( ' . $i . ' ) - ' . $locale,
+                            'price'            => rand(1, 1000),
+                            'weight'           => rand(1, 1000),
+                            'qty'              => rand(1, 30)
                         )
                     );
                 } else {
@@ -315,7 +314,7 @@ class Danslo_ApiImport_Helper_Test
     /**
      * Generates random configurable products.
      *
-     * @param  int   $numProducts
+     * @param int $numProducts
      * @return array
      */
     public function generateRandomConfigurableProduct($numProducts)
@@ -355,7 +354,7 @@ class Danslo_ApiImport_Helper_Test
     /**
      * Generates random bundle products.
      *
-     * @param  int   $numProducts
+     * @param int $numProducts
      * @return array
      */
     public function generateRandomBundleProduct($numProducts)
@@ -401,7 +400,7 @@ class Danslo_ApiImport_Helper_Test
     /**
      * Generates random grouped products.
      *
-     * @param  int   $numProducts
+     * @param int $numProducts
      * @return array
      */
     public function generateRandomGroupedProduct($numProducts)
@@ -439,7 +438,7 @@ class Danslo_ApiImport_Helper_Test
     /**
      * Generates random customers.
      *
-     * @param  int   $numCustomers
+     * @param int $numCustomers
      * @return array
      */
     public function generateRandomStandardCustomer($numCustomers)
@@ -463,7 +462,7 @@ class Danslo_ApiImport_Helper_Test
     /**
      * Generates random categories.
      *
-     * @param  int   $numCategories
+     * @param int $numCategories
      * @return array
      */
     public function generateRandomStandardCategory($numCategories)
@@ -474,13 +473,14 @@ class Danslo_ApiImport_Helper_Test
             $categories[$i - 1] = array_merge(
                 $this->_defaultCategoryAttributes,
                 array(
-                    'name'      => sprintf('Test Category %d', $i),
-                    '_category' => sprintf('Test Category %d', $i),
-                    'url_key'   => sprintf('test%d', $i),
+                    'name'          => sprintf('Test Category %d', $i),
+                    '_category'     => sprintf('Test Category %d', $i),
+                    'url_key'       => sprintf('test%d', $i),
                 )
             );
         }
 
         return $categories;
     }
+
 }

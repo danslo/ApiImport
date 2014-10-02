@@ -91,7 +91,6 @@ class Danslo_ApiImport_Model_Import
         foreach ($this->getErrors() as $errorCode => $rows) {
             $this->addLogComment($errorCode . ' ' . Mage::helper('importexport')->__('in rows') . ': ' . implode(', ', $rows));
         }
-
         return $result;
     }
 
@@ -131,7 +130,6 @@ class Danslo_ApiImport_Model_Import
             }
             $this->_entityAdapter->setParameters($this->getData());
         }
-
         return $this->_entityAdapter;
     }
 
@@ -140,7 +138,7 @@ class Danslo_ApiImport_Model_Import
      * This class is present in Enterprise, but has never existed in community.
      * The only changes are that we use a different LOG_DIRECTORY constant and remove some unused filename parts.
      *
-     * @param  mixed                            $debugData
+     * @param mixed $debugData
      * @return Mage_ImportExport_Model_Abstract
      */
     public function addLogComment($debugData)
@@ -173,7 +171,6 @@ class Danslo_ApiImport_Model_Import
                 ->setFilterDataKeys($this->_debugReplacePrivateDataKeys);
         }
         $this->_logInstance->log($debugData);
-
         return $this;
     }
 

@@ -55,13 +55,12 @@ class Danslo_ApiImport_Model_Import_Entity_Customer
             'entities'      => $this->_newCustomers,
             'entity_model'  => $this
         ));
-
         return $result;
     }
-
+    
     /**
      * Get old customers.
-     *
+     * 
      * @return array
      */
     public function getOldCustomers()

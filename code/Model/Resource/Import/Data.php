@@ -68,7 +68,6 @@ class Danslo_ApiImport_Model_Resource_Import_Data
             }
             $this->_iterator = new ArrayIterator($this->_bunches);
         }
-
         return $this->_iterator;
     }
 
@@ -96,7 +95,7 @@ class Danslo_ApiImport_Model_Resource_Import_Data
     /**
      * Stores entities and resets iterator.
      *
-     * @param  array                                        $entities
+     * @param array $entities
      * @return \Danslo_ApiImport_Model_Resource_Import_Data
      */
     public function setEntities($entities)
@@ -105,7 +104,6 @@ class Danslo_ApiImport_Model_Resource_Import_Data
             $this->_entities = $entities;
             $this->_iterator = null;
         }
-
         return $this;
     }
 
@@ -129,7 +127,6 @@ class Danslo_ApiImport_Model_Resource_Import_Data
         if ($this->_entityTypeCode === null) {
             Mage::throwException('Import resource model was not provided any entity type.');
         }
-
         return $this->_entityTypeCode;
     }
 
@@ -143,14 +140,13 @@ class Danslo_ApiImport_Model_Resource_Import_Data
         if ($this->_behavior === null) {
             Mage::throwException('Import resource model was not provided any import behavior.');
         }
-
         return $this->_behavior;
     }
 
     /**
      * Validates and sets the import behavior.
      *
-     * @param  string                                      $behavior
+     * @param string $behavior
      * @return Danslo_ApiImport_Model_Resource_Import_Data
      */
     public function setBehavior($behavior)
@@ -165,14 +161,13 @@ class Danslo_ApiImport_Model_Resource_Import_Data
             Mage::throwException('Specified import behavior (%s) is not in allowed behaviors: %s', $behavior, implode(', ', $allowedBehaviors));
         }
         $this->_behavior = $behavior;
-
         return $this;
     }
 
     /**
      * Valdiates and sets the entity type.
      *
-     * @param  string                                      $entityTypeCode
+     * @param string $entityTypeCode
      * @return Danslo_ApiImport_Model_Resource_Import_Data
      */
     public function setEntityTypeCode($entityTypeCode)
@@ -182,7 +177,6 @@ class Danslo_ApiImport_Model_Resource_Import_Data
             Mage::throwException('Specified entity type (%s) is not in allowed entity types: %s', $entityTypeCode, implode(', ', $allowedEntities));
         }
         $this->_entityTypeCode = $entityTypeCode;
-
         return $this;
     }
 
@@ -204,7 +198,6 @@ class Danslo_ApiImport_Model_Resource_Import_Data
             $this->_iterator = null;
             $dataRow = null;
         }
-
         return $dataRow;
     }
 
