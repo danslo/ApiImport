@@ -3,9 +3,11 @@
 1. The glaringly obvious one: being able to do imports programmatically rather than manually uploading a CSV file.
 2. Importing bundled products.
 3. Importing categories.
-4. Reindex products after they are imported.
-5. Automatic creation of dropdown attribute values.
-6. Useful events for enriching your entities from other Magento modules.
+4. Importing attributes, attribute sets and attribute groups.
+5. Associate attribute(s) with an attribute group in one or more attribute sets you specify.
+6. Reindex products after they are imported.
+7. Automatic creation of dropdown attribute values.
+8. Useful events for enriching your entities from other Magento modules.
 
 Additionally, ApiImport is 100% free from rewrites - making it upgrade-proof and reliable.
 
@@ -57,6 +59,9 @@ $session = $client->call('login', array($yourApiUser, $yourApiKey));
  * Do your import.
  */
 $client->call('call', array($session, 'import.importEntities', array($anArrayWithYourEntities, $entityType, $optionalImportBehavior)));
+$client->call('call', array($session, 'import.importAttributeSets', array($anArrayWithYourEntities, $optionalImportBehavior)));
+$client->call('call', array($session, 'import.importAttributes', array($anArrayWithYourEntities, $optionalImportBehavior)));
+$client->call('call', array($session, 'import.importAttributeAssociations', array($anArrayWithYourEntities, $optionalImportBehavior)));
 
 /*
  * Clean up.
@@ -74,6 +79,8 @@ The ``Danslo_ApiImport_Helper_Test`` class provides several examples on how to p
 
 Another useful trick to figure out what to give to ApiImport is to simply use Magento to generate an exported CSV file of some sample entities.
 
+For attributes, attribute sets and associate attributes to attribute groups in an attribute set, you can have a look to test.php, where you can find some example data. It's not the same than CSV because there is no way to import it with CSV in Magento.
+
 ### Entity types
 
 The second parameter to importEntities specifies what kind of entity is imported. By default it will assume you are importing products. If you want to import a different kind of entity, use the return value of any of these methods:
@@ -90,6 +97,7 @@ Magento will choose a replace behavior by default. If you would like to use anot
 2. ``Mage_ImportExport_Model_Import::BEHAVIOR_REPLACE`` - Simply replaces the data in Magento with whatever you have in the entity array. Any data you do not specify in your array will not be deleted!
 3. ``Mage_ImportExport_Model_Import::BEHAVIOR_DELETE`` - Deletes every product you have specified. You probably don't want to use this.
 4. ``Danslo_ApiImport_Model_Import::BEHAVIOR_STOCK`` - Magento normally requires ``sku``, ``_type``, ``_attribute_set``. This is not useful when you simply want to update stock of existing entities. With this behavior you can simply specify ``sku`` and ``qty``!
+5. ``Danslo_ApiImport_Model_Import::BEHAVIOR_DELETE_IF_NOT_EXIST`` - Works with attributes, attribute sets and attribute associations import. Any data you do not specify in your array will be deleted! Send your array, data that there are in Magento and not in your array are deleted.
 
 ## Example for updating stock 
 
