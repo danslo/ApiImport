@@ -218,6 +218,18 @@ class Danslo_ApiImport_Model_Observer
     }
 
     /**
+     * Creates the media import folder.
+     *
+     * @return Danslo_ApiImport_Model_Observer
+     */
+    protected function _createMediaImportFolder()
+    {
+        $ioAdapter = new Varien_Io_File();
+        $ioAdapter->checkAndCreateFolder(Mage::getConfig()->getOptions()->getMediaDir() . '/import');
+        return $this;
+    }
+
+    /**
      * Import images before products
      *
      * @param Varien_Event_Observer $observer
@@ -226,9 +238,11 @@ class Danslo_ApiImport_Model_Observer
      */
     public function importMedia($observer)
     {
+        $this->_createMediaImportFolder();
+
         $ioAdapter        = new Varien_Io_File();
-        $entities         = $observer->getData('data_source_model')->getEntities();
-        $uploader         = $observer->getData('uploader');
+        $entities         = $observer->getDataSourceModel()->getEntities();
+        $uploader         = $observer->getUploader();
         $tmpImportFolder  = $uploader->getTmpDir();
         $attributes       = Mage::getResourceModel('catalog/product_attribute_collection')->getItems();
         $mediaAttr        = array();
@@ -257,7 +271,7 @@ class Danslo_ApiImport_Model_Observer
                 }
             }
         }
-        $observer->getData('data_source_model')->setEntities($entities);
+        $observer->getDataSourceModel()->setEntities($entities);
 
         return true;
     }
