@@ -78,6 +78,29 @@ class Danslo_ApiImport_Helper_Test
     );
 
     /**
+     * Some attribute types used for attributes creation
+     *
+     * @var array
+     */
+    protected $_attributeTypes = array(
+        'text',
+        'textarea'
+    );
+
+    /**
+     * Some attribute groups used for attributes and attribute sets creation
+     *
+     * @var array
+     */
+    protected $_attributeGroups = array(
+        'General',
+        'Prices',
+        'Marketing',
+        'Color',
+        'Size'
+    );
+
+    /**
      * Creates and stores 3 simple products with different values for the color attribute.
      * These products are used for configurable, bundle and grouped product generation.
      *
@@ -123,6 +146,98 @@ class Danslo_ApiImport_Helper_Test
         }
 
         return $products;
+    }
+
+    /**
+     * Generates random standard attribute sets.
+     *
+     * @param  int   $numProducts
+     * @return array
+     */
+    public function generateRandomStandardAttributeSets($numProducts)
+    {
+        $attributeSets = array();
+
+        for ($i = 1; $i <= $numProducts; $i++) {
+            $attributeSets[$i] = array(
+                'attribute_set_name'       => 'set ' . $i,
+                'sortOrder'                => $i,
+                $this->_attributeGroups[0] => 1,
+                $this->_attributeGroups[1] => 2,
+                $this->_attributeGroups[2] => 3,
+                $this->_attributeGroups[3] => 4,
+                $this->_attributeGroups[4] => 5
+            );
+        }
+
+        return $attributeSets;
+    }
+
+    /**
+     * Generates random standard attribute
+     *
+     * @param  int   $numProducts
+     * @return array
+     */
+    public function generateRandomStandardAttributes($numProducts)
+    {
+        $attributes = array();
+
+        for ($i = 1; $i <= $numProducts; $i++) {
+            $type  = $this->_attributeTypes[array_rand($this->_attributeTypes)];
+
+            $attributes[$i] = array(
+                'attribute_id'            => 'attr_test_' . $i,
+                'type'                    => $type,
+                'default'                 => 'Default value of the DOOM for attribute test ' . $i,
+                'label'                   => 'My Attribute test ' . $i,
+                'input'                   => 'text',
+                'user_defined'            => true,
+                'is_user_defined'         => true,
+                'required'                => false,
+                'global'                  => 1,
+                'visible'                 => true,
+                'visible_on_front'        => true,
+                'searchable'              => true,
+                'filterable'              => true,
+                'is_filterable_in_search' => false,
+                'used_for_sort_by'        => true,
+                'used_in_product_listing' => true,
+                'comparable'              => true
+            );
+        }
+
+        return $attributes;
+    }
+
+    /**
+     * Generates random attribute association
+     *
+     * @param  int   $numProducts
+     * @return array
+     */
+    public function generateRandomStandardAttributeAssociations($numAssoc, $numAttrPerSet = 2)
+    {
+        $attributes = array();
+        $numSets = floor($numAssoc / $numAttrPerSet);
+
+        $it = 1;
+        for ($i = 1; $i <= $numSets; $i++) {
+            for ($j = 1; $j <= $numAttrPerSet; $j++) {
+                $group = $this->_attributeGroups[array_rand($this->_attributeGroups)];
+
+                $attributes[$it] = array (
+                    'attribute_id'       => 'attr_test_' . rand(1, $numAssoc),
+                    'attribute_set_id'   => 'set ' . $i,
+                    'attribute_group_id' => $group,
+                    'sort_order'         => rand(0, $numAttrPerSet)
+                );
+
+                $it++;
+            }
+        }
+
+        return $attributes;
     }
 
     /**
