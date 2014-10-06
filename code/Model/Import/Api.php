@@ -261,7 +261,7 @@ class Danslo_ApiImport_Model_Import_Api
             ->where('entity_type_id = :entity_type_id');
         $bind = array('entity_type_id' => $this->_catalogProductEntityTypeId);
 
-        $givenAssociations = [];
+        $givenAssociations = array();
         foreach ($data as $attribute) {
             $setId = $this->_setup->getAttributeSetId($entityTypeId, $attribute['attribute_set_id']);
             $givenAssociations[] = array(
@@ -276,7 +276,7 @@ class Danslo_ApiImport_Model_Import_Api
 
         }
 
-        $deletedRows = [];
+        $deletedRows = array();
         foreach ($this->_setup->getConnection()->fetchAssoc($query, $bind) as $magAssociation) {
 
             $rowFound = false;
@@ -381,7 +381,7 @@ class Danslo_ApiImport_Model_Import_Api
     {
         $entityTypeId         = $this->_catalogProductEntityTypeId;
         $magAttributeSetsName = $this->_getAttributeSetsNameAsArray();
-        $attributeSetsName    = [];
+        $attributeSetsName    = array();
 
         foreach ($data as $attributeSet) {
             $attributeSetsName[] = $attributeSet['attribute_set_name'];
@@ -421,7 +421,7 @@ class Danslo_ApiImport_Model_Import_Api
             ->getCollection()
             ->setEntityTypeFilter($this->_catalogProductEntityTypeId);
 
-        $attributeSetsName = [];
+        $attributeSetsName = array();
         foreach ($attributeSetCollection as $attrSet) {
             $attrSetAsArray      = $attrSet->getData();
             $attributeSetsName[] = $attrSetAsArray['attribute_set_name'];
@@ -448,7 +448,7 @@ class Danslo_ApiImport_Model_Import_Api
 
         $bind = array('attribute_set_id' => $attrSetId);
 
-        $currentGroups = [];
+        $currentGroups = array();
         foreach ($connexion->fetchAssoc($getOldGroupsQuery, $bind) as $attrGroup) {
             $currentGroups[$attrGroup['attribute_group_name']] = $attrGroup['sort_order'];
         }
