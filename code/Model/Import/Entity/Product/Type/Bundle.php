@@ -63,7 +63,7 @@ class Danslo_ApiImport_Model_Import_Entity_Product_Type_Bundle
     );
 
     /**
-     * Adds bundle price type to internet attributes.
+     * Adds bundle price type to internal attributes.
      *
      * @return Danslo_ApiImport_Model_Import_Entity_Product_Type_Bundle
      */
@@ -73,7 +73,7 @@ class Danslo_ApiImport_Model_Import_Entity_Product_Type_Bundle
 
         // Price type does not live in an attribute set, so it is not picked up by abstract _initAttributes method. We add it here manually.
         $attribute = Mage::getResourceModel('catalog/eav_attribute')->load('price_type', 'attribute_code');
-        foreach ($this->_attributes as $attrSetName => $attributes) {
+        foreach (array_keys($this->_attributes) as $attrSetName) {
             $this->_addAttributeParams(
                 $attrSetName,
                 array(
@@ -238,7 +238,7 @@ class Danslo_ApiImport_Model_Import_Entity_Product_Type_Bundle
 
     /**
      * check if Mage_Bundle module is enabled
-     * 
+     *
      * @return boolean
      */
     public function isSuitable()
