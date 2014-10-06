@@ -161,7 +161,7 @@ class Danslo_ApiImport_Helper_Test
         for ($i = 1; $i <= $numProducts; $i++) {
             $attributeSets[$i] = array(
                 'attribute_set_name'       => 'set ' . $i,
-                'sortOrder'                => $i,
+                'sort_order'               => $i,
                 $this->_attributeGroups[0] => 1,
                 $this->_attributeGroups[1] => 2,
                 $this->_attributeGroups[2] => 3,

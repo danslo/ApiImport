@@ -348,10 +348,10 @@ class Danslo_ApiImport_Model_Import_Api
         $entityTypeId = $this->_catalogProductEntityTypeId;
         foreach ($data as $attributeSet) {
             $attrSetName     = $attributeSet['attribute_set_name'];
-            $sortOrder       = $attributeSet['sortOrder'];
+            $sortOrder       = $attributeSet['sort_order'];
             $attributeGroups = $attributeSet;
             unset($attributeGroups['attribute_set_name']);
-            unset($attributeGroups['sortOrder']);
+            unset($attributeGroups['sort_order']);
 
             $this->_setup->addAttributeSet($entityTypeId, $attrSetName, $sortOrder);
 
@@ -396,7 +396,7 @@ class Danslo_ApiImport_Model_Import_Api
             $attrSetName     = $attributeSet['attribute_set_name'];
             $attributeGroups = $attributeSet;
             unset($attributeGroups['attribute_set_name']);
-            unset($attributeGroups['sortOrder']);
+            unset($attributeGroups['sort_order']);
 
             $attrSetId = $this->_setup->getAttributeSet($entityTypeId, $attrSetName, 'attribute_set_id');
 
