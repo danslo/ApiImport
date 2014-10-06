@@ -85,23 +85,18 @@ class Danslo_ApiImport_Model_Import_Api
         if (null === $behavior) {
             $behavior = Mage_ImportExport_Model_Import::BEHAVIOR_APPEND;
         }
-
         $this->_init();
 
         if (Danslo_ApiImport_Model_Import::BEHAVIOR_DELETE_IF_NOT_EXIST === $behavior) {
             $this->_pruneAttributes($data);
         } else {
-
             foreach ($data as $attribute) {
-
                 if (isset($attribute['attribute_id'])) {
-
                     $attributeCode = $attribute['attribute_id'];
                     unset($attribute['attribute_id']);
 
                     if (Mage_ImportExport_Model_Import::BEHAVIOR_REPLACE === $behavior
-                        || Mage_ImportExport_Model_Import::BEHAVIOR_APPEND === $behavior
-                    ) {
+                        || Mage_ImportExport_Model_Import::BEHAVIOR_APPEND === $behavior) {
                         $this->_setup->addAttribute($this->_catalogProductEntityTypeId, $attributeCode, $attribute);
                     } elseif (Mage_ImportExport_Model_Import::BEHAVIOR_DELETE === $behavior) {
                         $this->_setup->removeAttribute($this->_catalogProductEntityTypeId, $attributeCode);
@@ -126,14 +121,12 @@ class Danslo_ApiImport_Model_Import_Api
         if (null === $behavior) {
             $behavior = Mage_ImportExport_Model_Import::BEHAVIOR_APPEND;
         }
-
         $this->_init();
 
         if (Mage_ImportExport_Model_Import::BEHAVIOR_DELETE === $behavior) {
             $this->_removeAttributeSets($data);
         } elseif (Mage_ImportExport_Model_Import::BEHAVIOR_REPLACE === $behavior
-            || Mage_ImportExport_Model_Import::BEHAVIOR_APPEND === $behavior
-        ) {
+            || Mage_ImportExport_Model_Import::BEHAVIOR_APPEND === $behavior) {
             $this->_updateAttributeSets($data);
         } elseif (Danslo_ApiImport_Model_Import::BEHAVIOR_DELETE_IF_NOT_EXIST === $behavior) {
             $this->_pruneAttributeSets($data);
@@ -155,14 +148,12 @@ class Danslo_ApiImport_Model_Import_Api
         if (null === $behavior) {
             $behavior = Mage_ImportExport_Model_Import::BEHAVIOR_APPEND;
         }
-
         $this->_init();
 
         if (Mage_ImportExport_Model_Import::BEHAVIOR_DELETE === $behavior) {
             $this->_removeAttributeFromGroup($data);
         } elseif (Mage_ImportExport_Model_Import::BEHAVIOR_REPLACE === $behavior
-            || Mage_ImportExport_Model_Import::BEHAVIOR_APPEND === $behavior
-        ) {
+            || Mage_ImportExport_Model_Import::BEHAVIOR_APPEND === $behavior) {
             $this->_updateAttributeAssociations($data);
         } elseif (Danslo_ApiImport_Model_Import::BEHAVIOR_DELETE_IF_NOT_EXIST === $behavior) {
             $this->_pruneAttributesFromAttributeSets($data);
@@ -278,7 +269,6 @@ class Danslo_ApiImport_Model_Import_Api
 
         $deletedRows = array();
         foreach ($this->_setup->getConnection()->fetchAssoc($query, $bind) as $magAssociation) {
-
             $rowFound = false;
             while ((list($key, $association) = each($givenAssociations)) && $rowFound === false) {
                 if ($association['attribute_id'] === $magAssociation['attribute_id']
