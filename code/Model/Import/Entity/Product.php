@@ -152,7 +152,7 @@ class Danslo_ApiImport_Model_Import_Entity_Product
         ));
 
         // Do the actual import.
-        $result = parent::_importData();
+        parent::_importData();
 
         Mage::dispatchEvent($this->_eventPrefix . '_after_import', array(
             'entity_model' => $this,
