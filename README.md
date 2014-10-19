@@ -13,15 +13,43 @@ Additionally, ApiImport is 100% free from rewrites - making it upgrade-proof and
 
 ## How do I install ApiImport?
 
-ApiImport is a [modman](https://github.com/colinmollenhour/modman) module. Simply install modman and execute the following command:
+ApiImport is both [modman](https://github.com/colinmollenhour/modman) and [composer](https://getcomposer.org/download/) compatible.
+
+### Install directly with modman
 
 ``./modman clone ApiImport https://github.com/danslo/ApiImport.git``
+
+### Install through composer
+
+Add something like the following to your ``composer.json``:
+
+```json
+{
+    "require": {
+        "danslo/api-import": "1.1.0"
+    },
+    "extra": {
+        "magento-root-dir": "htdocs/"
+    },
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/danslo/ApiImport.git"
+        },
+        {
+            "type": "composer",
+            "url": "http://packages.firegento.com"
+        },
+}
+```
+
+Afterwards, issue the ``composer install`` command.
 
 ## How do I use ApiImport?
 
 ### Access it directly through Magento models
 
-``` php
+```php
 <?php
 
 require_once 'app/Mage.php';
@@ -33,7 +61,7 @@ $api->importEntities($anArrayWithYourEntities, $entityType, $optionalImportBehav
 ```
 ### Access it through the Magento Webservices API (any SOAP/XMLRPC capable language)
 
-``` php
+```php
 <?php
 
 require_once 'app/Mage.php';
@@ -103,7 +131,7 @@ Magento will choose a replace behavior by default. If you would like to use anot
 
 Sure!
 
-``` php
+```php
 <?php
 
 require_once 'app/Mage.php';
