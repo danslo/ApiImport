@@ -158,7 +158,7 @@ class Danslo_ApiImport_Model_Import_Entity_Product
             'entity_model' => $this,
             'entities'     => $this->_newSku
         ));
-        return $result;
+        return $this->_newSku;
     }
 
     /**
