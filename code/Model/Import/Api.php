@@ -65,6 +65,10 @@ class Danslo_ApiImport_Model_Import_Api
         $this->_api->getDataSourceModel()->setEntities($entities);
         try {
             $result = $this->_api->importSource();
+            $countError = $this->_api->getErrorsCount();
+            if ($countError > 0) {
+                Mage::throwException("There were {$countError} errors during the import process. Please be carefull all correct {$entityType} have been created.");
+            };
         } catch(Mage_Core_Exception $e) {
             $this->_fault('import_failed', $e->getMessage());
         }
