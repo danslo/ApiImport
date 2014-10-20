@@ -70,7 +70,8 @@ require_once 'app/Mage.php';
 Mage::init();
 
 // Get an XMLRPC client.
-$client = new Zend_XmlRpc_Client(Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_WEB) . 'api/xmlrpc/');
+$client = new Zend_XmlRpc_Client(
+    Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_WEB) . 'api/xmlrpc/');
 
 // For testing, just set an infinite timeout.
 $client->getHttpClient()->setConfig(array('timeout' => -1));
