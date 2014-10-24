@@ -380,6 +380,11 @@ class Danslo_ApiImport_Helper_Test
             $products[$counter]['_bundle_option_title'] = $optionTitle;
             $products[$counter]['_bundle_option_type']  = Danslo_ApiImport_Model_Import_Entity_Product_Type_Bundle::DEFAULT_OPTION_TYPE;
 
+            // Optionally you could add the following to localize your store titles.
+            // Please do note that you still need to always specify the Default title.
+            // $products[$counter]['_bundle_option_store']       = 'my_other_storeview';
+            // $products[$counter]['_bundle_option_store_title'] = 'Some localized title.';
+
             // Associate option selections.
             foreach ($this->_getLinkedProducts() as $linkedProduct) {
                 $products[$counter] = array_merge(

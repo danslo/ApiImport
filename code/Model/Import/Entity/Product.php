@@ -85,6 +85,16 @@ class Danslo_ApiImport_Model_Import_Entity_Product
     }
 
     /**
+     * Gets the internal store code to ID mapping, we need them for bundles.
+     *
+     * @return array
+     */
+    public function getStores()
+    {
+        return $this->_storeCodeToId;
+    }
+
+    /**
      * Set uploader
      *
      * Overcome the hardcoded $this->_fileUploader in parent::_getUploader()

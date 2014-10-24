@@ -106,6 +106,7 @@ class Danslo_ApiImport_Model_Import_Entity_Product_Type_Bundle
         $connection       = $this->_entityModel->getConnection();
         $newSku           = $this->_entityModel->getNewSku();
         $oldSku           = $this->_entityModel->getOldSku();
+        $stores           = $this->_entityModel->getStores();
         $optionTable      = Mage::getSingleton('core/resource')->getTableName('bundle/option');
         $optionValueTable = Mage::getSingleton('core/resource')->getTableName('bundle/option_value');
         $selectionTable   = Mage::getSingleton('core/resource')->getTableName('bundle/selection');
@@ -116,6 +117,7 @@ class Danslo_ApiImport_Model_Import_Entity_Product_Type_Bundle
         while ($bunch = $this->_entityModel->getNextBunch()) {
             $bundleOptions    = array();
             $bundleSelections = array();
+            $bundleTitles     = array();
 
             foreach ($bunch as $rowNum => $rowData) {
                 if (!$this->_entityModel->isRowAllowedToImport($rowData, $rowNum)) {
@@ -136,12 +138,19 @@ class Danslo_ApiImport_Model_Import_Entity_Product_Type_Bundle
 
                 if (empty($rowData['_bundle_option_title'])) {
                     continue;
+                } else {
+                    $bundleTitles[$rowData['_bundle_option_title']][Mage_Catalog_Model_Abstract::DEFAULT_STORE_ID] = $rowData['_bundle_option_title'];
                 }
-                if (isset($rowData['_bundle_option_type']) && !empty($rowData['_bundle_option_type'])) {
+                if (!empty($rowData['_bundle_option_store']) && !empty($rowData['_bundle_option_store_title'])) {
+                    $optionStore = $rowData['_bundle_option_store'];
+                    if (isset($stores[$optionStore])) {
+                        $bundleTitles[$rowData['_bundle_option_title']][$stores[$optionStore]] = $rowData['_bundle_option_store_title'];
+                    }
+                }
+                if (!empty($rowData['_bundle_option_type'])) {
                     if (!in_array($rowData['_bundle_option_type'], $this->_bundleOptionTypes)) {
                         continue;
                     }
-
                     $bundleOptions[$productId][$rowData['_bundle_option_title']] = array(
                         'parent_id' => $productId,
                         'required'  => !empty($rowData['_bundle_option_required']) ? $rowData['_bundle_option_required'] : '0',
@@ -200,11 +209,15 @@ class Danslo_ApiImport_Model_Import_Entity_Product_Type_Bundle
                 $optionValues = array();
                 foreach ($bundleOptions as $productId => $options) {
                     foreach ($options as $title => $option) {
-                        $optionValues[] = array(
-                            'option_id' => $titleOptionId++,
-                            'store_id'  => '0',
-                            'title'     => $title
-                        );
+                        $titles = $bundleTitles[$title];
+                        foreach ($titles as $storeId => $storeTitle) {
+                            $optionValues[] = array(
+                                'option_id' => $titleOptionId,
+                                'store_id'  => $storeId,
+                                'title'     => $storeTitle
+                            );
+                        }
+                        $titleOptionId++;
                     }
                 }
                 $connection->insertOnDuplicate($optionValueTable, $optionValues);
