@@ -192,25 +192,28 @@ class Danslo_ApiImport_Model_Import_Entity_Product_Type_Bundle
                 }
                 $connection->insertOnDuplicate($optionTable, $optionData);
 
-                // Insert option titles.
+                // InnoDB guarantees sequential numbering.
                 $optionId = $connection->lastInsertId();
+
+                // Insert option titles.
+                $titleOptionId = $optionId;
                 $optionValues = array();
                 foreach ($bundleOptions as $productId => $options) {
                     foreach ($options as $title => $option) {
                         $optionValues[] = array(
-                            'option_id' => $optionId++,
+                            'option_id' => $titleOptionId++,
                             'store_id'  => '0',
                             'title'     => $title
                         );
                     }
                 }
                 $connection->insertOnDuplicate($optionValueTable, $optionValues);
-                $optionId -= count($optionData); // TODO: Do this more nicely.
 
                 if (count($bundleSelections)) {
                     $optionSelections = array();
                     $productRelations = array();
 
+                    $selectionOptionId = $optionId;
                     foreach ($bundleSelections as $productId => $selections) {
                         foreach ($selections as $title => $selection) {
                             foreach ($selection as &$sel) {
@@ -218,9 +221,9 @@ class Danslo_ApiImport_Model_Import_Entity_Product_Type_Bundle
                                     'parent_id' => $sel['parent_product_id'],
                                     'child_id'  => $sel['product_id']
                                 );
-                                $sel['option_id'] = $optionId;
+                                $sel['option_id'] = $selectionOptionId;
                             }
-                            $optionId++;
+                            $selectionOptionId++;
                             $optionSelections = array_merge($optionSelections, $selection);
                         }
                     }
