@@ -103,6 +103,10 @@ class Danslo_ApiImport_Model_Import_Entity_Product_Type_Bundle
      */
     public function saveData()
     {
+        if (!$this->isSuitable()) {
+            return $this;
+        }
+
         $connection       = $this->_entityModel->getConnection();
         $newSku           = $this->_entityModel->getNewSku();
         $oldSku           = $this->_entityModel->getOldSku();
