@@ -82,11 +82,11 @@ class Danslo_ApiImport_Model_Observer
     protected function _indexProductRewrites(&$productIds)
     {
         // Only generate URL rewrites when this module is enabled.
-        $indexer = Mage::getResourceSingleton('ecomdev_urlrewrite/indexer');
-        if ($indexer) {
-            return $indexer->updateProductRewrites($productIds);
+        if(!Mage::helper('core')->isModuleEnabled('EcomDev_UrlRewrite')) {
+            return $this;
         }
-        return $this;
+
+        return Mage::getResourceSingleton('ecomdev_urlrewrite/indexer')->updateProductRewrites($productIds);
     }
 
     /**
@@ -98,11 +98,11 @@ class Danslo_ApiImport_Model_Observer
     protected function _indexCategoryRewrites(&$categoryIds)
     {
         // Only generate URL rewrites when this module is enabled.
-        $indexer = Mage::getResourceSingleton('ecomdev_urlrewrite/indexer');
-        if ($indexer) {
-            return $indexer->updateCategoryRewrites($categoryIds);
+        if(!Mage::helper('core')->isModuleEnabled('EcomDev_UrlRewrite')) {
+            return $this;
         }
-        return $this;
+
+        return Mage::getResourceSingleton('ecomdev_urlrewrite/indexer')->updateCategoryRewrites($categoryIds);
     }
 
     /**
