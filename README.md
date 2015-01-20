@@ -55,7 +55,7 @@ Afterwards, issue the ``composer install`` command.
 
 require_once 'app/Mage.php';
 
-Mage::init();
+Mage::init('admin');
 
 $api = Mage::getModel('api_import/import_api');
 $api->importEntities($anArrayWithYourEntities, $entityType, $optionalImportBehavior);
@@ -67,7 +67,7 @@ $api->importEntities($anArrayWithYourEntities, $entityType, $optionalImportBehav
 
 require_once 'app/Mage.php';
 
-Mage::init();
+Mage::init('admin');
 
 // Get an XMLRPC client.
 $client = new Zend_XmlRpc_Client(
@@ -150,7 +150,7 @@ Just import using the BEHAVIOR_STOCK behavior. See an example below:
 
 require_once 'app/Mage.php';
 
-Mage::init();
+Mage::init('admin');
 
 $api = Mage::getModel('api_import/import_api');
 $api->importEntities(
