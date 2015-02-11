@@ -210,9 +210,7 @@ class Danslo_ApiImport_Model_Import_Entity_Category
              ->_initCategories()
              ->_initAttributes();
 
-        /* @var $categoryResource Mage_Catalog_Model_Resource_Category */
-        $categoryResource   = Mage::getModel('catalog/category')->getResource();
-        $this->_entityTable = $categoryResource->getEntityTable();
+        $this->_entityTable = Mage::getSingleton('core/resource')->getTableName('catalog/category');
         $this->_dataSourceModel = Danslo_ApiImport_Model_Import::getDataSourceModel();
     }
 
