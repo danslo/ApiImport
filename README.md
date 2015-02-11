@@ -58,7 +58,11 @@ require_once 'app/Mage.php';
 Mage::init('admin');
 
 $api = Mage::getModel('api_import/import_api');
-$api->importEntities($anArrayWithYourEntities, $entityType, $optionalImportBehavior);
+try {
+    $api->importEntities($anArrayWithYourEntities, $entityType, $optionalImportBehavior);
+} catch (Exception $e) {
+    printf("%s: %s\n", $e->getMessage(), $e->getCustomMessage());
+}
 ```
 ### Access it through the Magento Webservices API (any SOAP/XMLRPC capable language)
 
