@@ -82,9 +82,9 @@ class Danslo_ApiImport_Model_Import_Entity_Category
     /**
      * Category entity DB table name.
      *
-     * @var string
+     * @var null|string
      */
-    protected $_entityTable;
+    protected $_entityTable = null;
 
     /**
      * Attributes with index (not label) value.
@@ -95,6 +95,13 @@ class Danslo_ApiImport_Model_Import_Entity_Category
         'default_sort_by',
         'available_sort_by'
     );
+
+    /**
+     * Default category attribute set id.
+     *
+     * @var null|int
+     */
+    protected $_defaultAttributeSetId = null;
 
     /**
      * Validation failure message template definitions
@@ -194,8 +201,33 @@ class Danslo_ApiImport_Model_Import_Entity_Category
              ->_initCategories()
              ->_initAttributes();
 
-        $this->_entityTable = Mage::getSingleton('core/resource')->getTableName('catalog/category');
         $this->_dataSourceModel = Danslo_ApiImport_Model_Import::getDataSourceModel();
+    }
+
+    /**
+     * Gets the default attribute set id for categories.
+     *
+     * @return int
+     */
+    protected function _getDefaultAttributeSetId()
+    {
+        if ($this->_defaultAttributeSetId === null) {
+            $this->_defaultAttributeSetId = Mage::getSingleton('catalog/category')->getDefaultAttributeSetId();
+        }
+        return $this->_defaultAttributeSetId;
+    }
+
+    /**
+     * Gets the entity table.
+     *
+     * @return string
+     */
+    protected function _getEntityTable()
+    {
+        if ($this->_entityTable === null) {
+            $this->_entityTable = Mage::getSingleton('core/resource')->getTableName('catalog/category');
+        }
+        return $this->_entityTable;
     }
 
     /**
@@ -216,7 +248,7 @@ class Danslo_ApiImport_Model_Import_Entity_Category
             if ($idToDelete) {
                 $this->_connection->query(
                     $this->_connection->quoteInto(
-                        "DELETE FROM `{$this->_entityTable}` WHERE `entity_id` IN (?)", $idToDelete
+                        "DELETE FROM `{$this->_getEntityTable()}` WHERE `entity_id` IN (?)", $idToDelete
                     )
                 );
             }
@@ -436,7 +468,7 @@ class Danslo_ApiImport_Model_Import_Entity_Category
     protected function _saveCategories()
     {
         $strftimeFormat = Varien_Date::convertZendToStrftime(Varien_Date::DATETIME_INTERNAL_FORMAT, true, true);
-        $nextEntityId   = Mage::getResourceHelper('importexport')->getNextAutoincrement($this->_entityTable);
+        $nextEntityId   = Mage::getResourceHelper('importexport')->getNextAutoincrement($this->_getEntityTable());
         static $entityId;
 
         while ($bunch = $this->_dataSourceModel->getNextBunch()) {
@@ -478,7 +510,7 @@ class Danslo_ApiImport_Model_Import_Entity_Category
                         $entityRow['entity_id']        = $entityId;
                         $entityRow['path']             = $parentCategory['path'] .'/'.$entityId;
                         $entityRow['entity_type_id']   = $this->_entityTypeId;
-                        $entityRow['attribute_set_id'] = 0;
+                        $entityRow['attribute_set_id'] = $this->_getDefaultAttributeSetId();
                         $entityRowsIn[]                = $entityRow;
 
                         $this->_newCategory[$rowData[self::COL_ROOT]][$rowData[self::COL_CATEGORY]] = array(
@@ -628,11 +660,11 @@ class Danslo_ApiImport_Model_Import_Entity_Category
     protected function _saveCategoryEntity(array $entityRowsIn, array $entityRowsUp)
     {
         if ($entityRowsIn) {
-            $this->_connection->insertMultiple($this->_entityTable, $entityRowsIn);
+            $this->_connection->insertMultiple($this->_getEntityTable(), $entityRowsIn);
         }
         if ($entityRowsUp) {
             $this->_connection->insertOnDuplicate(
-                $this->_entityTable,
+                $this->_getEntityTable(),
                 $entityRowsUp,
                 array('parent_id', 'path', 'position', 'level','children_count')
             );
