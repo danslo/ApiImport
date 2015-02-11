@@ -392,7 +392,7 @@ class Danslo_ApiImport_Model_Import_Entity_Category
 
         if (self::SCOPE_DEFAULT == $this->getRowScope($rowData)) {
             $rowData['name'] = $this->_getCategoryName($rowData);
-            if (!$rowData['position']) {
+            if (!isset($rowData['position'])) {
                 $rowData['position'] = 10000;
             }
         }
