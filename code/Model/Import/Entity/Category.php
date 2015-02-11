@@ -587,6 +587,9 @@ class Danslo_ApiImport_Model_Import_Entity_Category
             if (!is_writable($destDir)) {
                 @mkdir($destDir, 0777, true);
             }
+            if (!file_exists($tmpDir)) {
+                @mkdir($tmpDir, 0777, true);
+            }
             if (!$this->_fileUploader->setTmpDir($tmpDir)) {
                 Mage::throwException("File directory '{$tmpDir}' is not readable.");
             }
