@@ -26,7 +26,7 @@ Add something like the following to your ``composer.json``:
 ```json
 {
     "require": {
-        "danslo/api-import": "1.1.0"
+        "danslo/api-import": "1.1.*"
     },
     "extra": {
         "magento-root-dir": "htdocs/"
