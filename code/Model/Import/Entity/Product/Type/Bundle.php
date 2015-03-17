@@ -97,6 +97,21 @@ class Danslo_ApiImport_Model_Import_Entity_Product_Type_Bundle
     }
 
     /**
+     * Use reflection to get stores because by default it is protected.
+     * We do this to prevent a rewrite on the ImportExport controller which forces
+     * a specific entity model.
+     *
+     * @return array
+     */
+    protected function _getStores()
+    {
+        $obj  = new ReflectionObject($this->_entityModel);
+        $prop = $obj->getProperty('_storeCodeToId');
+        $prop->setAccessible(true);
+        return $prop->getValue($this->_entityModel);
+    }
+
+    /**
      * Saves data specific to bundle products.
      *
      * @return Danslo_ApiImport_Model_Import_Entity_Product_Type_Bundle
@@ -110,7 +125,7 @@ class Danslo_ApiImport_Model_Import_Entity_Product_Type_Bundle
         $connection       = $this->_entityModel->getConnection();
         $newSku           = $this->_entityModel->getNewSku();
         $oldSku           = $this->_entityModel->getOldSku();
-        $stores           = $this->_entityModel->getStores();
+        $stores           = $this->_getStores();
         $optionTable      = Mage::getSingleton('core/resource')->getTableName('bundle/option');
         $optionValueTable = Mage::getSingleton('core/resource')->getTableName('bundle/option_value');
         $selectionTable   = Mage::getSingleton('core/resource')->getTableName('bundle/selection');
