@@ -132,7 +132,7 @@ class Danslo_ApiImport_Model_Observer
      */
     protected function _isImageToImport($entity, $attribute)
     {
-        return (isset($entity[$attribute . '_content']) && !empty($entity[$attribute . '_content'])
+        return (isset($entity["_media_image_content"]) ||  isset($entity[$attribute . '_content']) && !empty($entity[$attribute . '_content'])
             && isset($entity[$attribute]) && !empty($entity[$attribute])
             && is_string($entity[$attribute]) && is_string($entity[$attribute . '_content']));
     }
@@ -253,6 +253,9 @@ class Danslo_ApiImport_Model_Observer
                 $mediaAttr[] = $attr->getAttributeCode();
             }
         }
+
+        /* Add generic image attribute. This allows uploading images to gallery even without a related attribute */
+        $mediaAttr[] = "_media_image";
 
         foreach($entities as $key => $entity) {
             foreach ($mediaAttr as $attr) {
