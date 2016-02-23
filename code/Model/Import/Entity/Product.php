@@ -295,4 +295,28 @@ class Danslo_ApiImport_Model_Import_Entity_Product
         return $this;
     }
 
+    /**
+     * Returns an object for upload a media files
+     */
+    protected function _getUploader()
+    {
+        if (is_null($this->_fileUploader)) {
+            $this->_fileUploader = new Danslo_ApiImport_Model_Import_Uploader();
+
+            $this->_fileUploader->init();
+
+            $tmpDir     = Mage::getConfig()->getOptions()->getMediaDir() . '/import';
+            $destDir    = Mage::getConfig()->getOptions()->getMediaDir() . '/catalog/product';
+            if (!is_writable($destDir)) {
+                @mkdir($destDir, 0777, true);
+            }
+            if (!$this->_fileUploader->setTmpDir($tmpDir)) {
+                Mage::throwException("File directory '{$tmpDir}' is not readable.");
+            }
+            if (!$this->_fileUploader->setDestDir($destDir)) {
+                Mage::throwException("File directory '{$destDir}' is not writable.");
+            }
+        }
+        return $this->_fileUploader;
+    }
 }
