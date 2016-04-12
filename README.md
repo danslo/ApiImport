@@ -60,7 +60,7 @@ Mage::init('admin');
 $api = Mage::getModel('api_import/import_api');
 try {
     $api->importEntities($anArrayWithYourEntities, $entityType, $optionalImportBehavior);
-} catch (Exception $e) {
+} catch (Mage_Api_Exception $e) {
     printf("%s: %s\n", $e->getMessage(), $e->getCustomMessage());
 }
 ```
@@ -113,6 +113,32 @@ $client->call('call', array(
 
 // End our session.
 $client->call('endSession', array($session));
+```
+
+### Import CSV file
+```php
+<?php
+
+require_once 'app/Mage.php';
+
+Mage::init('admin');
+
+/** @var Danslo_ApiImport_Model_Import_Api $api */
+$api = Mage::getModel('api_import/import_api');
+
+try {
+    $file = fopen('var/import/products.csv', 'r');
+    
+    $entities = array();
+    $header = fgetcsv($file);
+    while ($row = fgetcsv($file)) {
+        $entities[] = array_combine($header, $row);
+    }
+
+    $api->importEntities($entities);
+} catch (Mage_Api_Exception $e) {
+    printf("%s: %s\n", $e->getMessage(), $e->getCustomMessage());
+}
 ```
 
 ## What kind of data does ApiImport expect?
