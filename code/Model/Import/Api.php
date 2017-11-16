@@ -67,8 +67,8 @@ class Danslo_ApiImport_Model_Import_Api
             $result = $this->_api->importSource();
             $errorsCount = $this->_api->getErrorsCount();
             if ($errorsCount > 0) {
-                Mage::throwException("There were {$errorsCount} errors during the import process." .
-                    "Please be aware that valid entities were still imported.");
+		  $result["errors"] = "There were {$errorsCount} errors during the import process." .
+			                    "Please be aware that valid entities were still imported.";  
             };
         } catch(Mage_Core_Exception $e) {
             $this->_fault('import_failed', $e->getMessage());
