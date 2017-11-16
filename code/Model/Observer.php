@@ -178,6 +178,9 @@ class Danslo_ApiImport_Model_Observer
      */
     public function indexProducts($observer)
     {
+        /** @var Mage_ImportExport_Model_Import_Entity_Product $entityModel */
+        $entityModel = $observer->getEntityModel();
+
         // Obtain all imported entity IDs.
         $entityIds = array();
         foreach ($observer->getEntities() as $entity) {
@@ -190,7 +193,9 @@ class Danslo_ApiImport_Model_Observer
         // Index our product entities.
         $event = $this->_getIndexEvent($entityIds);
         try {
-            if (Mage::getStoreConfig('api_import/import_settings/enable_stock_index')) {
+            if (Mage::getStoreConfig('api_import/import_settings/enable_stock_index')
+                || $entityModel->getBehavior() == Danslo_ApiImport_Model_Import::BEHAVIOR_STOCK
+            ) {
                 $this->_indexStock($event);
             }
             if (Mage::getStoreConfig('api_import/import_settings/enable_price_index')) {
