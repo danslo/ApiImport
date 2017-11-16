@@ -75,6 +75,23 @@ class Danslo_ApiImport_Model_Import_Entity_Product
     }
 
     /**
+     * Import behavior getter.
+     *
+     * @return string
+     */
+    public function getBehavior()
+    {
+        if (!isset($this->_parameters['behavior'])
+            || ($this->_parameters['behavior'] != Mage_ImportExport_Model_Import::BEHAVIOR_APPEND
+            && $this->_parameters['behavior'] != Mage_ImportExport_Model_Import::BEHAVIOR_REPLACE
+            && $this->_parameters['behavior'] != Mage_ImportExport_Model_Import::BEHAVIOR_DELETE
+            && $this->_parameters['behavior'] != Danslo_ApiImport_Model_Import::BEHAVIOR_STOCK)) {
+            return Mage_ImportExport_Model_Import::getDefaultBehavior();
+        }
+        return $this->_parameters['behavior'];
+    }
+
+    /**
      * Gets the internal category array used for category mapping.
      *
      * @return array
