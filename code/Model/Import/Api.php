@@ -81,30 +81,32 @@ class Danslo_ApiImport_Model_Import_Api
      * Import attributes and put them in attribute sets and attribute group
      *
      * @param array  $data
-     * @param string $behavior
+     * @param string $behavior comma-separated list of behaviors
      *
      * @return true
      */
     public function importAttributes(array $data, $behavior = null)
     {
-        if (null === $behavior) {
-            $behavior = Mage_ImportExport_Model_Import::BEHAVIOR_APPEND;
-        }
+        // default behavior is BEHAVIOR_APPEND, convert comma separated behavior list to array
+        $behaviors = is_null ( $behavior ) ? array (Mage_ImportExport_Model_Import::BEHAVIOR_APPEND ) : explode ( ',', $behavior );
+        
         $this->_init();
-
-        if (Danslo_ApiImport_Model_Import::BEHAVIOR_DELETE_IF_NOT_EXIST === $behavior) {
-            $this->_pruneAttributes($data);
-        } else {
-            foreach ($data as $attribute) {
-                if (isset($attribute['attribute_id'])) {
-                    $attributeCode = $attribute['attribute_id'];
-                    unset($attribute['attribute_id']);
-
-                    if (Mage_ImportExport_Model_Import::BEHAVIOR_REPLACE === $behavior
-                        || Mage_ImportExport_Model_Import::BEHAVIOR_APPEND === $behavior) {
-                        $this->_setup->addAttribute($this->_catalogProductEntityTypeId, $attributeCode, $attribute);
-                    } elseif (Mage_ImportExport_Model_Import::BEHAVIOR_DELETE === $behavior) {
-                        $this->_setup->removeAttribute($this->_catalogProductEntityTypeId, $attributeCode);
+        
+        foreach ($behaviors as $behavior) {
+            
+            if (Danslo_ApiImport_Model_Import::BEHAVIOR_DELETE_IF_NOT_EXIST === $behavior) {
+                $this->_pruneAttributes($data);
+            } else {
+                foreach ($data as $attribute) {
+                    if (isset($attribute['attribute_id'])) {
+                        $attributeCode = $attribute['attribute_id'];
+                        unset($attribute['attribute_id']);
+                        
+                        if (Mage_ImportExport_Model_Import::BEHAVIOR_REPLACE === $behavior|| Mage_ImportExport_Model_Import::BEHAVIOR_APPEND === $behavior) {
+                            $this->_setup->addAttribute($this->_catalogProductEntityTypeId, $attributeCode, $attribute);
+                        } elseif (Mage_ImportExport_Model_Import::BEHAVIOR_DELETE === $behavior) {
+                            $this->_setup->removeAttribute($this->_catalogProductEntityTypeId, $attributeCode);
+                        }
                     }
                 }
             }
@@ -117,24 +119,26 @@ class Danslo_ApiImport_Model_Import_Api
      * Compute attributes sets and their groups and import them
      *
      * @param array  $data
-     * @param string $behavior
+     * @param string $behavior comma-separated list of behaviors
      *
      * @return true
      */
     public function importAttributeSets(array $data, $behavior = null)
     {
-        if (null === $behavior) {
-            $behavior = Mage_ImportExport_Model_Import::BEHAVIOR_APPEND;
-        }
+        // default behavior is BEHAVIOR_APPEND, convert comma separated behavior list to array
+        $behaviors = is_null ( $behavior ) ? array (Mage_ImportExport_Model_Import::BEHAVIOR_APPEND ) : explode ( ',', $behavior );
+        
         $this->_init();
-
-        if (Mage_ImportExport_Model_Import::BEHAVIOR_DELETE === $behavior) {
-            $this->_removeAttributeSets($data);
-        } elseif (Mage_ImportExport_Model_Import::BEHAVIOR_REPLACE === $behavior
-            || Mage_ImportExport_Model_Import::BEHAVIOR_APPEND === $behavior) {
-            $this->_updateAttributeSets($data);
-        } elseif (Danslo_ApiImport_Model_Import::BEHAVIOR_DELETE_IF_NOT_EXIST === $behavior) {
-            $this->_pruneAttributeSets($data);
+        
+        foreach ($behaviors as $behavior) {
+            
+            if (Mage_ImportExport_Model_Import::BEHAVIOR_DELETE === $behavior) {
+                $this->_removeAttributeSets($data);
+            } elseif (Mage_ImportExport_Model_Import::BEHAVIOR_REPLACE === $behavior|| Mage_ImportExport_Model_Import::BEHAVIOR_APPEND === $behavior) {
+                $this->_updateAttributeSets($data);
+            } elseif (Danslo_ApiImport_Model_Import::BEHAVIOR_DELETE_IF_NOT_EXIST === $behavior) {
+                $this->_pruneAttributeSets($data);
+            }
         }
 
         return true;
@@ -144,24 +148,26 @@ class Danslo_ApiImport_Model_Import_Api
      * Links attributes to attributes group and attribute sets
      *
      * @param array  $data
-     * @param string $behavior
+     * @param string $behavior comma-separated list of behaviors
      *
      * @return bool
      */
     public function importAttributeAssociations(array $data, $behavior = null)
     {
-        if (null === $behavior) {
-            $behavior = Mage_ImportExport_Model_Import::BEHAVIOR_APPEND;
-        }
+        // default behavior is BEHAVIOR_APPEND, convert comma separated behavior list to array
+        $behaviors = is_null ( $behavior ) ? array (Mage_ImportExport_Model_Import::BEHAVIOR_APPEND ) : explode ( ',', $behavior );
+        
         $this->_init();
-
-        if (Mage_ImportExport_Model_Import::BEHAVIOR_DELETE === $behavior) {
-            $this->_removeAttributeFromGroup($data);
-        } elseif (Mage_ImportExport_Model_Import::BEHAVIOR_REPLACE === $behavior
-            || Mage_ImportExport_Model_Import::BEHAVIOR_APPEND === $behavior) {
-            $this->_updateAttributeAssociations($data);
-        } elseif (Danslo_ApiImport_Model_Import::BEHAVIOR_DELETE_IF_NOT_EXIST === $behavior) {
-            $this->_pruneAttributesFromAttributeSets($data);
+        
+        foreach ($behaviors as $behavior) {
+            
+            if (Mage_ImportExport_Model_Import::BEHAVIOR_DELETE === $behavior) {
+                $this->_removeAttributeFromGroup($data);
+            } elseif (Mage_ImportExport_Model_Import::BEHAVIOR_REPLACE === $behavior|| Mage_ImportExport_Model_Import::BEHAVIOR_APPEND === $behavior) {
+                $this->_updateAttributeAssociations($data);
+            } elseif (Danslo_ApiImport_Model_Import::BEHAVIOR_DELETE_IF_NOT_EXIST === $behavior) {
+                $this->_pruneAttributesFromAttributeSets($data);
+            }
         }
 
         return true;
