@@ -257,40 +257,39 @@ class Danslo_ApiImport_Model_Import_Api
             ->where('entity_type_id = :entity_type_id');
         $bind = array('entity_type_id' => $this->_catalogProductEntityTypeId);
 
+        // store given associations in  3-dimenional array. $givenAssociations[setId][groupId][attributeId] = 1
+        // for each existing combination
         $givenAssociations = array();
         foreach ($data as $attribute) {
-            $setId = $this->_setup->getAttributeSetId($entityTypeId, $attribute['attribute_set_id']);
-            $givenAssociations[] = array(
-                'attribute_id'       => $this->_setup->getAttributeId($entityTypeId, $attribute['attribute_id']),
-                'attribute_set_id'   => $setId,
-                'attribute_group_id' => $this->_setup->getAttributeGroupId(
-                    $entityTypeId,
-                    $setId,
-                    $attribute['attribute_group_id']
-                )
-            );
-
+            $attributeName = $attribute['attribute_id'];
+            $setName = $attribute['attribute_set_id'];
+            $groupName = $attribute['attribute_group_id'];
+            
+            // get attributeId for attributeName; cache already fetched attribute ids in array $attributeIds by key attributeName
+            $attributeId = (isset($attributeIds[$attributeName]) ? $attributeIds[$attributeName] : $attributeIds[$attributeName]= $this->_setup->getAttributeId($entityTypeId,$attributeName));
+            // get setId for setName; cache already fetched set ids in array $setIds by key setName
+            $setId = (isset($setIds [$setName]) ? $setIds[$setName] : $setIds[$setName] = $this->_setup->getAttributeSetId($entityTypeId,$setName));
+            // get groupId for seIdt and groupName, cache already fetched set ids in 2-dim array $setIds[setId][groupName]
+            $groupId = (isset($groupIds[$setId][$groupName]) ? $groupIds[$setId][$groupName] : $groupIds[$setId][$groupName] = $this->_setup->getAttributeGroupId($entityTypeId,$setId,$groupName));
+            
+            $givenAssociations[$setId][$groupId][$attributeId] = 1;
         }
 
-        $deletedRows = array();
-        foreach ($this->_setup->getConnection()->fetchAssoc($query, $bind) as $magAssociation) {
-            $rowFound = false;
-            while ((list($key, $association) = each($givenAssociations)) && $rowFound === false) {
-                if ($association['attribute_id'] === $magAssociation['attribute_id']
-                    && $association['attribute_set_id'] === $magAssociation['attribute_set_id']
-                    && $association['attribute_group_id'] === $magAssociation['attribute_group_id']
-                ) {
-                    $rowFound = true;
-                }
-            }
-            reset($givenAssociations);
-
-            if (!$rowFound) {
-                $deletedRows[$magAssociation['entity_attribute_id']] = $this->_setup->getConnection()
-                    ->delete(
-                        $this->_setup->getTable('eav/entity_attribute'),
-                        new Zend_Db_Expr('entity_attribute_id = ' . $magAssociation['entity_attribute_id'])
-                    );
+        // fetch existing associations from magento
+        $magAssociations = $this->_setup->getConnection()->fetchAssoc($query, $bind);
+        $deletedRows = array ();
+        foreach ( $magAssociations as $magAssociation ) {
+            // get needed ids from $magAssociation
+            $attributeId = $magAssociation ['attribute_id'];
+            $setId = $magAssociation ['attribute_set_id'];
+            $groupId = $magAssociation ['attribute_group_id'];
+            $entityAttributeId = $magAssociation ['entity_attribute_id'];
+            
+            // check if association in magento is also in given associations
+            $isGiven = (isset ( $givenAssociations [$setId] [$groupId] [$attributeId] ) ? $givenAssociations [$setId] [$groupId] [$attributeId] : NULL);
+            if (! $isGiven) {
+                // if not -> delete!
+                $deletedRows [$entityAttributeId] = $this->_setup->getConnection ()->delete ( $this->_setup->getTable ( 'eav/entity_attribute' ), new Zend_Db_Expr ( 'entity_attribute_id = ' . $entityAttributeId ) );
             }
         }
 
@@ -306,14 +305,44 @@ class Danslo_ApiImport_Model_Import_Api
      */
     protected function _updateAttributeAssociations(array $data)
     {
-        foreach ($data as $attribute) {
-            $this->_setup->addAttributeToGroup(
-                $this->_catalogProductEntityTypeId,
-                $attribute['attribute_set_id'],
-                $attribute['attribute_group_id'],
-                $attribute['attribute_id'],
-                $attribute['sort_order']
-            );
+        // only call addAttributeToGroup if attribute association is not present in db (for performance reasons)
+        
+        // therefore fetch existing associations from db first
+        $query = $this->_setup->getConnection ()->select ()->from ( $this->_setup->getTable ( 'eav/entity_attribute' ) )->where ( 'entity_type_id = :entity_type_id' );
+        $bind = array ('entity_type_id' => $this->_catalogProductEntityTypeId );
+        $entityTypeId = $this->_catalogProductEntityTypeId;
+        
+        // $existingAssociations will be a 3-dimensional array: $existingAssociations[setId][groupId][attributeId] = magentoData for Association
+        $existingAssociations = array ();
+        $magAssociations = $this->_setup->getConnection ()->fetchAssoc ( $query, $bind );
+        foreach ( $magAssociations as $magAssociation ) {
+            // extract data and store to $existingAssociations
+            $attributeId = $magAssociation ['attribute_id'];
+            $setId = $magAssociation ['attribute_set_id'];
+            $groupId = $magAssociation ['attribute_group_id'];
+            $existingAssociations [$setId] [$groupId] [$attributeId] = $magAssociation;
+        }
+        
+        foreach ( $data as $attribute ) {
+            // exctract names from given data
+            $attributeName = $attribute ['attribute_id'];
+            $setName = $attribute ['attribute_set_id'];
+            $groupName = $attribute ['attribute_group_id'];
+            $sortOrder = $attribute ['sort_order'];
+            
+            // get attributeId for attributeName; cache already fetched attribute ids in array $attributeIds by key attributeName
+            $attributeId = (isset ( $attributeIds [$attributeName] ) ? $attributeIds [$attributeName] : $attributeIds [$attributeName] = $this->_setup->getAttributeId ( $entityTypeId, $attributeName ));
+            // get setId for setName; cache already fetched set ids in array $setIds by key setName
+            $setId = (isset ( $setIds [$setName] ) ? $setIds [$setName] : $setIds [$setName] = $this->_setup->getAttributeSetId ( $entityTypeId, $setName ));
+            // get groupId for groupName; cache already fetched group ids in 2-dim array $groupIds by keys[setId][groupName]
+            $groupId= (isset ( $groupIds [$setId] [$groupName] ) ? $groupIds [$setId] [$groupName] : $groupIds [$setId] [$groupName] = $this->_setup->getAttributeGroupId ( $entityTypeId, $setId, $groupName ));
+            
+            // fetch association data from $existingAssociations (if available)
+            $existingAssociation = (isset ( $existingAssociations [$setId] [$groupId] [$attributeId] ) ? $existingAssociations [$setId] [$groupId] [$attributeId] : NULL);
+            if (! $existingAssociation or ! ($existingAssociation ['sort_order'] == $sortOrder)) {
+                // if association was not existing or association's sort order was dfferent -> update!
+                $this->_setup->addAttributeToGroup ( $this->_catalogProductEntityTypeId, $setId, $groupId, $attributeId, $sortOrder );
+            } 
         }
     }
 
